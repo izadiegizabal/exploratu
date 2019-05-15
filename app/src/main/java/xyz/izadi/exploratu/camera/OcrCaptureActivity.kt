@@ -22,6 +22,7 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.ocr_capture.*
 import xyz.izadi.exploratu.R
 import xyz.izadi.exploratu.camera.ui.camera.CameraSource
 import xyz.izadi.exploratu.camera.ui.camera.CameraSourcePreview
@@ -69,6 +70,14 @@ class OcrCaptureActivity : AppCompatActivity() {
 
         gestureDetector = GestureDetector(this, CaptureGestureListener())
         scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
+
+        cameraFab.setOnClickListener {
+            if (preview!!.isActive){
+                onPause()
+            } else {
+                startCameraSource()
+            }
+        }
     }
 
     /**

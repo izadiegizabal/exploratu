@@ -39,11 +39,14 @@ public class CameraSourcePreview extends ViewGroup {
 
     private GraphicOverlay overlay;
 
+    private boolean isActive;
+
     public CameraSourcePreview(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         startRequested = false;
         surfaceAvailable = false;
+        isActive = false;
 
         surfaceView = new SurfaceView(context);
         surfaceView.getHolder().addCallback(new SurfaceCallback());
@@ -71,12 +74,14 @@ public class CameraSourcePreview extends ViewGroup {
     }
 
     public void stop() {
+        isActive = false;
         if (cameraSource != null) {
             cameraSource.stop();
         }
     }
 
     public void release() {
+        isActive = false;
         if (cameraSource != null) {
             cameraSource.release();
             cameraSource = null;
@@ -87,6 +92,7 @@ public class CameraSourcePreview extends ViewGroup {
     private void startIfReady() throws IOException, SecurityException {
         if (startRequested && surfaceAvailable) {
             cameraSource.start(surfaceView.getHolder());
+            isActive = true;
             if (overlay != null) {
                 Size size = cameraSource.getPreviewSize();
                 int min = Math.min(size.getWidth(), size.getHeight());
@@ -198,5 +204,9 @@ public class CameraSourcePreview extends ViewGroup {
 
         Log.d(TAG, "isPortraitMode returning false by default");
         return false;
+    }
+
+    public boolean isActive() {
+        return isActive;
     }
 }

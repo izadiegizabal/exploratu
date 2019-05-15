@@ -28,10 +28,10 @@
             app:navigationIcon="@drawable/ic_menu_white_24dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
+            android:id="@+id/cameraFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_twotone_camera_enhance"
+            android:src="@drawable/ic_twotone_camera_alt"
             app:layout_anchor="@id/bottomAppBar"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
