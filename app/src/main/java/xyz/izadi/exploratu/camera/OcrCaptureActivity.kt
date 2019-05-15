@@ -1,33 +1,14 @@
-/*
- * Copyright (C) The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package xyz.izadi.exploratu.camera
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlertDialog
-import android.app.Dialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.hardware.Camera
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -46,9 +27,7 @@ import xyz.izadi.exploratu.camera.ui.camera.CameraSource
 import xyz.izadi.exploratu.camera.ui.camera.CameraSourcePreview
 import xyz.izadi.exploratu.camera.ui.camera.GraphicOverlay
 import xyz.izadi.exploratu.camera.ui.camera.OcrGraphic
-
 import java.io.IOException
-import java.util.Locale
 
 /**
  * Activity for the Ocr Detecting app.  This app detects text and displays the value with the
@@ -64,9 +43,6 @@ class OcrCaptureActivity : AppCompatActivity() {
     // Helper objects for detecting taps and pinches.
     private var scaleGestureDetector: ScaleGestureDetector? = null
     private var gestureDetector: GestureDetector? = null
-
-    // A TextToSpeech engine for speaking a String value.
-    private var tts: TextToSpeech? = null
 
     /**
      * Initializes the UI and creates the detector pipeline.
@@ -93,23 +69,6 @@ class OcrCaptureActivity : AppCompatActivity() {
 
         gestureDetector = GestureDetector(this, CaptureGestureListener())
         scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
-
-        Snackbar.make(
-            graphicOverlay!!, "Tap to Speak. Pinch/Stretch to zoom",
-            Snackbar.LENGTH_LONG
-        )
-            .show()
-
-        // Set up the Text To Speech engine.
-        val listener = TextToSpeech.OnInitListener { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                Log.d("OnInitListener", "Text to speech engine started successfully.")
-                tts!!.language = Locale.US
-            } else {
-                Log.d("OnInitListener", "Error starting the text to speech engine.")
-            }
-        }
-        tts = TextToSpeech(this.applicationContext, listener)
     }
 
     /**
@@ -330,13 +289,7 @@ class OcrCaptureActivity : AppCompatActivity() {
         var text: TextBlock? = null
         if (graphic != null) {
             text = graphic.textBlock
-            if (text != null && text.value != null) {
-                Log.d(TAG, "text data is being spoken! " + text.value)
-                // Speak the string.
-                tts!!.speak(text.value, TextToSpeech.QUEUE_ADD, null, "DEFAULT")
-            } else {
-                Log.d(TAG, "text data is null")
-            }
+            // Text detected, do something
         } else {
             Log.d(TAG, "no text detected")
         }
