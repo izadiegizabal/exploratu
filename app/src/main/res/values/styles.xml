@@ -39,9 +39,15 @@
         <item name="itemTextAppearance">?textAppearanceBody2</item>
     </style>
 
+    <!-- Bottom App Bar -->
+    <style name="Widget.MyTheme.BottomAppBar.Colored" parent="Widget.MaterialComponents.BottomAppBar.Colored">
+        <item name="android:textColorSecondary">@color/color_on_primary</item>
+    </style>
+
     <!--Toolbar-->
     <style name="Widget.MyTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary"/>
 
+    <!-- Divider View -->
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>

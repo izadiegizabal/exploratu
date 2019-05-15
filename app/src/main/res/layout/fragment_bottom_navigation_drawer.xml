@@ -13,7 +13,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:text="Modes"
+            android:text="@string/bottom_sheet_title"
             style="@style/TextAppearance.AppCompat.Headline"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             style="@style/TextAppearance.AppCompat.Subhead"
-            android:text="Choose your converter"
+            android:text="@string/bottom_sheet_subtitle"
             android:alpha="0.87"
             app:layout_constraintStart_toStartOf="@+id/textView"
             app:layout_constraintTop_toBottomOf="@+id/textView"/>

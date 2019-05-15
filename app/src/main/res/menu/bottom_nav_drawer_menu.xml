@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="xyz.izadi.exploratu.MainActivity"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:checkableBehavior="none">
         <item
             android:id="@+id/currency"
             android:icon="@drawable/ic_twotone_attach_money"
-            android:title="Currency" />
+            android:title="@string/mode_title_currency" />
         <!--<item-->
                 <!--android:id="@+id/nav2"-->
                 <!--android:icon="@drawable/ic_twotone_access_time"-->
                 <!--android:title="Timezones" />-->
         <item
                 android:id="@+id/nav3"
-                android:title="More modes to come!" />
+                android:title="@string/mode_title_more" />
     </group>
 </menu>
