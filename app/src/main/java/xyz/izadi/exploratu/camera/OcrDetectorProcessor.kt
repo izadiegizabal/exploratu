@@ -13,26 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.izadi.exploratu.camera;
+package xyz.izadi.exploratu.camera
 
-import android.util.Log;
-import android.util.SparseArray;
-import com.google.android.gms.vision.Detector;
-import com.google.android.gms.vision.text.TextBlock;
-import xyz.izadi.exploratu.camera.ui.camera.GraphicOverlay;
-import xyz.izadi.exploratu.camera.ui.camera.OcrGraphic;
+import android.util.Log
+import com.google.android.gms.vision.Detector
+import com.google.android.gms.vision.text.TextBlock
+import xyz.izadi.exploratu.camera.ui.GraphicOverlay
+import xyz.izadi.exploratu.camera.ui.OcrGraphic
 
 /**
  * A very simple Processor which gets detected TextBlocks and adds them to the overlay
  * as OcrGraphics.
  */
-public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
-
-    private GraphicOverlay<OcrGraphic> graphicOverlay;
-
-    OcrDetectorProcessor(GraphicOverlay<OcrGraphic> ocrGraphicOverlay) {
-        graphicOverlay = ocrGraphicOverlay;
-    }
+class OcrDetectorProcessor internal constructor(private val graphicOverlay: GraphicOverlay<OcrGraphic>?) :
+    Detector.Processor<TextBlock> {
 
     /**
      * Called by the detector to deliver detection results.
@@ -41,16 +35,15 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
      * previous frames, or reduce noise by eliminating TextBlocks that have not persisted through
      * multiple detections.
      */
-    @Override
-    public void receiveDetections(Detector.Detections<TextBlock> detections) {
-        graphicOverlay.clear();
-        SparseArray<TextBlock> items = detections.getDetectedItems();
-        for (int i = 0; i < items.size(); ++i) {
-            TextBlock item = items.valueAt(i);
-            if (item != null && item.getValue() != null) {
-                Log.d("OcrDetectorProcessor", "Text detected! " + item.getValue());
-                OcrGraphic graphic = new OcrGraphic(graphicOverlay, item);
-                graphicOverlay.add(graphic);
+    override fun receiveDetections(detections: Detector.Detections<TextBlock>) {
+        graphicOverlay?.clear()
+        val items = detections.detectedItems
+        for (i in 0 until items.size()) {
+            val item = items.valueAt(i)
+            if (item != null && item.value != null) {
+                Log.d("OcrDetectorProcessor", "Text detected! " + item.value)
+                val graphic = OcrGraphic(graphicOverlay, item)
+                graphicOverlay?.add(graphic)
             }
         }
     }
@@ -58,8 +51,7 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
     /**
      * Frees the resources associated with this detection processor.
      */
-    @Override
-    public void release() {
-        graphicOverlay.clear();
+    override fun release() {
+        graphicOverlay?.clear()
     }
 }

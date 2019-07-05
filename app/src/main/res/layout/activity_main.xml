@@ -15,6 +15,13 @@
                 style="@style/ModeHeader"
                 android:text="@string/headline_currencies"/>
 
+        <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="4">
+
+        </GridLayout>
+
     </LinearLayout>
 
     <com.google.android.material.bottomappbar.BottomAppBar

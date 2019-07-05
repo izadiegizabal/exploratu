@@ -24,10 +24,10 @@ import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.ocr_capture.*
 import xyz.izadi.exploratu.R
-import xyz.izadi.exploratu.camera.ui.camera.CameraSource
-import xyz.izadi.exploratu.camera.ui.camera.CameraSourcePreview
-import xyz.izadi.exploratu.camera.ui.camera.GraphicOverlay
-import xyz.izadi.exploratu.camera.ui.camera.OcrGraphic
+import xyz.izadi.exploratu.camera.source.CameraSource
+import xyz.izadi.exploratu.camera.source.CameraSourcePreview
+import xyz.izadi.exploratu.camera.ui.GraphicOverlay
+import xyz.izadi.exploratu.camera.ui.OcrGraphic
 import java.io.IOException
 
 /**

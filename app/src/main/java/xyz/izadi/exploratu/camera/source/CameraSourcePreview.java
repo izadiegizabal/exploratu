@@ -1,4 +1,4 @@
-package xyz.izadi.exploratu.camera.ui.camera;
+package xyz.izadi.exploratu.camera.source;
 
 import android.Manifest;
 import android.content.Context;
@@ -10,6 +10,7 @@ import android.view.SurfaceView;
 import android.view.ViewGroup;
 import androidx.annotation.RequiresPermission;
 import com.google.android.gms.common.images.Size;
+import xyz.izadi.exploratu.camera.ui.GraphicOverlay;
 
 import java.io.IOException;
 

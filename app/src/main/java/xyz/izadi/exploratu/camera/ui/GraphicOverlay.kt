@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.izadi.exploratu.camera.ui.camera
+package xyz.izadi.exploratu.camera.ui
 
 import android.content.Context
 import android.graphics.Canvas
@@ -21,7 +21,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import com.google.android.gms.vision.CameraSource
-import xyz.izadi.exploratu.camera.ui.camera.GraphicOverlay.Graphic
+import xyz.izadi.exploratu.camera.ui.GraphicOverlay.Graphic
 import java.util.*
 
 /**
@@ -60,7 +60,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
      * this and implement the [Graphic.draw] method to define the
      * graphics element.  Add instances to the overlay using [GraphicOverlay.add].
      */
-    abstract class Graphic(private val mOverlay: GraphicOverlay<*>) {
+    abstract class Graphic(private val mOverlay: GraphicOverlay<*>?) {
 
         /**
          * Draw the graphic on the supplied canvas.  Drawing should use the following methods to
@@ -86,14 +86,14 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
          * scale.
          */
         fun scaleX(horizontal: Float): Float {
-            return horizontal * mOverlay.widthScaleFactor
+            return horizontal * mOverlay!!.widthScaleFactor
         }
 
         /**
          * Adjusts a vertical value of the supplied value from the preview scale to the view scale.
          */
         fun scaleY(vertical: Float): Float {
-            return vertical * mOverlay.heightScaleFactor
+            return vertical * mOverlay!!.heightScaleFactor
         }
 
         /**
@@ -101,7 +101,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
          * system.
          */
         fun translateX(x: Float): Float {
-            return if (mOverlay.facing == CameraSource.CAMERA_FACING_FRONT) {
+            return if (mOverlay!!.facing == CameraSource.CAMERA_FACING_FRONT) {
                 mOverlay.width - scaleX(x)
             } else {
                 scaleX(x)
@@ -132,7 +132,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
         }
 
         fun postInvalidate() {
-            mOverlay.postInvalidate()
+            mOverlay?.postInvalidate()
         }
     }
 

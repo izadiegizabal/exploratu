@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.izadi.exploratu.camera.ui.camera;
+package xyz.izadi.exploratu.camera.source;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
