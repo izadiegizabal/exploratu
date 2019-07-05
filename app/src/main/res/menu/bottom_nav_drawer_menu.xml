@@ -2,16 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="xyz.izadi.exploratu.MainActivity"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+        >
     <group android:checkableBehavior="none">
         <item
-            android:id="@+id/currency"
-            android:icon="@drawable/ic_twotone_attach_money"
-            android:title="@string/mode_title_currency" />
+                android:id="@+id/currency"
+                android:icon="@drawable/ic_twotone_attach_money"
+                android:title="@string/mode_title_currency"/>
         <!--<item-->
-                <!--android:id="@+id/nav2"-->
-                <!--android:icon="@drawable/ic_twotone_access_time"-->
-                <!--android:title="Timezones" />-->
+        <!--android:id="@+id/nav2"-->
+        <!--android:icon="@drawable/ic_twotone_access_time"-->
+        <!--android:title="Timezones" />-->
         <item
                 android:id="@+id/nav3"
                 android:title="@string/mode_title_more"

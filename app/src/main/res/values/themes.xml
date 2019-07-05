@@ -15,7 +15,7 @@
 ~ limitations under the License.
 -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
     <style name="MyTheme.DayNight" parent="Base.MyTheme"/>

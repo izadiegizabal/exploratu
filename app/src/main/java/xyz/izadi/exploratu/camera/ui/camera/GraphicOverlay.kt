@@ -20,10 +20,9 @@ import android.graphics.Canvas
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
-
 import com.google.android.gms.vision.CameraSource
-
-import java.util.HashSet
+import xyz.izadi.exploratu.camera.ui.camera.GraphicOverlay.Graphic
+import java.util.*
 
 /**
  * A view which renders a series of custom graphics to be overlaid on top of an associated preview

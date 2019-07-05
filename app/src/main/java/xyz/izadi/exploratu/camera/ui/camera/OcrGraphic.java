@@ -30,13 +30,11 @@ import java.util.List;
  */
 public class OcrGraphic extends GraphicOverlay.Graphic {
 
-    private int id;
-
     private static final int TEXT_COLOR = Color.WHITE;
-
     private static Paint rectPaint;
     private static Paint textPaint;
     private final TextBlock textBlock;
+    private int id;
 
     public OcrGraphic(GraphicOverlay overlay, TextBlock text) {
         super(overlay);

@@ -72,7 +72,7 @@ class OcrCaptureActivity : AppCompatActivity() {
         scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
 
         cameraFab.setOnClickListener {
-            if (preview!!.isActive){
+            if (preview!!.isActive) {
                 onPause()
             } else {
                 startCameraSource()

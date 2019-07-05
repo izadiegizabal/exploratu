@@ -10,9 +10,11 @@
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
         <TextView
                 style="@style/ModeHeader"
                 android:text="@string/headline_currencies"/>
+
     </LinearLayout>
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -29,6 +31,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_twotone_camera_enhance"
-            app:layout_anchor="@id/bottomAppBar" />
+            app:layout_anchor="@id/bottomAppBar"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

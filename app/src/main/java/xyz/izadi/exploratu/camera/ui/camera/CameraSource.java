@@ -30,7 +30,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 import androidx.annotation.StringDef;
@@ -90,163 +89,101 @@ public class CameraSource {
      * ratio is less than this tolerance, they are considered to be the same aspect ratio.
      */
     private static final float ASPECT_RATIO_TOLERANCE = 0.01f;
-
-    @StringDef({
-            Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE,
-            Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO,
-            Camera.Parameters.FOCUS_MODE_AUTO,
-            Camera.Parameters.FOCUS_MODE_EDOF,
-            Camera.Parameters.FOCUS_MODE_FIXED,
-            Camera.Parameters.FOCUS_MODE_INFINITY,
-            Camera.Parameters.FOCUS_MODE_MACRO
-    })
-    @Retention(RetentionPolicy.SOURCE)
-    private @interface FocusMode {}
-
-    @StringDef({
-            Camera.Parameters.FLASH_MODE_ON,
-            Camera.Parameters.FLASH_MODE_OFF,
-            Camera.Parameters.FLASH_MODE_AUTO,
-            Camera.Parameters.FLASH_MODE_RED_EYE,
-            Camera.Parameters.FLASH_MODE_TORCH
-    })
-    @Retention(RetentionPolicy.SOURCE)
-    private @interface FlashMode {}
-
-    private Context context;
-
     private final Object cameraLock = new Object();
-
+    private Context context;
     // Guarded by cameraLock
     private Camera camera;
-
     private int mFacing = CAMERA_FACING_BACK;
-
     /**
      * Rotation of the device, and thus the associated preview images captured from the device.
      * See {@link Frame.Metadata#getRotation()}.
      */
     private int rotation;
-
     private Size previewSize;
-
     // These values may be requested by the caller.  Due to hardware limitations, we may need to
     // select close, but not exactly the same values for these.
     private float requestedFps = 30.0f;
     private int requestedPreviewWidth = 1024;
     private int requestedPreviewHeight = 768;
-
-
     private String focusMode = null;
     private String flashMode = null;
-
     // These instances need to be held onto to avoid GC of their underlying resources.  Even though
     // these aren't used outside of the method that creates them, they still must have hard
     // references maintained to them.
     private SurfaceView dummySurfaceView;
     private SurfaceTexture dummySurfaceTexture;
-
     /**
      * Dedicated thread and associated runnable for calling into the detector with frames, as the
      * frames become available from the camera.
      */
     private Thread processingThread;
     private FrameProcessingRunnable frameProcessor;
-
     /**
      * Map to convert between a byte array, received from the camera, and its associated byte
      * buffer.  We use byte buffers internally because this is a more efficient way to call into
      * native code later (avoids a potential copy).
      */
     private Map<byte[], ByteBuffer> bytesToByteBuffer = new HashMap<>();
+    /**
+     * Only allow creation via the builder class.
+     */
+    private CameraSource() {
+    }
+
+    /**
+     * Gets the id for the camera specified by the direction it is facing.  Returns -1 if no such
+     * camera was found.
+     *
+     * @param facing the desired camera (front-facing or rear-facing)
+     */
+    private static int getIdForRequestedCamera(int facing) {
+        CameraInfo cameraInfo = new CameraInfo();
+        for (int i = 0; i < Camera.getNumberOfCameras(); ++i) {
+            Camera.getCameraInfo(i, cameraInfo);
+            if (cameraInfo.facing == facing) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     //==============================================================================================
     // Builder
     //==============================================================================================
 
     /**
-     * Builder for configuring and creating an associated camera source.
+     * Selects the most suitable preview and picture size, given the desired width and height.
+     * <p/>
+     * Even though we may only need the preview size, it's necessary to find both the preview
+     * size and the picture size of the camera together, because these need to have the same aspect
+     * ratio.  On some hardware, if you would only set the preview size, you will get a distorted
+     * image.
+     *
+     * @param camera        the camera to select a preview size from
+     * @param desiredWidth  the desired width of the camera preview frames
+     * @param desiredHeight the desired height of the camera preview frames
+     * @return the selected preview and picture size pair
      */
-    public static class Builder {
-        private final Detector<?> detector;
-        private CameraSource cameraSource = new CameraSource();
+    private static SizePair selectSizePair(Camera camera, int desiredWidth, int desiredHeight) {
+        List<SizePair> validPreviewSizes = generateValidPreviewSizeList(camera);
 
-        /**
-         * Creates a camera source builder with the supplied context and detector.  Camera preview
-         * images will be streamed to the associated detector upon starting the camera source.
-         */
-        public Builder(Context context, Detector<?> detector) {
-            if (context == null) {
-                throw new IllegalArgumentException("No context supplied.");
+        // The method for selecting the best size is to minimize the sum of the differences between
+        // the desired values and the actual values for width and height.  This is certainly not the
+        // only way to select the best size, but it provides a decent tradeoff between using the
+        // closest aspect ratio vs. using the closest pixel area.
+        SizePair selectedPair = null;
+        int minDiff = Integer.MAX_VALUE;
+        for (SizePair sizePair : validPreviewSizes) {
+            Size size = sizePair.previewSize();
+            int diff = Math.abs(size.getWidth() - desiredWidth) +
+                    Math.abs(size.getHeight() - desiredHeight);
+            if (diff < minDiff) {
+                selectedPair = sizePair;
+                minDiff = diff;
             }
-            if (detector == null) {
-                throw new IllegalArgumentException("No detector supplied.");
-            }
-
-            this.detector = detector;
-            cameraSource.context = context;
         }
 
-        /**
-         * Sets the requested frame rate in frames per second.  If the exact requested value is not
-         * not available, the best matching available value is selected.   Default: 30.
-         */
-        public Builder setRequestedFps(float fps) {
-            if (fps <= 0) {
-                throw new IllegalArgumentException("Invalid fps: " + fps);
-            }
-            cameraSource.requestedFps = fps;
-            return this;
-        }
-
-        public Builder setFocusMode(@FocusMode String mode) {
-            cameraSource.focusMode = mode;
-            return this;
-        }
-
-        public Builder setFlashMode(@FlashMode String mode) {
-            cameraSource.flashMode = mode;
-            return this;
-        }
-
-        /**
-         * Sets the desired width and height of the camera frames in pixels.  If the exact desired
-         * values are not available options, the best matching available options are selected.
-         * Also, we try to select a preview size which corresponds to the aspect ratio of an
-         * associated full picture size, if applicable.  Default: 1024x768.
-         */
-        public Builder setRequestedPreviewSize(int width, int height) {
-            // Restrict the requested range to something within the realm of possibility.  The
-            // choice of 1000000 is a bit arbitrary -- intended to be well beyond resolutions that
-            // devices can support.  We bound this to avoid int overflow in the code later.
-            final int MAX = 1000000;
-            if ((width <= 0) || (width > MAX) || (height <= 0) || (height > MAX)) {
-                throw new IllegalArgumentException("Invalid preview size: " + width + "x" + height);
-            }
-            cameraSource.requestedPreviewWidth = width;
-            cameraSource.requestedPreviewHeight = height;
-            return this;
-        }
-
-        /**
-         * Sets the camera to use (either {@link #CAMERA_FACING_BACK} or
-         * {@link #CAMERA_FACING_FRONT}). Default: back facing.
-         */
-        public Builder setFacing(int facing) {
-            if ((facing != CAMERA_FACING_BACK) && (facing != CAMERA_FACING_FRONT)) {
-                throw new IllegalArgumentException("Invalid camera: " + facing);
-            }
-            cameraSource.mFacing = facing;
-            return this;
-        }
-
-        /**
-         * Creates an instance of the camera source.
-         */
-        public CameraSource build() {
-            cameraSource.frameProcessor = cameraSource.new FrameProcessingRunnable(detector);
-            return cameraSource;
-        }
+        return selectedPair;
     }
 
     //==============================================================================================
@@ -254,67 +191,49 @@ public class CameraSource {
     //==============================================================================================
 
     /**
-     * Callback interface used to signal the moment of actual image capture.
-     */
-    public interface ShutterCallback {
-        /**
-         * Called as near as possible to the moment when a photo is captured from the sensor. This
-         * is a good opportunity to play a shutter sound or give other feedback of camera operation.
-         * This may be some time after the photo was triggered, but some time before the actual data
-         * is available.
-         */
-        void onShutter();
-    }
-
-    /**
-     * Callback interface used to supply image data from a photo capture.
-     */
-    public interface PictureCallback {
-        /**
-         * Called when image data is available after a picture is taken.  The format of the data
-         * is a jpeg binary.
-         */
-        void onPictureTaken(byte[] data);
-    }
-
-    /**
-     * Callback interface used to notify on completion of camera auto focus.
-     */
-    public interface AutoFocusCallback {
-        /**
-         * Called when the camera auto focus completes.  If the camera
-         * does not support auto-focus and autoFocus is called,
-         * onAutoFocus will be called immediately with a fake value of
-         * <code>success</code> set to <code>true</code>.
-         * <p/>
-         * The auto-focus routine does not lock auto-exposure and auto-white
-         * balance after it completes.
-         *
-         * @param success true if focus was successful, false if otherwise
-         */
-        void onAutoFocus(boolean success);
-    }
-
-    /**
-     * Callback interface used to notify on auto focus start and stop.
+     * Generates a list of acceptable preview sizes.  Preview sizes are not acceptable if there is
+     * not a corresponding picture size of the same aspect ratio.  If there is a corresponding
+     * picture size of the same aspect ratio, the picture size is paired up with the preview size.
      * <p/>
-     * <p>This is only supported in continuous autofocus modes -- {@link
-     * Camera.Parameters#FOCUS_MODE_CONTINUOUS_VIDEO} and {@link
-     * Camera.Parameters#FOCUS_MODE_CONTINUOUS_PICTURE}. Applications can show
-     * autofocus animation based on this.</p>
+     * This is necessary because even if we don't use still pictures, the still picture size must be
+     * set to a size that is the same aspect ratio as the preview size we choose.  Otherwise, the
+     * preview images may be distorted on some devices.
      */
-    public interface AutoFocusMoveCallback {
-        /**
-         * Called when the camera auto focus starts or stops.
-         *
-         * @param start true if focus starts to move, false if focus stops to move
-         */
-        void onAutoFocusMoving(boolean start);
-    }
+    private static List<SizePair> generateValidPreviewSizeList(Camera camera) {
+        Camera.Parameters parameters = camera.getParameters();
+        List<android.hardware.Camera.Size> supportedPreviewSizes =
+                parameters.getSupportedPreviewSizes();
+        List<android.hardware.Camera.Size> supportedPictureSizes =
+                parameters.getSupportedPictureSizes();
+        List<SizePair> validPreviewSizes = new ArrayList<>();
+        for (android.hardware.Camera.Size previewSize : supportedPreviewSizes) {
+            float previewAspectRatio = (float) previewSize.width / (float) previewSize.height;
 
-    //==============================================================================================
-    // Public
-    //==============================================================================================
+            // By looping through the picture sizes in order, we favor the higher resolutions.
+            // We choose the highest resolution in order to support taking the full resolution
+            // picture later.
+            for (android.hardware.Camera.Size pictureSize : supportedPictureSizes) {
+                float pictureAspectRatio = (float) pictureSize.width / (float) pictureSize.height;
+                if (Math.abs(previewAspectRatio - pictureAspectRatio) < ASPECT_RATIO_TOLERANCE) {
+                    validPreviewSizes.add(new SizePair(previewSize, pictureSize));
+                    break;
+                }
+            }
+        }
+
+        // If there are no picture sizes with the same aspect ratio as any preview sizes, allow all
+        // of the preview sizes and hope that the camera can handle it.  Probably unlikely, but we
+        // still account for it.
+        if (validPreviewSizes.size() == 0) {
+            Log.w(TAG, "No preview sizes have a corresponding same-aspect-ratio picture size");
+            for (android.hardware.Camera.Size previewSize : supportedPreviewSizes) {
+                // The null picture size will let us know that we shouldn't set a picture size.
+                validPreviewSizes.add(new SizePair(previewSize, null));
+            }
+        }
+
+        return validPreviewSizes;
+    }
 
     /**
      * Stops the camera and releases the resources of the camera and underlying detector.
@@ -383,6 +302,10 @@ public class CameraSource {
         }
         return this;
     }
+
+    //==============================================================================================
+    // Public
+    //==============================================================================================
 
     /**
      * Closes the camera and stops sending frames to the underlying frame detector.
@@ -663,79 +586,6 @@ public class CameraSource {
         return true;
     }
 
-    //==============================================================================================
-    // Private
-    //==============================================================================================
-
-    /**
-     * Only allow creation via the builder class.
-     */
-    private CameraSource() {
-    }
-
-    /**
-     * Wraps the camera1 shutter callback so that the deprecated API isn't exposed.
-     */
-    private class PictureStartCallback implements Camera.ShutterCallback {
-        private ShutterCallback mDelegate;
-
-        @Override
-        public void onShutter() {
-            if (mDelegate != null) {
-                mDelegate.onShutter();
-            }
-        }
-    }
-
-    /**
-     * Wraps the final callback in the camera sequence, so that we can automatically turn the camera
-     * preview back on after the picture has been taken.
-     */
-    private class PictureDoneCallback implements Camera.PictureCallback {
-        private PictureCallback mDelegate;
-
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
-            if (mDelegate != null) {
-                mDelegate.onPictureTaken(data);
-            }
-            synchronized (cameraLock) {
-                if (CameraSource.this.camera != null) {
-                    CameraSource.this.camera.startPreview();
-                }
-            }
-        }
-    }
-
-    /**
-     * Wraps the camera1 auto focus callback so that the deprecated API isn't exposed.
-     */
-    private class CameraAutoFocusCallback implements Camera.AutoFocusCallback {
-        private AutoFocusCallback mDelegate;
-
-        @Override
-        public void onAutoFocus(boolean success, Camera camera) {
-            if (mDelegate != null) {
-                mDelegate.onAutoFocus(success);
-            }
-        }
-    }
-
-    /**
-     * Wraps the camera1 auto focus move callback so that the deprecated API isn't exposed.
-     */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private class CameraAutoFocusMoveCallback implements Camera.AutoFocusMoveCallback {
-        private AutoFocusMoveCallback mDelegate;
-
-        @Override
-        public void onAutoFocusMoving(boolean start, Camera camera) {
-            if (mDelegate != null) {
-                mDelegate.onAutoFocusMoving(start);
-            }
-        }
-    }
-
     /**
      * Opens the camera and applies the user settings.
      *
@@ -815,131 +665,6 @@ public class CameraSource {
         camera.addCallbackBuffer(createPreviewBuffer(previewSize));
 
         return camera;
-    }
-
-    /**
-     * Gets the id for the camera specified by the direction it is facing.  Returns -1 if no such
-     * camera was found.
-     *
-     * @param facing the desired camera (front-facing or rear-facing)
-     */
-    private static int getIdForRequestedCamera(int facing) {
-        CameraInfo cameraInfo = new CameraInfo();
-        for (int i = 0; i < Camera.getNumberOfCameras(); ++i) {
-            Camera.getCameraInfo(i, cameraInfo);
-            if (cameraInfo.facing == facing) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Selects the most suitable preview and picture size, given the desired width and height.
-     * <p/>
-     * Even though we may only need the preview size, it's necessary to find both the preview
-     * size and the picture size of the camera together, because these need to have the same aspect
-     * ratio.  On some hardware, if you would only set the preview size, you will get a distorted
-     * image.
-     *
-     * @param camera        the camera to select a preview size from
-     * @param desiredWidth  the desired width of the camera preview frames
-     * @param desiredHeight the desired height of the camera preview frames
-     * @return the selected preview and picture size pair
-     */
-    private static SizePair selectSizePair(Camera camera, int desiredWidth, int desiredHeight) {
-        List<SizePair> validPreviewSizes = generateValidPreviewSizeList(camera);
-
-        // The method for selecting the best size is to minimize the sum of the differences between
-        // the desired values and the actual values for width and height.  This is certainly not the
-        // only way to select the best size, but it provides a decent tradeoff between using the
-        // closest aspect ratio vs. using the closest pixel area.
-        SizePair selectedPair = null;
-        int minDiff = Integer.MAX_VALUE;
-        for (SizePair sizePair : validPreviewSizes) {
-            Size size = sizePair.previewSize();
-            int diff = Math.abs(size.getWidth() - desiredWidth) +
-                    Math.abs(size.getHeight() - desiredHeight);
-            if (diff < minDiff) {
-                selectedPair = sizePair;
-                minDiff = diff;
-            }
-        }
-
-        return selectedPair;
-    }
-
-    /**
-     * Stores a preview size and a corresponding same-aspect-ratio picture size.  To avoid distorted
-     * preview images on some devices, the picture size must be set to a size that is the same
-     * aspect ratio as the preview size or the preview may end up being distorted.  If the picture
-     * size is null, then there is no picture size with the same aspect ratio as the preview size.
-     */
-    private static class SizePair {
-        private Size mPreview;
-        private Size mPicture;
-
-        public SizePair(android.hardware.Camera.Size previewSize,
-                        android.hardware.Camera.Size pictureSize) {
-            mPreview = new Size(previewSize.width, previewSize.height);
-            if (pictureSize != null) {
-                mPicture = new Size(pictureSize.width, pictureSize.height);
-            }
-        }
-
-        public Size previewSize() {
-            return mPreview;
-        }
-
-        @SuppressWarnings("unused")
-        public Size pictureSize() {
-            return mPicture;
-        }
-    }
-
-    /**
-     * Generates a list of acceptable preview sizes.  Preview sizes are not acceptable if there is
-     * not a corresponding picture size of the same aspect ratio.  If there is a corresponding
-     * picture size of the same aspect ratio, the picture size is paired up with the preview size.
-     * <p/>
-     * This is necessary because even if we don't use still pictures, the still picture size must be
-     * set to a size that is the same aspect ratio as the preview size we choose.  Otherwise, the
-     * preview images may be distorted on some devices.
-     */
-    private static List<SizePair> generateValidPreviewSizeList(Camera camera) {
-        Camera.Parameters parameters = camera.getParameters();
-        List<android.hardware.Camera.Size> supportedPreviewSizes =
-                parameters.getSupportedPreviewSizes();
-        List<android.hardware.Camera.Size> supportedPictureSizes =
-                parameters.getSupportedPictureSizes();
-        List<SizePair> validPreviewSizes = new ArrayList<>();
-        for (android.hardware.Camera.Size previewSize : supportedPreviewSizes) {
-            float previewAspectRatio = (float) previewSize.width / (float) previewSize.height;
-
-            // By looping through the picture sizes in order, we favor the higher resolutions.
-            // We choose the highest resolution in order to support taking the full resolution
-            // picture later.
-            for (android.hardware.Camera.Size pictureSize : supportedPictureSizes) {
-                float pictureAspectRatio = (float) pictureSize.width / (float) pictureSize.height;
-                if (Math.abs(previewAspectRatio - pictureAspectRatio) < ASPECT_RATIO_TOLERANCE) {
-                    validPreviewSizes.add(new SizePair(previewSize, pictureSize));
-                    break;
-                }
-            }
-        }
-
-        // If there are no picture sizes with the same aspect ratio as any preview sizes, allow all
-        // of the preview sizes and hope that the camera can handle it.  Probably unlikely, but we
-        // still account for it.
-        if (validPreviewSizes.size() == 0) {
-            Log.w(TAG, "No preview sizes have a corresponding same-aspect-ratio picture size");
-            for (android.hardware.Camera.Size previewSize : supportedPreviewSizes) {
-                // The null picture size will let us know that we shouldn't set a picture size.
-                validPreviewSizes.add(new SizePair(previewSize, null));
-            }
-        }
-
-        return validPreviewSizes;
     }
 
     /**
@@ -1024,6 +749,10 @@ public class CameraSource {
         parameters.setRotation(angle);
     }
 
+    //==============================================================================================
+    // Private
+    //==============================================================================================
+
     /**
      * Creates one buffer for the camera preview callback.  The size of the buffer is based off of
      * the camera preview size and the format of the camera image.
@@ -1053,6 +782,265 @@ public class CameraSource {
         return byteArray;
     }
 
+    @StringDef({
+            Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE,
+            Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO,
+            Camera.Parameters.FOCUS_MODE_AUTO,
+            Camera.Parameters.FOCUS_MODE_EDOF,
+            Camera.Parameters.FOCUS_MODE_FIXED,
+            Camera.Parameters.FOCUS_MODE_INFINITY,
+            Camera.Parameters.FOCUS_MODE_MACRO
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface FocusMode {
+    }
+
+    @StringDef({
+            Camera.Parameters.FLASH_MODE_ON,
+            Camera.Parameters.FLASH_MODE_OFF,
+            Camera.Parameters.FLASH_MODE_AUTO,
+            Camera.Parameters.FLASH_MODE_RED_EYE,
+            Camera.Parameters.FLASH_MODE_TORCH
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface FlashMode {
+    }
+
+    /**
+     * Callback interface used to signal the moment of actual image capture.
+     */
+    public interface ShutterCallback {
+        /**
+         * Called as near as possible to the moment when a photo is captured from the sensor. This
+         * is a good opportunity to play a shutter sound or give other feedback of camera operation.
+         * This may be some time after the photo was triggered, but some time before the actual data
+         * is available.
+         */
+        void onShutter();
+    }
+
+    /**
+     * Callback interface used to supply image data from a photo capture.
+     */
+    public interface PictureCallback {
+        /**
+         * Called when image data is available after a picture is taken.  The format of the data
+         * is a jpeg binary.
+         */
+        void onPictureTaken(byte[] data);
+    }
+
+    /**
+     * Callback interface used to notify on completion of camera auto focus.
+     */
+    public interface AutoFocusCallback {
+        /**
+         * Called when the camera auto focus completes.  If the camera
+         * does not support auto-focus and autoFocus is called,
+         * onAutoFocus will be called immediately with a fake value of
+         * <code>success</code> set to <code>true</code>.
+         * <p/>
+         * The auto-focus routine does not lock auto-exposure and auto-white
+         * balance after it completes.
+         *
+         * @param success true if focus was successful, false if otherwise
+         */
+        void onAutoFocus(boolean success);
+    }
+
+    /**
+     * Callback interface used to notify on auto focus start and stop.
+     * <p/>
+     * <p>This is only supported in continuous autofocus modes -- {@link
+     * Camera.Parameters#FOCUS_MODE_CONTINUOUS_VIDEO} and {@link
+     * Camera.Parameters#FOCUS_MODE_CONTINUOUS_PICTURE}. Applications can show
+     * autofocus animation based on this.</p>
+     */
+    public interface AutoFocusMoveCallback {
+        /**
+         * Called when the camera auto focus starts or stops.
+         *
+         * @param start true if focus starts to move, false if focus stops to move
+         */
+        void onAutoFocusMoving(boolean start);
+    }
+
+    /**
+     * Builder for configuring and creating an associated camera source.
+     */
+    public static class Builder {
+        private final Detector<?> detector;
+        private CameraSource cameraSource = new CameraSource();
+
+        /**
+         * Creates a camera source builder with the supplied context and detector.  Camera preview
+         * images will be streamed to the associated detector upon starting the camera source.
+         */
+        public Builder(Context context, Detector<?> detector) {
+            if (context == null) {
+                throw new IllegalArgumentException("No context supplied.");
+            }
+            if (detector == null) {
+                throw new IllegalArgumentException("No detector supplied.");
+            }
+
+            this.detector = detector;
+            cameraSource.context = context;
+        }
+
+        /**
+         * Sets the requested frame rate in frames per second.  If the exact requested value is not
+         * not available, the best matching available value is selected.   Default: 30.
+         */
+        public Builder setRequestedFps(float fps) {
+            if (fps <= 0) {
+                throw new IllegalArgumentException("Invalid fps: " + fps);
+            }
+            cameraSource.requestedFps = fps;
+            return this;
+        }
+
+        public Builder setFocusMode(@FocusMode String mode) {
+            cameraSource.focusMode = mode;
+            return this;
+        }
+
+        public Builder setFlashMode(@FlashMode String mode) {
+            cameraSource.flashMode = mode;
+            return this;
+        }
+
+        /**
+         * Sets the desired width and height of the camera frames in pixels.  If the exact desired
+         * values are not available options, the best matching available options are selected.
+         * Also, we try to select a preview size which corresponds to the aspect ratio of an
+         * associated full picture size, if applicable.  Default: 1024x768.
+         */
+        public Builder setRequestedPreviewSize(int width, int height) {
+            // Restrict the requested range to something within the realm of possibility.  The
+            // choice of 1000000 is a bit arbitrary -- intended to be well beyond resolutions that
+            // devices can support.  We bound this to avoid int overflow in the code later.
+            final int MAX = 1000000;
+            if ((width <= 0) || (width > MAX) || (height <= 0) || (height > MAX)) {
+                throw new IllegalArgumentException("Invalid preview size: " + width + "x" + height);
+            }
+            cameraSource.requestedPreviewWidth = width;
+            cameraSource.requestedPreviewHeight = height;
+            return this;
+        }
+
+        /**
+         * Sets the camera to use (either {@link #CAMERA_FACING_BACK} or
+         * {@link #CAMERA_FACING_FRONT}). Default: back facing.
+         */
+        public Builder setFacing(int facing) {
+            if ((facing != CAMERA_FACING_BACK) && (facing != CAMERA_FACING_FRONT)) {
+                throw new IllegalArgumentException("Invalid camera: " + facing);
+            }
+            cameraSource.mFacing = facing;
+            return this;
+        }
+
+        /**
+         * Creates an instance of the camera source.
+         */
+        public CameraSource build() {
+            cameraSource.frameProcessor = cameraSource.new FrameProcessingRunnable(detector);
+            return cameraSource;
+        }
+    }
+
+    /**
+     * Stores a preview size and a corresponding same-aspect-ratio picture size.  To avoid distorted
+     * preview images on some devices, the picture size must be set to a size that is the same
+     * aspect ratio as the preview size or the preview may end up being distorted.  If the picture
+     * size is null, then there is no picture size with the same aspect ratio as the preview size.
+     */
+    private static class SizePair {
+        private Size mPreview;
+        private Size mPicture;
+
+        public SizePair(android.hardware.Camera.Size previewSize,
+                        android.hardware.Camera.Size pictureSize) {
+            mPreview = new Size(previewSize.width, previewSize.height);
+            if (pictureSize != null) {
+                mPicture = new Size(pictureSize.width, pictureSize.height);
+            }
+        }
+
+        public Size previewSize() {
+            return mPreview;
+        }
+
+        @SuppressWarnings("unused")
+        public Size pictureSize() {
+            return mPicture;
+        }
+    }
+
+    /**
+     * Wraps the camera1 shutter callback so that the deprecated API isn't exposed.
+     */
+    private class PictureStartCallback implements Camera.ShutterCallback {
+        private ShutterCallback mDelegate;
+
+        @Override
+        public void onShutter() {
+            if (mDelegate != null) {
+                mDelegate.onShutter();
+            }
+        }
+    }
+
+    /**
+     * Wraps the final callback in the camera sequence, so that we can automatically turn the camera
+     * preview back on after the picture has been taken.
+     */
+    private class PictureDoneCallback implements Camera.PictureCallback {
+        private PictureCallback mDelegate;
+
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            if (mDelegate != null) {
+                mDelegate.onPictureTaken(data);
+            }
+            synchronized (cameraLock) {
+                if (CameraSource.this.camera != null) {
+                    CameraSource.this.camera.startPreview();
+                }
+            }
+        }
+    }
+
+    /**
+     * Wraps the camera1 auto focus callback so that the deprecated API isn't exposed.
+     */
+    private class CameraAutoFocusCallback implements Camera.AutoFocusCallback {
+        private AutoFocusCallback mDelegate;
+
+        @Override
+        public void onAutoFocus(boolean success, Camera camera) {
+            if (mDelegate != null) {
+                mDelegate.onAutoFocus(success);
+            }
+        }
+    }
+
+    /**
+     * Wraps the camera1 auto focus move callback so that the deprecated API isn't exposed.
+     */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private class CameraAutoFocusMoveCallback implements Camera.AutoFocusMoveCallback {
+        private AutoFocusMoveCallback mDelegate;
+
+        @Override
+        public void onAutoFocusMoving(boolean start, Camera camera) {
+            if (mDelegate != null) {
+                mDelegate.onAutoFocusMoving(start);
+            }
+        }
+    }
+
     //==============================================================================================
     // Frame processing
     //==============================================================================================
@@ -1078,11 +1066,10 @@ public class CameraSource {
      * received frame will immediately start on the same thread.
      */
     private class FrameProcessingRunnable implements Runnable {
-        private Detector<?> mDetector;
-        private long mStartTimeMillis = SystemClock.elapsedRealtime();
-
         // This lock guards all of the member variables below.
         private final Object mLock = new Object();
+        private Detector<?> mDetector;
+        private long mStartTimeMillis = SystemClock.elapsedRealtime();
         private boolean mActive = true;
 
         // These pending variables hold the state associated with the new frame awaiting processing.
