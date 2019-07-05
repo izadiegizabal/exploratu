@@ -14,6 +14,12 @@
                 <!--android:title="Timezones" />-->
         <item
                 android:id="@+id/nav3"
-                android:title="@string/mode_title_more" />
+                android:title="@string/mode_title_more"
+                android:enabled="false"/>
+        <item
+                android:id="@+id/nav4"
+                android:title="Updates at @izadiegizabal, follow us!"
+                android:checkable="false"
+                android:enabled="false"/>
     </group>
 </menu>

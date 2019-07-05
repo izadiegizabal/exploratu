@@ -3,7 +3,9 @@
     <string name="bottom_sheet_title">Modes</string>
     <string name="bottom_sheet_subtitle">Choose your converter</string>
     <string name="mode_title_currency">Currency</string>
+    <string name="headline_currencies">Currencies</string>
     <string name="mode_title_more">More to come!</string>
+    <string name="menu_settings">Settings</string>
 
 
     <!-- cosos prueba ocr-->

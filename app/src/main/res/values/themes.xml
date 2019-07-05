@@ -67,10 +67,12 @@
     </style>
 
     <style name="Base.MaterialThemeBuilder" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:statusBarColor">?colorSurface</item>
+        <item name="android:statusBarColor">@color/color_primary</item>
         <item name="android:navigationBarColor">@color/color_primary</item>
-        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
-        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">?colorControlHighlight</item>
+
+        <!--Divider and navbar icons color light == true -> black -->
+        <!--<item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>-->
+        <!--<item name="android:navigationBarDividerColor" tools:ignore="NewApi">?colorControlHighlight</item>-->
 
         <!--Remap legacy AppCompat attributes to MaterialComponent attributes-->
         <item name="colorPrimaryDark">?colorPrimaryVariant</item>
