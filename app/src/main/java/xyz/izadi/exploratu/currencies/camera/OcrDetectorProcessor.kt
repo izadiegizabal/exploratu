@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.izadi.exploratu.camera
+package xyz.izadi.exploratu.currencies.camera
 
 import android.util.Log
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.text.TextBlock
-import xyz.izadi.exploratu.camera.ui.GraphicOverlay
-import xyz.izadi.exploratu.camera.ui.OcrGraphic
+import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
+import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 
 /**
  * A very simple Processor which gets detected TextBlocks and adds them to the overlay

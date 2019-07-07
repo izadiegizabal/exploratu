@@ -18,4 +18,7 @@
     <dimen name="alpha_emphasis_medium">@dimen/mtrl_emphasis_medium</dimen>
     <dimen name="alpha_emphasis_disabled">@dimen/mtrl_emphasis_disabled</dimen>
 
+    <!--  Font sizes  -->
+    <dimen name="label">10sp</dimen>
+
 </resources>

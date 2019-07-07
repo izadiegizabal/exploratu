@@ -61,7 +61,7 @@
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/textView2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView"/>
+            app:layout_constraintTop_toTopOf="@+id/textView" />
 
     <com.google.android.material.navigation.NavigationView
             app:elevation="0dp"

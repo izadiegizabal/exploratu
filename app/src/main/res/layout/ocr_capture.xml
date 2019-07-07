@@ -7,17 +7,17 @@
         android:keepScreenOn="true">
 
     <!-- Other components and views -->
-    <xyz.izadi.exploratu.camera.source.CameraSourcePreview
+    <xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview
             android:id="@+id/preview"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <xyz.izadi.exploratu.camera.ui.GraphicOverlay
+        <xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
                 android:id="@+id/graphicOverlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 
-    </xyz.izadi.exploratu.camera.source.CameraSourcePreview>
+    </xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview>
 
     <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/bottomAppBar"

@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".camera.OcrCaptureActivity"></activity>
+        <activity android:name="xyz.izadi.exploratu.currencies.camera.OcrCaptureActivity"></activity>
         <!-- To download on-device API of ML Kit OCR -->
         <meta-data
                 android:name="com.google.firebase.ml.vision.DEPENDENCIES"

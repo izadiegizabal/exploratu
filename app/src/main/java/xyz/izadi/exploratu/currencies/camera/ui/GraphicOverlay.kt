@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.izadi.exploratu.camera.ui
+package xyz.izadi.exploratu.currencies.camera.ui
 
 import android.content.Context
 import android.graphics.Canvas
@@ -21,7 +21,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import com.google.android.gms.vision.CameraSource
-import xyz.izadi.exploratu.camera.ui.GraphicOverlay.Graphic
+import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay.Graphic
 import java.util.*
 
 /**

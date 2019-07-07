@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.izadi.exploratu.camera.ui
+package xyz.izadi.exploratu.currencies.camera.ui
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
-import com.google.android.gms.vision.text.Text
 import com.google.android.gms.vision.text.TextBlock
 
 /**

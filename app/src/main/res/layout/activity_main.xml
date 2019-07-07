@@ -10,6 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/color_pad_bg"
             android:orientation="vertical">
 
         <TextView
@@ -19,10 +20,152 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+        <ImageView
+                android:id="@+id/iv_currency_1_flag"
+                style="@style/CurrencyFlag"
+                android:contentDescription="@string/flag_of_the_first_currency"
+                app:layout_constraintBottom_toTopOf="@+id/iv_currency_2_flag"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/currency_header" />
+
+        <TextView
+                android:id="@+id/tv_currency_1_code"
+                style="@style/CurrencyCode"
+                android:text="USD"
+                app:layout_constraintBottom_toBottomOf="@id/iv_currency_1_flag"
+                app:layout_constraintStart_toEndOf="@id/iv_currency_1_flag"
+                app:layout_constraintTop_toTopOf="@id/iv_currency_1_flag" />
+
+        <ImageView
+                android:id="@+id/iv_currency_1_arrow"
+                style="@style/CurrencyArrow"
+                app:layout_constraintBottom_toBottomOf="@id/tv_currency_1_code"
+                app:layout_constraintStart_toEndOf="@id/tv_currency_1_code"
+                app:layout_constraintTop_toTopOf="@id/tv_currency_1_code" />
+
+        <TextView
+                android:id="@+id/tv_currency_1_quantity"
+                style="@style/CurrencyAmount"
+                android:text="500"
+                android:textColor="@color/color_secondary"
+                app:layout_constraintBottom_toTopOf="@+id/tv_currency_1_desc"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/iv_currency_1_flag" />
+
+        <TextView
+                android:id="@+id/tv_currency_1_desc"
+                style="@style/CurrencyDesc"
+                android:text="US Dollar - $"
+                app:layout_constraintBottom_toBottomOf="@id/iv_currency_1_flag"
+                app:layout_constraintEnd_toEndOf="@id/tv_currency_1_quantity"
+                app:layout_constraintTop_toBottomOf="@id/tv_currency_1_quantity" />
+
+        <ImageView
+                android:id="@+id/iv_currency_2_flag"
+                style="@style/CurrencyFlag"
+                android:contentDescription="@string/flag_of_the_second_currency"
+                app:layout_constraintBottom_toTopOf="@+id/iv_currency_3_flag"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_currency_1_flag" />
+
+        <TextView
+                android:id="@+id/tv_currency_2_code"
+                style="@style/CurrencyCode"
+                android:text="EUR"
+                app:layout_constraintBottom_toBottomOf="@id/iv_currency_2_flag"
+                app:layout_constraintStart_toEndOf="@id/iv_currency_2_flag"
+                app:layout_constraintTop_toTopOf="@id/iv_currency_2_flag" />
+
+        <ImageView
+                android:id="@+id/iv_currency_2_arrow"
+                style="@style/CurrencyArrow"
+                app:layout_constraintBottom_toBottomOf="@id/tv_currency_2_code"
+                app:layout_constraintStart_toEndOf="@id/tv_currency_2_code"
+                app:layout_constraintTop_toTopOf="@id/tv_currency_2_code" />
+
+        <TextView
+                android:id="@+id/tv_currency_2_quantity"
+                style="@style/CurrencyAmount"
+                android:text="445.39"
+                app:layout_constraintBottom_toTopOf="@id/tv_currency_2_desc"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/iv_currency_2_flag" />
+
+        <TextView
+                android:id="@+id/tv_currency_2_desc"
+                style="@style/CurrencyDesc"
+                android:text="Euro - €"
+                app:layout_constraintBottom_toBottomOf="@id/iv_currency_2_flag"
+                app:layout_constraintEnd_toEndOf="@id/tv_currency_2_quantity"
+                app:layout_constraintTop_toBottomOf="@id/tv_currency_2_quantity" />
+
+        <ImageView
+                android:id="@+id/iv_currency_3_flag"
+                style="@style/CurrencyFlag"
+                android:contentDescription="@string/flag_of_the_second_currency"
+                app:layout_constraintBottom_toTopOf="@+id/textView3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_currency_2_flag" />
+
+        <TextView
+                android:id="@+id/tv_currency_3_code"
+                style="@style/CurrencyCode"
+                android:text="JPY"
+                app:layout_constraintBottom_toBottomOf="@id/iv_currency_3_flag"
+                app:layout_constraintStart_toEndOf="@id/iv_currency_3_flag"
+                app:layout_constraintTop_toTopOf="@id/iv_currency_3_flag" />
+
+        <ImageView
+                android:id="@+id/iv_currency_3_arrow"
+                style="@style/CurrencyArrow"
+                app:layout_constraintBottom_toBottomOf="@id/tv_currency_3_code"
+                app:layout_constraintStart_toEndOf="@id/tv_currency_3_code"
+                app:layout_constraintTop_toTopOf="@id/tv_currency_3_code" />
+
+        <TextView
+                android:id="@+id/tv_currency_3_quantity"
+                style="@style/CurrencyAmount"
+                android:text="54,235"
+                app:layout_constraintBottom_toTopOf="@id/tv_currency_3_desc"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/iv_currency_3_flag" />
+
+        <TextView
+                android:id="@+id/tv_currency_3_desc"
+                style="@style/CurrencyDesc"
+                android:text="Yen - ¥/円"
+                app:layout_constraintBottom_toBottomOf="@id/iv_currency_3_flag"
+                app:layout_constraintEnd_toEndOf="@id/tv_currency_3_quantity"
+                app:layout_constraintTop_toBottomOf="@id/tv_currency_3_quantity" />
+
+        <!-- Pad and filler -->
+        <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.38"
+                android:fontFamily="monospace"
+                android:paddingBottom="2dp"
+                android:text="@string/exchanges_provided_by_at"
+                android:textSize="@dimen/label"
+                app:layout_constraintBottom_toTopOf="@+id/navigation_divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        <View
+                android:id="@+id/navigation_divider"
+                style="@style/Divider"
+                android:alpha="0.05"
+                app:layout_constraintBottom_toTopOf="@+id/gridLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
         <GridLayout
+                android:id="@+id/gridLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="?attr/actionBarSize"
+                android:background="@color/color_pad"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
@@ -35,7 +178,7 @@
                     android:text="7"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_8"
                     style="@style/PadButton"
                     android:layout_row="0"
@@ -43,7 +186,7 @@
                     android:text="8"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_9"
                     style="@style/PadButton"
                     android:layout_row="0"
@@ -51,7 +194,7 @@
                     android:text="9"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_4"
                     style="@style/PadButton"
                     android:layout_row="1"
@@ -59,7 +202,7 @@
                     android:text="4"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_5"
                     style="@style/PadButton"
                     android:layout_row="1"
@@ -67,7 +210,7 @@
                     android:text="5"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_6"
                     style="@style/PadButton"
                     android:layout_row="1"
@@ -75,7 +218,7 @@
                     android:text="6"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_1"
                     style="@style/PadButton"
                     android:layout_row="2"
@@ -83,7 +226,7 @@
                     android:text="1"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_2"
                     style="@style/PadButton"
                     android:layout_row="2"
@@ -91,7 +234,7 @@
                     android:text="2"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_3"
                     style="@style/PadButton"
                     android:layout_row="2"
@@ -99,7 +242,7 @@
                     android:text="3"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_comma"
                     style="@style/PadButton"
                     android:layout_row="3"
@@ -107,7 +250,7 @@
                     android:text=","
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_0"
                     style="@style/PadButton"
                     android:layout_row="3"
@@ -115,7 +258,7 @@
                     android:text="0"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_00"
                     style="@style/PadButton"
                     android:layout_column="2"
@@ -123,7 +266,7 @@
                     android:text="00"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_ac"
                     style="@style/PadButton"
                     android:layout_row="0"
@@ -132,15 +275,25 @@
                     android:text="AC"
                     app:rippleColor="@color/color_secondary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                     android:id="@+id/pad_backspace"
                     style="@style/PadButton"
                     android:layout_row="2"
                     android:layout_rowSpan="2"
                     android:layout_column="3"
-                    android:text="del"
+                    app:icon="@drawable/ic_twotone_backspace"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/color_on_surface"
                     app:rippleColor="@color/color_secondary" />
         </GridLayout>
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/color_pad"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

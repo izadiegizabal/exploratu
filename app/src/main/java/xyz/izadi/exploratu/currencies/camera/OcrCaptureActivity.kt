@@ -1,4 +1,4 @@
-package xyz.izadi.exploratu.camera
+package xyz.izadi.exploratu.currencies.camera
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -24,10 +24,10 @@ import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.ocr_capture.*
 import xyz.izadi.exploratu.R
-import xyz.izadi.exploratu.camera.source.CameraSource
-import xyz.izadi.exploratu.camera.source.CameraSourcePreview
-import xyz.izadi.exploratu.camera.ui.GraphicOverlay
-import xyz.izadi.exploratu.camera.ui.OcrGraphic
+import xyz.izadi.exploratu.currencies.camera.source.CameraSource
+import xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview
+import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
+import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 import java.io.IOException
 
 /**
