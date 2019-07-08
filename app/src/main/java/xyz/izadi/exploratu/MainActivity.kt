@@ -14,8 +14,11 @@ import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_main.*
 import xyz.izadi.exploratu.currencies.camera.OcrCaptureActivity
 import xyz.izadi.exploratu.currencies.models.Currencies
-import xyz.izadi.exploratu.others.Utils
+import xyz.izadi.exploratu.currencies.models.Rates
+import xyz.izadi.exploratu.currencies.others.Utils
 import java.io.IOException
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private var activeCurrencyIndex = -1
     private var activeCurrencyAmount = ""
     private var isDefaultValue = true
+    private val activeCurCodes = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,11 +39,12 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, OcrCaptureActivity::class.java)
             startActivity(intent)
         }
+        currencies = getCurrencies()
+        setPreferredCurrencies()
+
         setUpAmountListeners()
         setUpPadListeners()
 
-        loadCurrencies()
-        setPreferredCurrencies()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -58,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun loadCurrencies() {
+    private fun getCurrencies(): Currencies? {
         try {
             val gson = Gson()
 
@@ -67,19 +72,22 @@ class MainActivity : AppCompatActivity() {
                     it.readText()
                 }
 
-            currencies = gson.fromJson(jsonString, Currencies::class.java)
+            return gson.fromJson(jsonString, Currencies::class.java)
 
         } catch (e: IOException) {
             e.printStackTrace()
         }
+
+        return null
     }
 
 
     private fun setPreferredCurrencies() {
         // TODO "Read from sharedpreferences which ones to load"
-        loadCurrencyTo("USD", 0)
-        loadCurrencyTo("CNY", 1)
-        loadCurrencyTo("JPY", 2)
+        activeCurCodes.addAll(listOf("USD", "CNY", "JPY"))
+        loadCurrencyTo(activeCurCodes[0], 0)
+        loadCurrencyTo(activeCurCodes[1], 1)
+        loadCurrencyTo(activeCurCodes[2], 2)
     }
 
     private fun loadCurrencyTo(code: String, listPos: Int) {
@@ -195,6 +203,8 @@ class MainActivity : AppCompatActivity() {
                 resetActiveCurrencyValues(2, 1)
             }
         }
+
+        tv_currency_1_quantity.performClick()
     }
 
     private fun resetActiveCurrencyValues(activeIndex: Int, resetNumber: Int) {
@@ -214,6 +224,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         calculateConversions()
+
+        if (resetNumber == 0) {
+            tv_currency_1_quantity.text = "0"
+            tv_currency_2_quantity.text = "0"
+            tv_currency_3_quantity.text = "0"
+        }
     }
 
     private fun setUpPadListeners() {
@@ -350,5 +366,40 @@ class MainActivity : AppCompatActivity() {
 
     private fun calculateConversions() {
         // Get conversions rates an calculate exchanges
+        val rates = getRates()
+        val from = activeCurCodes[activeCurrencyIndex]
+        val quantity = getAmountFloat()
+        when (activeCurrencyIndex) {
+            0 -> {
+                tv_currency_2_quantity.text = rates?.convert(quantity, from, activeCurCodes[1])
+                tv_currency_3_quantity.text = rates?.convert(quantity, from, activeCurCodes[2])
+            }
+            1 -> {
+                tv_currency_1_quantity.text = rates?.convert(quantity, from, activeCurCodes[0])
+                tv_currency_3_quantity.text = rates?.convert(quantity, from, activeCurCodes[2])
+            }
+            2 -> {
+                tv_currency_1_quantity.text = rates?.convert(quantity, from, activeCurCodes[0])
+                tv_currency_2_quantity.text = rates?.convert(quantity, from, activeCurCodes[1])
+            }
+        }
+
+        val formattedDate = getFormattedDate(rates?.timestamp)
+        tv_exchange_provider.text = getString(R.string.exchanges_provided_by_at, formattedDate)
+    }
+
+    private fun getFormattedDate(timestamp: Date?): String {
+        val df = android.text.format.DateFormat.getDateFormat(this)
+        return df.format(timestamp)
+    }
+
+    private fun getAmountFloat(): Float {
+        return activeCurrencyAmount.replace(",", "").toFloat()
+    }
+
+    private fun getRates(): Rates? {
+        // Check if you can download newer
+        // Otherwise load from currencies
+        return currencies?.getRates()
     }
 }

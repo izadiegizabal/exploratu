@@ -1,13 +1,14 @@
 package xyz.izadi.exploratu.currencies.models
 
 import java.util.*
+import kotlin.collections.ArrayList
 
-data class Currencies (
+data class Currencies(
     val version: Float,
     val versionDate: Date,
     val totalCurrencies: Int,
     val currencies: Array<Currency>
-){
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -31,12 +32,20 @@ data class Currencies (
     }
 
     fun getCurrency(currencyCodeToSearch: String): Currency? {
-        for (currency: Currency in currencies){
-            if (currency?.code == currencyCodeToSearch){
+        for (currency: Currency in currencies) {
+            if (currency?.code == currencyCodeToSearch) {
                 return currency
             }
         }
 
         return null
+    }
+
+    fun getRates(): Rates {
+        val rates: ArrayList<Float> = ArrayList()
+        for (currency: Currency in currencies) {
+            rates.add(currency?.defaultValue)
+        }
+        return Rates(versionDate, Exchanges(rates))
     }
 }
