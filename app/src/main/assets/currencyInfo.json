@@ -1,7 +1,7 @@
 {
 	"version": 0.1,
 	"versionDate": "2019-07-06T00:44:12.511Z",
-	"totalCurrencies": 32,
+	"totalCurrencies": 33,
 	"currencies": [
 		{
 			"name": "Euro",

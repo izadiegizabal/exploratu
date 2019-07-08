@@ -29,4 +29,14 @@ data class Currencies (
         result = 31 * result + currencies.contentHashCode()
         return result
     }
+
+    fun getCurrency(currencyCodeToSearch: String): Currency? {
+        for (currency: Currency in currencies){
+            if (currency?.code == currencyCodeToSearch){
+                return currency
+            }
+        }
+
+        return null
+    }
 }
