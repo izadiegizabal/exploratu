@@ -35,12 +35,6 @@ data class Exchanges(
     val KRW: Float,
     val MYR: Float
 ) {
-    fun getRate(from: String): Float? {
-        val field = Exchanges::class.java.getDeclaredField(from)
-        field.isAccessible
-        return field.getFloat(this)
-    }
-
     constructor(rates: ArrayList<Float>) : this(
         rates[0],
         rates[1],
@@ -76,4 +70,10 @@ data class Exchanges(
         rates[31],
         rates[32]
     )
+
+    fun getRate(from: String): Float? {
+        val field = Exchanges::class.java.getDeclaredField(from)
+        field.isAccessible
+        return field.getFloat(this)
+    }
 }

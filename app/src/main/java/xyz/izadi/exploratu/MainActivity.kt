@@ -16,6 +16,7 @@ import xyz.izadi.exploratu.currencies.camera.OcrCaptureActivity
 import xyz.izadi.exploratu.currencies.models.Currencies
 import xyz.izadi.exploratu.currencies.models.Rates
 import xyz.izadi.exploratu.currencies.others.Utils
+import xyz.izadi.exploratu.currencies.others.Utils.reformatIfNeeded
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -304,8 +305,8 @@ class MainActivity : AppCompatActivity() {
             if (amount.length > 15) {
                 return
             }
-            activeCurrencyAmount = amount
-            reformatIfNeeded()
+            activeCurrencyAmount = reformatIfNeeded(amount)
+            Log.d(LOG_TAG, "the amount is: $amount")
             if (amount.isBlank()) {
                 resetActiveCurrencyValues(activeCurrencyIndex, 0)
             }
@@ -325,44 +326,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun reformatIfNeeded() {
-        val amountParts = activeCurrencyAmount.split(".")
-
-        // Remove unwanted second comma 1,000.52.
-        if (amountParts.size > 2) {
-            activeCurrencyAmount = activeCurrencyAmount.dropLast(1)
-        }
-
-        // Add 1,000 thousand comma
-        if (amountParts[0].length >= 4) {
-            val originalString = amountParts[0].replace(",", "")
-            val numberWithCommas = Utils.insertPeriodically(originalString, ",", 3)
-            activeCurrencyAmount = numberWithCommas
-            if (amountParts.size > 1) {
-                activeCurrencyAmount += "." + amountParts[1]
-            }
-        }
-
-        // Remove unwanted leading zeros
-        if (amountParts[0].length == 2) {
-            if (amountParts[0][0] == '0') {
-                activeCurrencyAmount = activeCurrencyAmount.substring(1)
-            }
-        }
-        if (amountParts[0].length == 3) {
-            if (amountParts[0][0] == '0') {
-                activeCurrencyAmount = activeCurrencyAmount.substring(1)
-                if (amountParts[0][1] == '0') {
-                    activeCurrencyAmount = activeCurrencyAmount.substring(1)
-                }
-            }
-        }
-
-        // Limit the decimals to 4
-        if (amountParts.size > 1 && amountParts[1].length >= 4) {
-            activeCurrencyAmount = amountParts[0] + "." + amountParts[1].substring(0, 4)
-        }
-    }
 
     private fun calculateConversions() {
         // Get conversions rates an calculate exchanges

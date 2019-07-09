@@ -12,6 +12,7 @@ data class Rates(
         val fromRate = exchanges.getRate(from)
         val toRate = exchanges.getRate(to)
         val conversion: Float = (quantity / fromRate!!) * toRate!!
-        return Utils.round(conversion, 4).toString()
+        val roundedString = Utils.round(conversion, 4).toString()
+        return Utils.addCommas(roundedString)
     }
 }
