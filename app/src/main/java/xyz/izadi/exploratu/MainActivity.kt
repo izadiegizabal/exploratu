@@ -3,7 +3,6 @@ package xyz.izadi.exploratu
 import BottomNavigationDrawerFragment
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -15,7 +14,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import xyz.izadi.exploratu.currencies.camera.OcrCaptureActivity
 import xyz.izadi.exploratu.currencies.models.Currencies
 import xyz.izadi.exploratu.currencies.models.Rates
-import xyz.izadi.exploratu.currencies.others.Utils
 import xyz.izadi.exploratu.currencies.others.Utils.reformatIfNeeded
 import java.io.IOException
 import java.util.*
@@ -306,7 +304,6 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             activeCurrencyAmount = reformatIfNeeded(amount)
-            Log.d(LOG_TAG, "the amount is: $amount")
             if (amount.isBlank()) {
                 resetActiveCurrencyValues(activeCurrencyIndex, 0)
             }
