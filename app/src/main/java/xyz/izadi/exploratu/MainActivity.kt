@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
 
     private fun setPreferredCurrencies() {
         // TODO "Read from sharedpreferences which ones to load"
-        activeCurCodes.addAll(listOf("USD", "CNY", "JPY"))
+        activeCurCodes.addAll(listOf("USD", "ILS", "JPY"))
         loadCurrencyTo(activeCurCodes[0], 0)
         loadCurrencyTo(activeCurCodes[1], 1)
         loadCurrencyTo(activeCurCodes[2], 2)
@@ -99,6 +99,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                 Picasso
                     .get()
                     .load(flagPath)
+                    .placeholder(R.drawable.ic_dollar_placeholder)
                     .transform(transformation)
                     .into(iv_currency_1_flag)
                 tv_currency_1_code.text = curr?.code
@@ -109,6 +110,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                 Picasso
                     .get()
                     .load(flagPath)
+                    .placeholder(R.drawable.ic_dollar_placeholder)
                     .transform(transformation)
                     .into(iv_currency_2_flag)
                 tv_currency_2_code.text = curr?.code
@@ -119,6 +121,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                 Picasso
                     .get()
                     .load(flagPath)
+                    .placeholder(R.drawable.ic_dollar_placeholder)
                     .transform(transformation)
                     .into(iv_currency_3_flag)
                 tv_currency_3_code.text = curr?.code

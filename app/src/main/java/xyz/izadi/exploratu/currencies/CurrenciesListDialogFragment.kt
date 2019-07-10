@@ -109,6 +109,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
             Picasso
                 .get()
                 .load(flagPath)
+                .placeholder(R.drawable.ic_dollar_placeholder)
                 .transform(transformation)
                 .into(holder.flag)
         }

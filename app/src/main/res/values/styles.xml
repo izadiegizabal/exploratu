@@ -97,6 +97,7 @@
         <item name="android:layout_height">16dp</item>
         <item name="android:layout_marginStart">4dp</item>
         <item name="android:alpha">0.6</item>
+        <item name="android:tint">@drawable/selector_currency_text_color</item>
         <item name="android:src">@drawable/ic_twotone_expand_more</item>
     </style>
 
