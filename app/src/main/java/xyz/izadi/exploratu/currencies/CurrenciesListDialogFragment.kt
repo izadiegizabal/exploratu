@@ -64,7 +64,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
     }
 
     interface Listener {
-        fun onCurrencyClicked(position: Int)
+        fun onCurrencyClicked(code: String)
     }
 
     private inner class ViewHolder internal constructor(
@@ -85,7 +85,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         init {
             itemView.setOnClickListener {
                 mListener?.let {
-                    it.onCurrencyClicked(adapterPosition)
+                    it.onCurrencyClicked(cod.text.toString())
                     dismiss()
                 }
             }

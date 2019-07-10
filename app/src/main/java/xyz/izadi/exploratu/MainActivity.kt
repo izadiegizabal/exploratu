@@ -1,7 +1,9 @@
 package xyz.izadi.exploratu
 
 import BottomNavigationDrawerFragment
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -22,10 +24,10 @@ import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener {
-
     private val LOG_TAG = this.javaClass.simpleName
     private var currencies: Currencies? = null
     private var activeCurrencyIndex = -1
+    private var selectingCurrencyIndex = -1
     private var activeCurrencyAmount = ""
     private var isDefaultValue = true
     private val activeCurCodes = ArrayList<String>()
@@ -33,7 +35,6 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         setSupportActionBar(bottomAppBar)
 
         fab.setOnClickListener {
@@ -83,14 +84,22 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     }
 
     private fun setPreferredCurrencies() {
-        // TODO "Read from sharedpreferences which ones to load"
-        activeCurCodes.addAll(listOf("USD", "ILS", "JPY"))
+        // read preferences to load
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        activeCurCodes.add(sharedPref.getString("currency_code_0", "EUR")?: return)
+        activeCurCodes.add(sharedPref.getString("currency_code_1", "USD")?: return)
+        activeCurCodes.add(sharedPref.getString("currency_code_2", "JPY")?: return)
+
         loadCurrencyTo(activeCurCodes[0], 0)
         loadCurrencyTo(activeCurCodes[1], 1)
         loadCurrencyTo(activeCurCodes[2], 2)
     }
 
     private fun loadCurrencyTo(code: String, listPos: Int) {
+        // change global variable
+        activeCurCodes[listPos] = code
+
+        // update tv
         val curr = currencies?.getCurrency(code)
         val flagPath = "file:///android_asset/flags/${curr?.code}.png"
         val transformation = RoundedCornersTransformation(32, 0)
@@ -129,16 +138,36 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                     applicationContext.getString(R.string.currency_desc, curr?.name, curr?.sign)
             }
         }
+
+        calculateConversions()
+
+        // update preferences
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        getPreferences(Context.MODE_PRIVATE) ?: return
+        with (sharedPref.edit()) {
+            putString("currency_code_$listPos", code)
+            apply()
+        }
     }
 
     private fun setUpCurrencySelectorListeners() {
         ll_currency_1.setOnClickListener {
+            selectingCurrencyIndex = 0
+            CurrenciesListDialogFragment.newInstance(currencies).show(supportFragmentManager, "dialog")
+        }
+        ll_currency_2.setOnClickListener {
+            selectingCurrencyIndex = 1
+            CurrenciesListDialogFragment.newInstance(currencies).show(supportFragmentManager, "dialog")
+        }
+        ll_currency_3.setOnClickListener {
+            selectingCurrencyIndex = 2
             CurrenciesListDialogFragment.newInstance(currencies).show(supportFragmentManager, "dialog")
         }
     }
 
-    override fun onCurrencyClicked(position: Int) {
-        // On item selected in the currency selector
+    override fun onCurrencyClicked(code: String) {
+        loadCurrencyTo(code, selectingCurrencyIndex)
+        calculateConversions()
     }
 
     private fun setUpAmountListeners() {
@@ -337,29 +366,30 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
         }
     }
 
-
     private fun calculateConversions() {
         // Get conversions rates an calculate exchanges
-        val rates = getRates()
-        val from = activeCurCodes[activeCurrencyIndex]
-        val quantity = getAmountFloat()
-        when (activeCurrencyIndex) {
-            0 -> {
-                tv_currency_2_quantity.text = rates?.convert(quantity, from, activeCurCodes[1])
-                tv_currency_3_quantity.text = rates?.convert(quantity, from, activeCurCodes[2])
+        if (activeCurrencyIndex != -1){
+            val rates = getRates()
+            val from = activeCurCodes[activeCurrencyIndex]
+            val quantity = getAmountFloat()
+            when (activeCurrencyIndex) {
+                0 -> {
+                    tv_currency_2_quantity.text = rates?.convert(quantity, from, activeCurCodes[1])
+                    tv_currency_3_quantity.text = rates?.convert(quantity, from, activeCurCodes[2])
+                }
+                1 -> {
+                    tv_currency_1_quantity.text = rates?.convert(quantity, from, activeCurCodes[0])
+                    tv_currency_3_quantity.text = rates?.convert(quantity, from, activeCurCodes[2])
+                }
+                2 -> {
+                    tv_currency_1_quantity.text = rates?.convert(quantity, from, activeCurCodes[0])
+                    tv_currency_2_quantity.text = rates?.convert(quantity, from, activeCurCodes[1])
+                }
             }
-            1 -> {
-                tv_currency_1_quantity.text = rates?.convert(quantity, from, activeCurCodes[0])
-                tv_currency_3_quantity.text = rates?.convert(quantity, from, activeCurCodes[2])
-            }
-            2 -> {
-                tv_currency_1_quantity.text = rates?.convert(quantity, from, activeCurCodes[0])
-                tv_currency_2_quantity.text = rates?.convert(quantity, from, activeCurCodes[1])
-            }
-        }
 
-        val formattedDate = getFormattedDate(rates?.timestamp)
-        tv_exchange_provider.text = getString(R.string.exchanges_provided_by_at, formattedDate)
+            val formattedDate = getFormattedDate(rates?.timestamp)
+            tv_exchange_provider.text = getString(R.string.exchanges_provided_by_at, formattedDate)
+        }
     }
 
     private fun getFormattedDate(timestamp: Date?): String {
