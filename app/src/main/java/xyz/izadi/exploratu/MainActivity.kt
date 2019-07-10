@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_main.*
+import xyz.izadi.exploratu.currencies.CurrenciesListDialogFragment
 import xyz.izadi.exploratu.currencies.camera.OcrCaptureActivity
 import xyz.izadi.exploratu.currencies.models.Currencies
 import xyz.izadi.exploratu.currencies.models.Rates
@@ -20,7 +21,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener {
+
     private val LOG_TAG = this.javaClass.simpleName
     private var currencies: Currencies? = null
     private var activeCurrencyIndex = -1
@@ -43,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
         setUpAmountListeners()
         setUpPadListeners()
-
+        setUpCurrencySelectorListeners()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -79,7 +81,6 @@ class MainActivity : AppCompatActivity() {
 
         return null
     }
-
 
     private fun setPreferredCurrencies() {
         // TODO "Read from sharedpreferences which ones to load"
@@ -125,6 +126,16 @@ class MainActivity : AppCompatActivity() {
                     applicationContext.getString(R.string.currency_desc, curr?.name, curr?.sign)
             }
         }
+    }
+
+    private fun setUpCurrencySelectorListeners() {
+        ll_currency_1.setOnClickListener {
+            CurrenciesListDialogFragment.newInstance(currencies).show(supportFragmentManager, "dialog")
+        }
+    }
+
+    override fun onCurrencyClicked(position: Int) {
+        // On item selected in the currency selector
     }
 
     private fun setUpAmountListeners() {
@@ -206,31 +217,6 @@ class MainActivity : AppCompatActivity() {
         tv_currency_1_quantity.performClick()
     }
 
-    private fun resetActiveCurrencyValues(activeIndex: Int, resetNumber: Int) {
-        activeCurrencyIndex = activeIndex
-        activeCurrencyAmount = "" + resetNumber
-        isDefaultValue = true
-        when (activeIndex) {
-            0 -> {
-                tv_currency_1_quantity.text = activeCurrencyAmount
-            }
-            1 -> {
-                tv_currency_2_quantity.text = activeCurrencyAmount
-            }
-            2 -> {
-                tv_currency_3_quantity.text = activeCurrencyAmount
-            }
-        }
-
-        calculateConversions()
-
-        if (resetNumber == 0) {
-            tv_currency_1_quantity.text = "0"
-            tv_currency_2_quantity.text = "0"
-            tv_currency_3_quantity.text = "0"
-        }
-    }
-
     private fun setUpPadListeners() {
         bt_pad_0.setOnClickListener {
             addAmount("0")
@@ -281,6 +267,31 @@ class MainActivity : AppCompatActivity() {
         }
         bt_pad_ac.setOnClickListener {
             resetActiveCurrencyValues(activeCurrencyIndex, 0)
+        }
+    }
+
+    private fun resetActiveCurrencyValues(activeIndex: Int, resetNumber: Int) {
+        activeCurrencyIndex = activeIndex
+        activeCurrencyAmount = "" + resetNumber
+        isDefaultValue = true
+        when (activeIndex) {
+            0 -> {
+                tv_currency_1_quantity.text = activeCurrencyAmount
+            }
+            1 -> {
+                tv_currency_2_quantity.text = activeCurrencyAmount
+            }
+            2 -> {
+                tv_currency_3_quantity.text = activeCurrencyAmount
+            }
+        }
+
+        calculateConversions()
+
+        if (resetNumber == 0) {
+            tv_currency_1_quantity.text = "0"
+            tv_currency_2_quantity.text = "0"
+            tv_currency_3_quantity.text = "0"
         }
     }
 

@@ -14,6 +14,9 @@
     <string name="flag_of_the_third_currency">Flag of the third currency</string>
     <string name="currency_desc">%1$s - %2$s</string>
 
+    <!-- Select Currency -->
+    <string name="select_currency">Select Currency</string>
+
     <!-- cosos prueba ocr-->
     <string name="ok">OK</string>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>

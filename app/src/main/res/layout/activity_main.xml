@@ -21,128 +21,145 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-                android:id="@+id/iv_currency_1_flag"
-                style="@style/CurrencyFlag"
-                android:contentDescription="@string/flag_of_the_first_currency"
-                app:layout_constraintBottom_toTopOf="@+id/iv_currency_2_flag"
+        <LinearLayout
+                android:id="@+id/ll_currency_1"
+                style="@style/CurrencyInfo"
+                app:layout_constraintBottom_toTopOf="@+id/ll_currency_2"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/currency_header" />
+                app:layout_constraintTop_toBottomOf="@id/currency_header">
 
-        <TextView
-                android:id="@+id/tv_currency_1_code"
-                style="@style/CurrencyCode"
-                app:layout_constraintBottom_toBottomOf="@id/iv_currency_1_flag"
-                app:layout_constraintStart_toEndOf="@id/iv_currency_1_flag"
-                app:layout_constraintTop_toTopOf="@id/iv_currency_1_flag"
-                tool:text="USD" />
+            <ImageView
+                    android:id="@+id/iv_currency_1_flag"
+                    style="@style/CurrencyFlag"
+                    android:contentDescription="@string/flag_of_the_first_currency" />
 
-        <ImageView
-                android:id="@+id/iv_currency_1_arrow"
-                style="@style/CurrencyArrow"
-                app:layout_constraintBottom_toBottomOf="@id/tv_currency_1_code"
-                app:layout_constraintStart_toEndOf="@id/tv_currency_1_code"
-                app:layout_constraintTop_toTopOf="@id/tv_currency_1_code" />
+            <TextView
+                    android:id="@+id/tv_currency_1_code"
+                    style="@style/CurrencyCode"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_currency_1_flag"
+                    app:layout_constraintStart_toEndOf="@id/iv_currency_1_flag"
+                    app:layout_constraintTop_toTopOf="@id/iv_currency_1_flag"
+                    tool:text="USD" />
+
+            <ImageView
+                    android:id="@+id/iv_currency_1_arrow"
+                    style="@style/CurrencyArrow"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_currency_1_code"
+                    app:layout_constraintStart_toEndOf="@id/tv_currency_1_code"
+                    app:layout_constraintTop_toTopOf="@id/tv_currency_1_code" />
+        </LinearLayout>
 
         <TextView
                 android:id="@+id/tv_currency_1_quantity"
                 style="@style/CurrencyAmount"
-                android:text="500"
+                tool:text="500"
                 app:autoSizeMaxTextSize="28sp"
                 app:autoSizeTextType="uniform"
                 app:layout_constraintBottom_toTopOf="@+id/tv_currency_1_desc"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/iv_currency_1_arrow"
-                app:layout_constraintTop_toTopOf="@id/iv_currency_1_flag" />
+                app:layout_constraintStart_toEndOf="@+id/ll_currency_1"
+                app:layout_constraintTop_toTopOf="@id/ll_currency_1" />
 
         <TextView
                 android:id="@+id/tv_currency_1_desc"
                 style="@style/CurrencyDesc"
-                app:layout_constraintBottom_toBottomOf="@id/iv_currency_1_flag"
+                app:layout_constraintBottom_toBottomOf="@id/ll_currency_1"
                 app:layout_constraintEnd_toEndOf="@id/tv_currency_1_quantity"
                 app:layout_constraintTop_toBottomOf="@id/tv_currency_1_quantity"
                 tool:text="US Dollar - $" />
 
-        <ImageView
-                android:id="@+id/iv_currency_2_flag"
-                style="@style/CurrencyFlag"
-                android:contentDescription="@string/flag_of_the_second_currency"
-                app:layout_constraintBottom_toTopOf="@+id/iv_currency_3_flag"
+        <LinearLayout
+                android:id="@+id/ll_currency_2"
+                style="@style/CurrencyInfo"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_currency_1_flag" />
+                app:layout_constraintBottom_toTopOf="@+id/ll_currency_3"
+                app:layout_constraintTop_toBottomOf="@id/ll_currency_1" >
+            <ImageView
+                    android:id="@+id/iv_currency_2_flag"
+                    style="@style/CurrencyFlag"
+                    android:contentDescription="@string/flag_of_the_second_currency" />
 
-        <TextView
-                android:id="@+id/tv_currency_2_code"
-                style="@style/CurrencyCode"
-                app:layout_constraintBottom_toBottomOf="@id/iv_currency_2_flag"
-                app:layout_constraintStart_toEndOf="@id/iv_currency_2_flag"
-                app:layout_constraintTop_toTopOf="@id/iv_currency_2_flag"
-                tool:text="EUR" />
+            <TextView
+                    android:id="@+id/tv_currency_2_code"
+                    style="@style/CurrencyCode"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_currency_2_flag"
+                    app:layout_constraintStart_toEndOf="@id/iv_currency_2_flag"
+                    app:layout_constraintTop_toTopOf="@id/iv_currency_2_flag"
+                    tool:text="EUR" />
 
-        <ImageView
-                android:id="@+id/iv_currency_2_arrow"
-                style="@style/CurrencyArrow"
-                app:layout_constraintBottom_toBottomOf="@id/tv_currency_2_code"
-                app:layout_constraintStart_toEndOf="@id/tv_currency_2_code"
-                app:layout_constraintTop_toTopOf="@id/tv_currency_2_code" />
+            <ImageView
+                    android:id="@+id/iv_currency_2_arrow"
+                    style="@style/CurrencyArrow"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_currency_2_code"
+                    app:layout_constraintStart_toEndOf="@id/tv_currency_2_code"
+                    app:layout_constraintTop_toTopOf="@id/tv_currency_2_code" />
+        </LinearLayout>
 
         <TextView
                 android:id="@+id/tv_currency_2_quantity"
                 style="@style/CurrencyAmount"
-                android:text="445.39"
+                tool:text="445.39"
                 app:autoSizeMaxTextSize="28sp"
                 app:autoSizeTextType="uniform"
                 app:layout_constraintBottom_toTopOf="@id/tv_currency_2_desc"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/iv_currency_2_arrow"
-                app:layout_constraintTop_toTopOf="@id/iv_currency_2_flag" />
+                app:layout_constraintStart_toEndOf="@+id/ll_currency_2"
+                app:layout_constraintTop_toTopOf="@id/ll_currency_2" />
 
         <TextView
                 android:id="@+id/tv_currency_2_desc"
                 style="@style/CurrencyDesc"
-                app:layout_constraintBottom_toBottomOf="@id/iv_currency_2_flag"
+                app:layout_constraintBottom_toBottomOf="@id/ll_currency_2"
                 app:layout_constraintEnd_toEndOf="@id/tv_currency_2_quantity"
                 app:layout_constraintTop_toBottomOf="@id/tv_currency_2_quantity"
                 tool:text="Euro - €" />
 
-        <ImageView
-                android:id="@+id/iv_currency_3_flag"
-                style="@style/CurrencyFlag"
-                android:contentDescription="@string/flag_of_the_second_currency"
+        <LinearLayout
+                android:id="@+id/ll_currency_3"
+                style="@style/CurrencyInfo"
                 app:layout_constraintBottom_toTopOf="@+id/tv_exchange_provider"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_currency_2_flag" />
+                app:layout_constraintTop_toBottomOf="@id/ll_currency_2">
+            <ImageView
+                    android:id="@+id/iv_currency_3_flag"
+                    style="@style/CurrencyFlag"
+                    android:contentDescription="@string/flag_of_the_second_currency"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_exchange_provider"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ll_currency_2" />
 
-        <TextView
-                android:id="@+id/tv_currency_3_code"
-                style="@style/CurrencyCode"
-                app:layout_constraintBottom_toBottomOf="@id/iv_currency_3_flag"
-                app:layout_constraintStart_toEndOf="@id/iv_currency_3_flag"
-                app:layout_constraintTop_toTopOf="@id/iv_currency_3_flag"
-                tool:text="JPY" />
+            <TextView
+                    android:id="@+id/tv_currency_3_code"
+                    style="@style/CurrencyCode"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_currency_3_flag"
+                    app:layout_constraintStart_toEndOf="@id/iv_currency_3_flag"
+                    app:layout_constraintTop_toTopOf="@id/iv_currency_3_flag"
+                    tool:text="JPY" />
 
-        <ImageView
-                android:id="@+id/iv_currency_3_arrow"
-                style="@style/CurrencyArrow"
-                app:layout_constraintBottom_toBottomOf="@id/tv_currency_3_code"
-                app:layout_constraintStart_toEndOf="@id/tv_currency_3_code"
-                app:layout_constraintTop_toTopOf="@id/tv_currency_3_code" />
+            <ImageView
+                    android:id="@+id/iv_currency_3_arrow"
+                    style="@style/CurrencyArrow"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_currency_3_code"
+                    app:layout_constraintStart_toEndOf="@id/tv_currency_3_code"
+                    app:layout_constraintTop_toTopOf="@id/tv_currency_3_code" />
+        </LinearLayout>
+
 
         <TextView
                 android:id="@+id/tv_currency_3_quantity"
                 style="@style/CurrencyAmount"
-                android:text="54,235"
+                tool:text="54,235"
                 app:autoSizeMaxTextSize="28sp"
                 app:autoSizeTextType="uniform"
                 app:layout_constraintBottom_toTopOf="@id/tv_currency_3_desc"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/iv_currency_3_arrow"
-                app:layout_constraintTop_toTopOf="@id/iv_currency_3_flag" />
+                app:layout_constraintStart_toEndOf="@+id/ll_currency_3"
+                app:layout_constraintTop_toTopOf="@id/ll_currency_3" />
 
         <TextView
                 android:id="@+id/tv_currency_3_desc"
                 style="@style/CurrencyDesc"
-                app:layout_constraintBottom_toBottomOf="@id/iv_currency_3_flag"
+                app:layout_constraintBottom_toBottomOf="@id/ll_currency_3"
                 app:layout_constraintEnd_toEndOf="@id/tv_currency_3_quantity"
                 app:layout_constraintTop_toBottomOf="@id/tv_currency_3_quantity"
                 tool:text="Yen - ¥/円" />

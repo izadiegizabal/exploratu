@@ -1,14 +1,24 @@
 package xyz.izadi.exploratu.currencies.models
 
+import android.os.Parcel
+import android.os.Parcelable
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 data class Currencies(
     val version: Float,
     val versionDate: Date,
     val totalCurrencies: Int,
     val currencies: Array<Currency>
-) {
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readFloat(),
+        Date(parcel.readLong()),
+        parcel.readInt(),
+        parcel.createTypedArray(Currency)
+    )
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -47,5 +57,26 @@ data class Currencies(
             rates.add(currency?.defaultValue)
         }
         return Rates(versionDate, Exchanges(rates))
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeFloat(version)
+        parcel.writeLong(versionDate.time)
+        parcel.writeInt(totalCurrencies)
+        parcel.writeTypedArray(currencies, flags)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Currencies> {
+        override fun createFromParcel(parcel: Parcel): Currencies {
+            return Currencies(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Currencies?> {
+            return arrayOfNulls(size)
+        }
     }
 }
