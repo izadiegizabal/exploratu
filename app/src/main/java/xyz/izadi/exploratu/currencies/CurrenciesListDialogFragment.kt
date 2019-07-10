@@ -2,23 +2,28 @@ package xyz.izadi.exploratu.currencies
 
 import android.content.Context
 import android.os.Bundle
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import androidx.recyclerview.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.fragment_currencies_list_dialog.*
-import xyz.izadi.exploratu.R
 import kotlinx.android.synthetic.main.fragment_currencies_list_dialog_item.view.*
+import xyz.izadi.exploratu.R
 import xyz.izadi.exploratu.currencies.models.Currencies
+import xyz.izadi.exploratu.currencies.models.Currency
+import java.util.*
+import kotlin.collections.ArrayList
 
-// TODO: Customize parameter argument names
-const val ARG_CURRENCIES = "item_count"
+
+const val ARG_CURRENCIES = "currencies_object"
 
 /**
  *
@@ -33,8 +38,9 @@ const val ARG_CURRENCIES = "item_count"
  */
 class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
-
+    private val LOG_TAG = this.javaClass.simpleName
     private var mListener: Listener? = null
+    private var mAdapter: CurrenciesAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,8 +50,38 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        list.layoutManager = LinearLayoutManager(context)
-        list.adapter = CurrenciesAdapter(arguments!!.getParcelable(ARG_CURRENCIES))
+        val layoutManager = LinearLayoutManager(context)
+        rv_currency_list.layoutManager = layoutManager
+        mAdapter = CurrenciesAdapter(arguments!!.getParcelable(ARG_CURRENCIES))
+        rv_currency_list.adapter = mAdapter
+
+        setUpQueryListener()
+    }
+
+    private fun setUpQueryListener() {
+        sv_currencies.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+           override fun onQueryTextSubmit(query: String?): Boolean {
+               val parentWithBSBehavior = cl_bs_currency_selector.parent as FrameLayout
+               val mBottomSheetBehavior = BottomSheetBehavior.from(parentWithBSBehavior)
+
+                mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+                Log.d(LOG_TAG, "It works! $query")
+                mAdapter?.filter?.filter(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                val parentWithBSBehavior = cl_bs_currency_selector.parent as FrameLayout
+                val mBottomSheetBehavior = BottomSheetBehavior.from(parentWithBSBehavior)
+
+                mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+                Log.d(LOG_TAG, "It works! $newText")
+                mAdapter?.filter?.filter(newText)
+                return false
+            }
+        })
     }
 
     override fun onAttach(context: Context) {
@@ -79,8 +115,8 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
     ) {
 
         internal val flag: ImageView = itemView.iv_currency_flag
-        internal val cod : TextView = itemView.tv_currency_code
-        internal val desc : TextView = itemView.tv_currency_desc
+        internal val cod: TextView = itemView.tv_currency_code
+        internal val desc: TextView = itemView.tv_currency_desc
 
         init {
             itemView.setOnClickListener {
@@ -92,30 +128,76 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private inner class CurrenciesAdapter internal constructor(private val mCurrencies: Currencies) :
-        RecyclerView.Adapter<ViewHolder>() {
+    private inner class CurrenciesAdapter internal constructor(
+        private val mCurrencies: Currencies,
+        private var mCurrenciesFiltered: Currencies = mCurrencies
+    ) : RecyclerView.Adapter<ViewHolder>(), Filterable {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(LayoutInflater.from(parent.context), parent)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val currency = mCurrencies.currencies[position]
-            holder.cod.text = currency.code
-            holder.desc.text = context?.getString(R.string.currency_desc, currency.name, currency.sign)
+            if (position < mCurrenciesFiltered.currencies.size) {
+                val currency = mCurrenciesFiltered.currencies[position]
+                holder.cod.text = currency.code
+                holder.desc.text =
+                    context?.getString(R.string.currency_desc, currency.name, currency.sign)
 
-            val flagPath = "file:///android_asset/flags/${currency.code}.png"
-            val transformation = RoundedCornersTransformation(32, 0)
-            Picasso
-                .get()
-                .load(flagPath)
-                .placeholder(R.drawable.ic_dollar_placeholder)
-                .transform(transformation)
-                .into(holder.flag)
+                val flagPath = "file:///android_asset/flags/${currency.code}.png"
+                val transformation = RoundedCornersTransformation(32, 0)
+                Picasso
+                    .get()
+                    .load(flagPath)
+                    .placeholder(R.drawable.ic_dollar_placeholder)
+                    .transform(transformation)
+                    .into(holder.flag)
+            }
         }
 
         override fun getItemCount(): Int {
-            return mCurrencies.totalCurrencies
+            return mCurrenciesFiltered.totalCurrencies
+        }
+
+        override fun getFilter(): Filter {
+            return object : Filter() {
+                override fun performFiltering(charSequence: CharSequence): FilterResults {
+                    val charString = charSequence.toString()
+                    if (charString.isEmpty()) {
+                        mCurrenciesFiltered = mCurrencies
+                    } else {
+                        val filteredList = ArrayList<Currency>()
+                        for (currency in mCurrencies.currencies) {
+                            // name match condition. this might differ depending on your requirement
+                            // here we are looking for name or phone number match
+                            if (currency.name.toLowerCase(Locale.getDefault()).contains(
+                                    charString.toLowerCase(Locale.getDefault())
+                                )
+                                || currency.code.contains(charString.toLowerCase(Locale.getDefault()))
+                            ) {
+                                filteredList.add(currency)
+                            }
+                        }
+                        mCurrenciesFiltered =
+                            Currencies(2.0f, Date(), 2, filteredList.toTypedArray())
+                    }
+
+                    val filterResults = FilterResults()
+                    filterResults.values = mCurrenciesFiltered
+
+                    return filterResults
+                }
+
+                override fun publishResults(
+                    charSequence: CharSequence,
+                    filterResults: FilterResults
+                ) {
+                    mCurrenciesFiltered = filterResults.values as Currencies
+
+                    // refresh the list with filtered data
+                    notifyDataSetChanged()
+                }
+            }
         }
     }
 

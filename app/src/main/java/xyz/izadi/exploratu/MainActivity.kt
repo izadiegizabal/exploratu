@@ -3,7 +3,6 @@ package xyz.izadi.exploratu
 import BottomNavigationDrawerFragment
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -54,7 +53,6 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
         return true
     }
 
-
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item!!.itemId) {
             android.R.id.home -> {
@@ -86,10 +84,11 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     private fun setPreferredCurrencies() {
         // read preferences to load
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
-        activeCurCodes.add(sharedPref.getString("currency_code_0", "EUR")?: return)
-        activeCurCodes.add(sharedPref.getString("currency_code_1", "USD")?: return)
-        activeCurCodes.add(sharedPref.getString("currency_code_2", "JPY")?: return)
+        activeCurCodes.add(sharedPref.getString("currency_code_0", "EUR") ?: return)
+        activeCurCodes.add(sharedPref.getString("currency_code_1", "USD") ?: return)
+        activeCurCodes.add(sharedPref.getString("currency_code_2", "JPY") ?: return)
 
+        // load them
         loadCurrencyTo(activeCurCodes[0], 0)
         loadCurrencyTo(activeCurCodes[1], 1)
         loadCurrencyTo(activeCurCodes[2], 2)
@@ -144,7 +143,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
         // update preferences
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
         getPreferences(Context.MODE_PRIVATE) ?: return
-        with (sharedPref.edit()) {
+        with(sharedPref.edit()) {
             putString("currency_code_$listPos", code)
             apply()
         }
@@ -153,15 +152,18 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     private fun setUpCurrencySelectorListeners() {
         ll_currency_1.setOnClickListener {
             selectingCurrencyIndex = 0
-            CurrenciesListDialogFragment.newInstance(currencies).show(supportFragmentManager, "dialog")
+            CurrenciesListDialogFragment.newInstance(currencies)
+                .show(supportFragmentManager, "dialog")
         }
         ll_currency_2.setOnClickListener {
             selectingCurrencyIndex = 1
-            CurrenciesListDialogFragment.newInstance(currencies).show(supportFragmentManager, "dialog")
+            CurrenciesListDialogFragment.newInstance(currencies)
+                .show(supportFragmentManager, "dialog")
         }
         ll_currency_3.setOnClickListener {
             selectingCurrencyIndex = 2
-            CurrenciesListDialogFragment.newInstance(currencies).show(supportFragmentManager, "dialog")
+            CurrenciesListDialogFragment.newInstance(currencies)
+                .show(supportFragmentManager, "dialog")
         }
     }
 
@@ -368,7 +370,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
 
     private fun calculateConversions() {
         // Get conversions rates an calculate exchanges
-        if (activeCurrencyIndex != -1){
+        if (activeCurrencyIndex != -1) {
             val rates = getRates()
             val from = activeCurCodes[activeCurrencyIndex]
             val quantity = getAmountFloat()

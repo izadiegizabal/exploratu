@@ -16,6 +16,7 @@
 
     <!-- Select Currency -->
     <string name="select_currency">Select Currency</string>
+    <string name="currency_query_hint">Japan, Yen, JPY…</string>
 
     <!-- cosos prueba ocr-->
     <string name="ok">OK</string>

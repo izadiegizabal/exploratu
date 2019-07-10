@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/cl_bs_currency_selector"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_behavior="@string/bottom_sheet_behavior"
         android:background="@drawable/bg_rounded_dialog">
 
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
         <TextView
@@ -19,10 +22,21 @@
                 android:text="@string/select_currency"
                 android:textSize="24sp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list"
+        <androidx.appcompat.widget.SearchView
+                android:id="@+id/sv_currencies"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:queryHint="@string/currency_query_hint"
+                android:paddingEnd="16dp"
+                android:paddingStart="0dp"
+                android:layout_marginBottom="16dp"
+                app:iconifiedByDefault="false"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_currency_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:minHeight="5000dp"
                 android:clipToPadding="false"
                 android:paddingTop="@dimen/list_item_spacing_half"
                 android:paddingBottom="@dimen/list_item_spacing_half"
