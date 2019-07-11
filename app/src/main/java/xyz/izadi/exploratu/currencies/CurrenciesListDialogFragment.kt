@@ -60,9 +60,9 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
     private fun setUpQueryListener() {
         sv_currencies.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-           override fun onQueryTextSubmit(query: String?): Boolean {
-               val parentWithBSBehavior = cl_bs_currency_selector.parent as FrameLayout
-               val mBottomSheetBehavior = BottomSheetBehavior.from(parentWithBSBehavior)
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                val parentWithBSBehavior = cl_bs_currency_selector.parent as FrameLayout
+                val mBottomSheetBehavior = BottomSheetBehavior.from(parentWithBSBehavior)
 
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
@@ -162,24 +162,21 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         override fun getFilter(): Filter {
             return object : Filter() {
                 override fun performFiltering(charSequence: CharSequence): FilterResults {
-                    val charString = charSequence.toString()
-                    if (charString.isEmpty()) {
-                        mCurrenciesFiltered = mCurrencies
+                    val charString = charSequence.toString().toLowerCase()
+
+                    mCurrenciesFiltered = if (charString.isEmpty()) {
+                        mCurrencies
                     } else {
                         val filteredList = ArrayList<Currency>()
                         for (currency in mCurrencies.currencies) {
-                            // name match condition. this might differ depending on your requirement
-                            // here we are looking for name or phone number match
-                            if (currency.name.toLowerCase(Locale.getDefault()).contains(
-                                    charString.toLowerCase(Locale.getDefault())
-                                )
-                                || currency.code.contains(charString.toLowerCase(Locale.getDefault()))
+                            if (currency.name.toLowerCase().contains(charString)
+                                || currency.code.toLowerCase().contains(charString)
+                                || countryNameMatch(currency.countries, charString)
                             ) {
                                 filteredList.add(currency)
                             }
                         }
-                        mCurrenciesFiltered =
-                            Currencies(2.0f, Date(), 2, filteredList.toTypedArray())
+                        Currencies(2.0f, Date(), filteredList.size, filteredList.toTypedArray())
                     }
 
                     val filterResults = FilterResults()
@@ -199,6 +196,15 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+    }
+
+    private fun countryNameMatch(countries: Array<String>, query: String): Boolean {
+        for (country in countries) {
+           if (country.toLowerCase().contains(query)) {
+               return true
+           }
+        }
+        return false
     }
 
     companion object {
