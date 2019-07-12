@@ -109,7 +109,7 @@
         <item name="android:layout_marginEnd">16dp</item>
         <item name="android:textAlignment">viewEnd</item>
         <item name="android:textColor">@color/color_on_background</item>
-        <item name="android:textSize">28sp</item>
+        <item name="android:textSize">32sp</item>
         <item name="android:maxLines">1</item>
     </style>
 
@@ -126,7 +126,7 @@
         <item name="android:layout_gravity">fill</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_columnWeight">1</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/color_on_surface</item>
         <item name="android:fontFamily">monospace</item>
         <item name="android:layout_height">64dp</item>

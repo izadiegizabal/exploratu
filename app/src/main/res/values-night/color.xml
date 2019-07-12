@@ -40,4 +40,5 @@
     <!-- Specific colours -->
     <color name="color_pad">#0C0C0C</color>
     <color name="color_pad_bg">#000</color>
+    <color name="color_placeholder">#28FFFFFF</color>
 </resources>

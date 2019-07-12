@@ -1,6 +1,12 @@
-package xyz.izadi.exploratu.currencies.models
+package xyz.izadi.exploratu.currencies.data.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 data class Exchanges(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int? = null,
     val AUD: Float,
     val BGN: Float,
     val BRL: Float,
@@ -36,6 +42,7 @@ data class Exchanges(
     val ZAR: Float
 ) {
     constructor(rates: ArrayList<Float>) : this(
+        null,
         rates[0],
         rates[1],
         rates[2],

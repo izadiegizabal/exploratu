@@ -64,5 +64,6 @@
     <!-- Specific colours -->
     <color name="color_pad">#FFFFFF</color>
     <color name="color_pad_bg">#fafafa</color>
+    <color name="color_placeholder">#0D000000</color>
 
 </resources>

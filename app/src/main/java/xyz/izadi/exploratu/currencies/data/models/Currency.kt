@@ -1,4 +1,4 @@
-package xyz.izadi.exploratu.currencies.models
+package xyz.izadi.exploratu.currencies.data.models
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -11,11 +11,11 @@ data class Currency(
     val countries: Array<String>
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!,
         parcel.readFloat(),
-        parcel.createStringArray()
+        parcel.createStringArray()!!
     )
 
     override fun equals(other: Any?): Boolean {

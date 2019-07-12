@@ -4,6 +4,8 @@ import BottomNavigationDrawerFragment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.format.DateUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -12,10 +14,13 @@ import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import xyz.izadi.exploratu.currencies.CurrenciesListDialogFragment
 import xyz.izadi.exploratu.currencies.camera.OcrCaptureActivity
-import xyz.izadi.exploratu.currencies.models.Currencies
-import xyz.izadi.exploratu.currencies.models.Rates
+import xyz.izadi.exploratu.currencies.data.models.Currencies
+import xyz.izadi.exploratu.currencies.data.models.Rates
+import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.others.Utils.reformatIfNeeded
 import java.io.IOException
 import java.util.*
@@ -24,7 +29,9 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener {
     private val LOG_TAG = this.javaClass.simpleName
+    private var ratesDB: RatesDatabase? = null
     private var currencies: Currencies? = null
+    private var currencyRates: Rates? = null
     private var activeCurrencyIndex = -1
     private var selectingCurrencyIndex = -1
     private var activeCurrencyAmount = ""
@@ -40,6 +47,9 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
             val intent = Intent(this, OcrCaptureActivity::class.java)
             startActivity(intent)
         }
+
+        ratesDB = RatesDatabase.getInstance(applicationContext)
+
         currencies = getCurrencies()
         setPreferredCurrencies()
 
@@ -371,26 +381,36 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     private fun calculateConversions() {
         // Get conversions rates an calculate exchanges
         if (activeCurrencyIndex != -1) {
-            val rates = getRates()
-            val from = activeCurCodes[activeCurrencyIndex]
-            val quantity = getAmountFloat()
-            when (activeCurrencyIndex) {
-                0 -> {
-                    tv_currency_2_quantity.text = rates?.convert(quantity, from, activeCurCodes[1])
-                    tv_currency_3_quantity.text = rates?.convert(quantity, from, activeCurCodes[2])
+            updateRates()
+            if (currencyRates != null) {
+                val rates = currencyRates
+                val from = activeCurCodes[activeCurrencyIndex]
+                val quantity = getAmountFloat()
+                when (activeCurrencyIndex) {
+                    0 -> {
+                        tv_currency_2_quantity.text =
+                            rates?.convert(quantity, from, activeCurCodes[1])
+                        tv_currency_3_quantity.text =
+                            rates?.convert(quantity, from, activeCurCodes[2])
+                    }
+                    1 -> {
+                        tv_currency_1_quantity.text =
+                            rates?.convert(quantity, from, activeCurCodes[0])
+                        tv_currency_3_quantity.text =
+                            rates?.convert(quantity, from, activeCurCodes[2])
+                    }
+                    2 -> {
+                        tv_currency_1_quantity.text =
+                            rates?.convert(quantity, from, activeCurCodes[0])
+                        tv_currency_2_quantity.text =
+                            rates?.convert(quantity, from, activeCurCodes[1])
+                    }
                 }
-                1 -> {
-                    tv_currency_1_quantity.text = rates?.convert(quantity, from, activeCurCodes[0])
-                    tv_currency_3_quantity.text = rates?.convert(quantity, from, activeCurCodes[2])
-                }
-                2 -> {
-                    tv_currency_1_quantity.text = rates?.convert(quantity, from, activeCurCodes[0])
-                    tv_currency_2_quantity.text = rates?.convert(quantity, from, activeCurCodes[1])
-                }
-            }
 
-            val formattedDate = getFormattedDate(rates?.timestamp)
-            tv_exchange_provider.text = getString(R.string.exchanges_provided_by_at, formattedDate)
+                val formattedDate = getFormattedDate(rates?.timestamp)
+                tv_exchange_provider.text =
+                    getString(R.string.exchanges_provided_by_at, formattedDate)
+            }
         }
     }
 
@@ -403,9 +423,26 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
         return activeCurrencyAmount.replace(",", "").toFloat()
     }
 
-    private fun getRates(): Rates? {
+    private fun updateRates() {
         // Check if you can download newer
-        // Otherwise load from currencies
-        return currencies?.getRates()
+        GlobalScope.launch {
+            val latestRatesFromDB = ratesDB?.ratesDao()?.getLatestRates()
+
+            if (latestRatesFromDB != null) {
+                if (DateUtils.isToday(latestRatesFromDB.timestamp.time)){
+                    currencyRates = latestRatesFromDB
+                } else {
+                    // fetch from API
+                }
+            } else {
+                currencyRates = currencies?.getRates()
+                ratesDB?.ratesDao()?.insertRates(currencyRates!!)
+            }
+
+            Log.d(LOG_TAG, "db created?! $latestRatesFromDB")
+        }
+
+        // Otherwise load defaults from currencies
+        currencyRates = currencies?.getRates()
     }
 }

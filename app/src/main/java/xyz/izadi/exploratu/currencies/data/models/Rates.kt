@@ -1,10 +1,16 @@
-package xyz.izadi.exploratu.currencies.models
+package xyz.izadi.exploratu.currencies.data.models
 
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import xyz.izadi.exploratu.currencies.others.Utils
 import java.util.*
 
+@Entity
 data class Rates(
+    @PrimaryKey
     val timestamp: Date,
+    @Embedded
     val exchanges: Exchanges
 ) {
     fun convert(quantity: Float, from: String, to: String): String {

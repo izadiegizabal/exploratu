@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -46,9 +48,15 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'jp.wasabeef:picasso-transformations:2.2.1'
 
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 }
 
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin

@@ -1,4 +1,4 @@
-package xyz.izadi.exploratu.currencies.models
+package xyz.izadi.exploratu.currencies.data.models
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -43,7 +43,7 @@ data class Currencies(
 
     fun getCurrency(currencyCodeToSearch: String): Currency? {
         for (currency: Currency in currencies) {
-            if (currency?.code == currencyCodeToSearch) {
+            if (currency.code == currencyCodeToSearch) {
                 return currency
             }
         }
@@ -54,7 +54,7 @@ data class Currencies(
     fun getRates(): Rates {
         val rates: ArrayList<Float> = ArrayList()
         for (currency: Currency in currencies) {
-            rates.add(currency?.defaultValue)
+            rates.add(currency.defaultValue)
         }
         return Rates(versionDate, Exchanges(rates))
     }

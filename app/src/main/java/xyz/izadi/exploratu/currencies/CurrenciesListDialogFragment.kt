@@ -17,10 +17,12 @@ import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.fragment_currencies_list_dialog.*
 import kotlinx.android.synthetic.main.fragment_currencies_list_dialog_item.view.*
 import xyz.izadi.exploratu.R
-import xyz.izadi.exploratu.currencies.models.Currencies
-import xyz.izadi.exploratu.currencies.models.Currency
+import xyz.izadi.exploratu.currencies.data.models.Currencies
+import xyz.izadi.exploratu.currencies.data.models.Currency
 import java.util.*
 import kotlin.collections.ArrayList
+import android.app.Activity
+import android.view.inputmethod.InputMethodManager
 
 
 const val ARG_CURRENCIES = "currencies_object"
@@ -56,6 +58,22 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         rv_currency_list.adapter = mAdapter
 
         setUpQueryListener()
+        setUpScrollListener()
+    }
+
+    private fun setUpScrollListener() {
+        rv_currency_list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0) {
+                    val imm =
+                        context?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                    //Find the currently focused view, so we can grab the correct window token from it.
+                    val view = view?.rootView?.windowToken
+                    imm.hideSoftInputFromWindow(view, 0)
+                }
+            }
+        })
     }
 
     private fun setUpQueryListener() {
@@ -171,6 +189,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
                         for (currency in mCurrencies.currencies) {
                             if (currency.name.toLowerCase().contains(charString)
                                 || currency.code.toLowerCase().contains(charString)
+                                || currency.sign.toLowerCase().contains(charString)
                                 || countryNameMatch(currency.countries, charString)
                             ) {
                                 filteredList.add(currency)
@@ -200,9 +219,9 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
     private fun countryNameMatch(countries: Array<String>, query: String): Boolean {
         for (country in countries) {
-           if (country.toLowerCase().contains(query)) {
-               return true
-           }
+            if (country.toLowerCase().contains(query)) {
+                return true
+            }
         }
         return false
     }
