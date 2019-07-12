@@ -6,14 +6,14 @@ import xyz.izadi.exploratu.currencies.data.models.Rates
 @Dao
 interface RatesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertRates(rates: Rates)
+    suspend fun insertRates(rates: Rates)
 
     @Update
-    fun updateRates(rates: Rates)
+    suspend fun updateRates(rates: Rates)
 
     @Delete
-    fun deleteRates(rates: Rates)
+    suspend fun deleteRates(rates: Rates)
 
-    @Query("SELECT * FROM Rates ORDER BY timestamp DESC LIMIT 1")
-    fun getLatestRates(): Rates
+    @Query("SELECT * FROM Rates ORDER BY date DESC LIMIT 1")
+    suspend fun getLatestRates(): Rates
 }
