@@ -1,6 +1,14 @@
 package xyz.izadi.exploratu.currencies.others
 
+import android.content.Context
 import java.math.BigDecimal
+import java.net.InetAddress
+import android.net.NetworkInfo
+import android.content.Context.CONNECTIVITY_SERVICE
+import androidx.core.content.ContextCompat.getSystemService
+import android.net.ConnectivityManager
+
+
 
 object Utils {
 
@@ -85,5 +93,4 @@ object Utils {
 
         return quantityRes
     }
-
 }

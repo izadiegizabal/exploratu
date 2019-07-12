@@ -10,7 +10,7 @@ import xyz.izadi.exploratu.currencies.data.models.Rates
 
 @Database(
     entities = [Rates::class, Exchanges::class],
-    version = 1
+    version = 3
 )
 @TypeConverters(DateTypeConverter::class)
 abstract class RatesDatabase : RoomDatabase() {
@@ -23,6 +23,7 @@ abstract class RatesDatabase : RoomDatabase() {
                 synchronized(RatesDatabase::class) {
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
                         RatesDatabase::class.java, "rates.db")
+                        .fallbackToDestructiveMigration()
                         .build()
                 }
             }

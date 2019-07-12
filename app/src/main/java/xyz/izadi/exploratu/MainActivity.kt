@@ -3,6 +3,8 @@ package xyz.izadi.exploratu
 import BottomNavigationDrawerFragment
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
@@ -14,13 +16,16 @@ import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import xyz.izadi.exploratu.currencies.CurrenciesListDialogFragment
 import xyz.izadi.exploratu.currencies.camera.OcrCaptureActivity
+import xyz.izadi.exploratu.currencies.data.RatesDatabase
+import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
-import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.others.Utils.reformatIfNeeded
 import java.io.IOException
 import java.util.*
@@ -379,38 +384,42 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     }
 
     private fun calculateConversions() {
-        // Get conversions rates an calculate exchanges
+        // Get conversions rates an calculate rates
         if (activeCurrencyIndex != -1) {
             updateRates()
-            if (currencyRates != null) {
-                val rates = currencyRates
-                val from = activeCurCodes[activeCurrencyIndex]
-                val quantity = getAmountFloat()
-                when (activeCurrencyIndex) {
-                    0 -> {
-                        tv_currency_2_quantity.text =
-                            rates?.convert(quantity, from, activeCurCodes[1])
-                        tv_currency_3_quantity.text =
-                            rates?.convert(quantity, from, activeCurCodes[2])
-                    }
-                    1 -> {
-                        tv_currency_1_quantity.text =
-                            rates?.convert(quantity, from, activeCurCodes[0])
-                        tv_currency_3_quantity.text =
-                            rates?.convert(quantity, from, activeCurCodes[2])
-                    }
-                    2 -> {
-                        tv_currency_1_quantity.text =
-                            rates?.convert(quantity, from, activeCurCodes[0])
-                        tv_currency_2_quantity.text =
-                            rates?.convert(quantity, from, activeCurCodes[1])
-                    }
-                }
+            makeConversions()
+        }
+    }
 
-                val formattedDate = getFormattedDate(rates?.timestamp)
-                tv_exchange_provider.text =
-                    getString(R.string.exchanges_provided_by_at, formattedDate)
+    private fun makeConversions() {
+        if (currencyRates != null) {
+            val rates = currencyRates
+            val from = activeCurCodes[activeCurrencyIndex]
+            val quantity = getAmountFloat()
+            when (activeCurrencyIndex) {
+                0 -> {
+                    tv_currency_2_quantity.text =
+                        rates?.convert(quantity, from, activeCurCodes[1])
+                    tv_currency_3_quantity.text =
+                        rates?.convert(quantity, from, activeCurCodes[2])
+                }
+                1 -> {
+                    tv_currency_1_quantity.text =
+                        rates?.convert(quantity, from, activeCurCodes[0])
+                    tv_currency_3_quantity.text =
+                        rates?.convert(quantity, from, activeCurCodes[2])
+                }
+                2 -> {
+                    tv_currency_1_quantity.text =
+                        rates?.convert(quantity, from, activeCurCodes[0])
+                    tv_currency_2_quantity.text =
+                        rates?.convert(quantity, from, activeCurCodes[1])
+                }
             }
+
+            val formattedDate = getFormattedDate(rates?.date)
+            tv_exchange_provider.text =
+                getString(R.string.exchanges_provided_by_at, formattedDate)
         }
     }
 
@@ -424,25 +433,72 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     }
 
     private fun updateRates() {
-        // Check if you can download newer
         GlobalScope.launch {
-            val latestRatesFromDB = ratesDB?.ratesDao()?.getLatestRates()
-
-            if (latestRatesFromDB != null) {
-                if (DateUtils.isToday(latestRatesFromDB.timestamp.time)){
-                    currencyRates = latestRatesFromDB
+            // If there are no conversion rates or if they are older than today
+            if (currencyRates == null || !DateUtils.isToday(currencyRates?.date?.time!!)) {
+                // get the latest from db
+                val latestRatesFromDB = ratesDB?.ratesDao()?.getLatestRates()
+                // if there isn't any on db or if they are older than today
+                if (latestRatesFromDB == null || !DateUtils.isToday(latestRatesFromDB.date.time)) {
+                    // check for internet
+                    if (isInternetAvailable()) {
+                        // Try to fetch from the API
+                        val response = ApiFactory.exchangeRatesAPI.getLatestRates()
+                        withContext(Dispatchers.Main) {
+                            try {
+                                if (response.isSuccessful) {
+                                    currencyRates = response.body()
+                                    ratesDB?.ratesDao()?.insertRates(response.body()!!)
+                                    runOnUiThread {
+                                        makeConversions()
+                                    }
+                                } else {
+                                    Log.d(
+                                        LOG_TAG,
+                                        "Error while getting new data: ${response.code()}"
+                                    )
+                                    // DB fallback in case of error, no connection...
+                                    if (latestRatesFromDB == null) {
+                                        currencyRates = currencies?.getRates() //fallback from JSON
+                                        ratesDB?.ratesDao()?.insertRates(currencyRates!!)
+                                    } else {
+                                        currencyRates = latestRatesFromDB
+                                    }
+                                    runOnUiThread {
+                                        makeConversions()
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    } else {
+                        // DB fallback in case of no connection...
+                        if (latestRatesFromDB == null) {
+                            currencyRates = currencies?.getRates() //fallback from JSON
+                            ratesDB?.ratesDao()?.insertRates(currencyRates!!)
+                        } else {
+                            currencyRates = latestRatesFromDB
+                        }
+                        runOnUiThread {
+                            makeConversions()
+                        }
+                    }
                 } else {
-                    // fetch from API
+                    // if they are from today we just use them
+                    currencyRates = latestRatesFromDB
+                    runOnUiThread {
+                        makeConversions()
+                    }
                 }
-            } else {
-                currencyRates = currencies?.getRates()
-                ratesDB?.ratesDao()?.insertRates(currencyRates!!)
             }
-
-            Log.d(LOG_TAG, "db created?! $latestRatesFromDB")
         }
+    }
 
-        // Otherwise load defaults from currencies
-        currencyRates = currencies?.getRates()
+    private fun isInternetAvailable(): Boolean {
+        val cm =
+            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+        return activeNetwork?.isConnected == true
     }
 }
