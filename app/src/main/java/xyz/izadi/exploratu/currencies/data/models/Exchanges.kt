@@ -51,6 +51,10 @@ data class Exchanges(
         EUR = 1.0f
     }
 
+    fun resetEur(){
+        EUR = 1.0f
+    }
+
     constructor(rates: ArrayList<Float>) : this(
         null,
         rates[0],

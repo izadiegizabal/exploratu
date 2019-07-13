@@ -61,6 +61,8 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
         setUpAmountListeners()
         setUpPadListeners()
         setUpCurrencySelectorListeners()
+
+        tv_currency_1_quantity.performClick()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -448,6 +450,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                             try {
                                 if (response.isSuccessful) {
                                     currencyRates = response.body()
+                                    currencyRates?.rates?.resetEur()
                                     ratesDB?.ratesDao()?.insertRates(response.body()!!)
                                     runOnUiThread {
                                         makeConversions()
@@ -459,8 +462,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                                     )
                                     // DB fallback in case of error, no connection...
                                     if (latestRatesFromDB == null) {
-                                        currencyRates = currencies?.getRates() //fallback from JSON
-                                        ratesDB?.ratesDao()?.insertRates(currencyRates!!)
+                                        saveRatesFallbackInDB()
                                     } else {
                                         currencyRates = latestRatesFromDB
                                     }
@@ -475,8 +477,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                     } else {
                         // DB fallback in case of no connection...
                         if (latestRatesFromDB == null) {
-                            currencyRates = currencies?.getRates() //fallback from JSON
-                            ratesDB?.ratesDao()?.insertRates(currencyRates!!)
+                            saveRatesFallbackInDB()
                         } else {
                             currencyRates = latestRatesFromDB
                         }
@@ -500,5 +501,15 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
         return activeNetwork?.isConnected == true
+    }
+
+    private suspend fun insertRateInDB(rates: Rates) {
+        rates.rates.resetEur()
+        ratesDB?.ratesDao()?.insertRates(rates)
+    }
+
+    private suspend fun saveRatesFallbackInDB() {
+        currencyRates = currencies?.getRates() //fallback from JSON
+        insertRateInDB(currencyRates!!)
     }
 }
