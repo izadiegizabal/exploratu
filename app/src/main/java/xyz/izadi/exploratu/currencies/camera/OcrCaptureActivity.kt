@@ -22,7 +22,6 @@ import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.vision.text.Text
-import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.ocr_capture.*
@@ -32,7 +31,6 @@ import xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
 import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 import java.io.IOException
-import java.io.InputStream
 
 /**
  * Activity for the Ocr Detecting app.  This app detects text and displays the value with the

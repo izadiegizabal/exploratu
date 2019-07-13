@@ -15,10 +15,8 @@
  */
 package xyz.izadi.exploratu.currencies.camera.ui
 
-import com.google.android.gms.vision.text.Text
-import com.google.android.gms.vision.text.TextBlock
-import android.R
 import android.graphics.*
+import com.google.android.gms.vision.text.Text
 
 
 /**
@@ -82,7 +80,7 @@ class OcrGraphic(
         canvas.drawBitmap(
             graphic,
             end,
-            (bottom - (text.boundingBox.height()/2 + graphic.height/2 + 15)),
+            (bottom - (text.boundingBox.height() / 2 + graphic.height / 2 + 15)),
             textPaint
         )
         canvas.drawText(
