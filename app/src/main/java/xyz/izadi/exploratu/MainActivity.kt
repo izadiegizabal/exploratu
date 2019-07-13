@@ -4,7 +4,9 @@ import BottomNavigationDrawerFragment
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
+import android.net.Network
 import android.net.NetworkInfo
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
@@ -57,10 +59,12 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
 
         currencies = getCurrencies()
         setPreferredCurrencies()
+        updateRates()
 
         setUpAmountListeners()
         setUpPadListeners()
         setUpCurrencySelectorListeners()
+        setUpNetworkChangeListener()
 
         tv_currency_1_quantity.performClick()
     }
@@ -187,6 +191,24 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     override fun onCurrencyClicked(code: String) {
         loadCurrencyTo(code, selectingCurrencyIndex)
         calculateConversions()
+    }
+
+    private fun setUpNetworkChangeListener() {
+        val connectivityManager =
+            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager?.let {
+            it.registerNetworkCallback(
+                NetworkRequest.Builder().build(),
+                object : ConnectivityManager.NetworkCallback() {
+                    override fun onAvailable(network: Network) {
+                        updateRates()
+                    }
+
+                    override fun onLost(network: Network?) {
+                        //take action when network connection is lost
+                    }
+                })
+        }
     }
 
     private fun setUpAmountListeners() {
@@ -388,7 +410,6 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     private fun calculateConversions() {
         // Get conversions rates an calculate rates
         if (activeCurrencyIndex != -1) {
-            updateRates()
             makeConversions()
         }
     }
