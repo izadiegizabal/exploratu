@@ -7,6 +7,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.hardware.Camera
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.vision.text.Text
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.snackbar.Snackbar
@@ -29,6 +32,7 @@ import xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
 import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 import java.io.IOException
+import java.io.InputStream
 
 /**
  * Activity for the Ocr Detecting app.  This app detects text and displays the value with the
@@ -142,7 +146,12 @@ class OcrCaptureActivity : AppCompatActivity() {
         // graphics for each text block on screen.  The factory is used by the multi-processor to
         // create a separate tracker instance for each text block.
         val textRecognizer = TextRecognizer.Builder(context).build()
-        textRecognizer.setProcessor(OcrDetectorProcessor(graphicOverlay))
+
+        // Load bitmap that will be shown alongside the price
+        val inputStream = assets.open("priceTag.png")
+        val icon: Bitmap = BitmapFactory.decodeStream(inputStream)
+
+        textRecognizer.setProcessor(OcrDetectorProcessor(graphicOverlay, icon))
 
         if (!textRecognizer.isOperational) {
             // Note: The first time that an app using a Vision API is installed on a
@@ -295,9 +304,9 @@ class OcrCaptureActivity : AppCompatActivity() {
      */
     private fun onTap(rawX: Float, rawY: Float): Boolean {
         val graphic = graphicOverlay!!.getGraphicAtLocation(rawX, rawY)
-        var text: TextBlock? = null
+        var text: Text? = null
         if (graphic != null) {
-            text = graphic.textBlock
+            text = graphic.text
             // Text detected, do something
         } else {
             Log.d(TAG, "no text detected")

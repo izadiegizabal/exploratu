@@ -19,13 +19,19 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import com.google.android.gms.vision.text.Text
 import com.google.android.gms.vision.text.TextBlock
+import android.R
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+
+
 
 /**
  * Graphic instance for rendering TextBlock position, size, and ID within an associated graphic
  * overlay view.
  */
-class OcrGraphic(overlay: GraphicOverlay<*>?, val textBlock: TextBlock?) : GraphicOverlay.Graphic(overlay) {
+class OcrGraphic(overlay: GraphicOverlay<*>?, val text: Text, private val number: Double, private val graphic: Bitmap) : GraphicOverlay.Graphic(overlay) {
     var id: Int = 0
 
     init {
@@ -55,10 +61,7 @@ class OcrGraphic(overlay: GraphicOverlay<*>?, val textBlock: TextBlock?) : Graph
      * @return True if the provided point is contained within this graphic's bounding box.
      */
     override fun contains(x: Float, y: Float): Boolean {
-        if (textBlock == null) {
-            return false
-        }
-        var rect = RectF(textBlock.boundingBox)
+        var rect = RectF(text.boundingBox)
         rect = translateRect(rect)
         return rect.contains(x, y)
     }
@@ -67,22 +70,17 @@ class OcrGraphic(overlay: GraphicOverlay<*>?, val textBlock: TextBlock?) : Graph
      * Draws the text block annotations for position, size, and raw value on the supplied canvas.
      */
     override fun draw(canvas: Canvas) {
-        if (textBlock == null) {
-            return
-        }
 
         // Draws the bounding box around the TextBlock.
-        var rect = RectF(textBlock.boundingBox)
+        var rect = RectF(text.boundingBox)
         rect = translateRect(rect)
-        canvas.drawRect(rect, rectPaint!!)
+        // canvas.drawRect(rect, rectPaint!!)
 
         // Break the text into multiple lines and draw each one according to its own bounding box.
-        val textComponents = textBlock.components
-        for (currentText in textComponents) {
-            val left = translateX(currentText.boundingBox.left.toFloat())
-            val bottom = translateY(currentText.boundingBox.bottom.toFloat())
-            canvas.drawText(currentText.value, left, bottom, textPaint!!)
-        }
+        val left = translateX(text.boundingBox.left.toFloat())
+        val bottom = translateY(text.boundingBox.bottom.toFloat())
+        canvas.drawText(number.toString(), left, bottom, textPaint!!)
+        canvas.drawBitmap(graphic, left, bottom, textPaint)
     }
 
     companion object {
