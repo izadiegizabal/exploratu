@@ -15,23 +15,22 @@
  */
 package xyz.izadi.exploratu.currencies.camera.ui
 
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
 import com.google.android.gms.vision.text.Text
 import com.google.android.gms.vision.text.TextBlock
 import android.R
-import android.graphics.BitmapFactory
-import android.graphics.Bitmap
-
+import android.graphics.*
 
 
 /**
  * Graphic instance for rendering TextBlock position, size, and ID within an associated graphic
  * overlay view.
  */
-class OcrGraphic(overlay: GraphicOverlay<*>?, val text: Text, private val number: Double, private val graphic: Bitmap) : GraphicOverlay.Graphic(overlay) {
+class OcrGraphic(
+    overlay: GraphicOverlay<*>?,
+    val text: Text,
+    private val number: Double,
+    private val graphic: Bitmap
+) : GraphicOverlay.Graphic(overlay) {
     var id: Int = 0
 
     init {
@@ -45,8 +44,9 @@ class OcrGraphic(overlay: GraphicOverlay<*>?, val text: Text, private val number
 
         if (textPaint == null) {
             textPaint = Paint()
-            textPaint!!.color = TEXT_COLOR
-            textPaint!!.textSize = 54.0f
+            textPaint!!.color = PRICE_COLOR
+            textPaint!!.textSize = 64.0f
+            textPaint!!.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
         }
         // Redraw the overlay, as this graphic has been added.
         postInvalidate()
@@ -77,15 +77,25 @@ class OcrGraphic(overlay: GraphicOverlay<*>?, val text: Text, private val number
         // canvas.drawRect(rect, rectPaint!!)
 
         // Break the text into multiple lines and draw each one according to its own bounding box.
-        val left = translateX(text.boundingBox.left.toFloat())
+        val end = translateX(text.boundingBox.right.toFloat())
         val bottom = translateY(text.boundingBox.bottom.toFloat())
-        canvas.drawText(number.toString(), left, bottom, textPaint!!)
-        canvas.drawBitmap(graphic, left, bottom, textPaint)
+        canvas.drawBitmap(
+            graphic,
+            end,
+            (bottom - (text.boundingBox.height()/2 + graphic.height/2 + 15)),
+            textPaint
+        )
+        canvas.drawText(
+            number.toString(),
+            (end + (graphic.width / 2 - (number.toString().length / 2 * 35))),
+            (bottom - (text.boundingBox.height() / 2 - 10)),
+            textPaint!!
+        )
     }
 
     companion object {
-
-        private val TEXT_COLOR = Color.WHITE
+        private const val TEXT_COLOR = Color.WHITE
+        private const val PRICE_COLOR = Color.BLACK
         private var rectPaint: Paint? = null
         private var textPaint: Paint? = null
     }
