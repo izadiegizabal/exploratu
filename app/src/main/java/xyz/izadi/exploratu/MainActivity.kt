@@ -14,7 +14,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_main.*
@@ -28,8 +27,8 @@ import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
+import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
 import xyz.izadi.exploratu.currencies.others.Utils.reformatIfNeeded
-import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -57,7 +56,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
 
         ratesDB = RatesDatabase.getInstance(applicationContext)
 
-        currencies = getCurrencies()
+        currencies = getCurrencies(applicationContext)
         setPreferredCurrencies()
         updateRates()
 
@@ -82,24 +81,6 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
             }
         }
         return true
-    }
-
-    private fun getCurrencies(): Currencies? {
-        try {
-            val gson = Gson()
-
-            val jsonString =
-                applicationContext.assets.open("currencyInfo.json").bufferedReader().use {
-                    it.readText()
-                }
-
-            return gson.fromJson(jsonString, Currencies::class.java)
-
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
-        return null
     }
 
     private fun setPreferredCurrencies() {
@@ -196,19 +177,17 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
     private fun setUpNetworkChangeListener() {
         val connectivityManager =
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        connectivityManager?.let {
-            it.registerNetworkCallback(
-                NetworkRequest.Builder().build(),
-                object : ConnectivityManager.NetworkCallback() {
-                    override fun onAvailable(network: Network) {
-                        updateRates()
-                    }
+        connectivityManager.registerNetworkCallback(
+            NetworkRequest.Builder().build(),
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    updateRates()
+                }
 
-                    override fun onLost(network: Network?) {
-                        //take action when network connection is lost
-                    }
-                })
-        }
+                override fun onLost(network: Network?) {
+                    //take action when network connection is lost
+                }
+            })
     }
 
     private fun setUpAmountListeners() {

@@ -15,6 +15,7 @@
  */
 package xyz.izadi.exploratu.currencies.camera
 
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.text.TextBlock
@@ -28,7 +29,8 @@ import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
  */
 class OcrDetectorProcessor internal constructor(
     private val graphicOverlay: GraphicOverlay<OcrGraphic>?,
-    private val drawable: Bitmap
+    private val drawable: Bitmap,
+    private val sharedPreferences: SharedPreferences
 ) :
     Detector.Processor<TextBlock> {
 
@@ -59,7 +61,8 @@ class OcrDetectorProcessor internal constructor(
                                         graphicOverlay,
                                         word,
                                         number.toDouble(),
-                                        drawable
+                                        drawable,
+                                        sharedPreferences
                                     )
                                     graphicOverlay?.add(graphic)
                                 }
@@ -78,6 +81,7 @@ class OcrDetectorProcessor internal constructor(
         graphicOverlay?.clear()
     }
 
+    // Extracts numbers from the passed string, returns null if there aren't
     private fun extractNumbers(originalString: String): String? {
         val regexNotNumbersCommaDot =
             Regex("([^0-9.,]+[.,])") // select everything except numbers with commas/dots

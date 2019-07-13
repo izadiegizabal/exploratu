@@ -15,8 +15,10 @@
  */
 package xyz.izadi.exploratu.currencies.camera.ui
 
+import android.content.SharedPreferences
 import android.graphics.*
 import com.google.android.gms.vision.text.Text
+import xyz.izadi.exploratu.currencies.others.Utils
 
 
 /**
@@ -27,7 +29,8 @@ class OcrGraphic(
     overlay: GraphicOverlay<*>?,
     val text: Text,
     private val number: Double,
-    private val graphic: Bitmap
+    private val graphic: Bitmap,
+    private val sharedPreferences: SharedPreferences
 ) : GraphicOverlay.Graphic(overlay) {
     var id: Int = 0
 
@@ -43,7 +46,7 @@ class OcrGraphic(
         if (textPaint == null) {
             textPaint = Paint()
             textPaint!!.color = PRICE_COLOR
-            textPaint!!.textSize = 64.0f
+            textPaint!!.textSize = 56.0f
             textPaint!!.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
         }
         // Redraw the overlay, as this graphic has been added.
@@ -69,12 +72,11 @@ class OcrGraphic(
      */
     override fun draw(canvas: Canvas) {
 
-        // Draws the bounding box around the TextBlock.
-        var rect = RectF(text.boundingBox)
-        rect = translateRect(rect)
-        // canvas.drawRect(rect, rectPaint!!)
 
-        // Break the text into multiple lines and draw each one according to its own bounding box.
+        val conversionRate = sharedPreferences.getFloat("currency_conversion_rate_AR", 1f)
+        val convertedNum = Utils.round((number * conversionRate).toFloat(), 2)
+        val convertedSting = Utils.addCommas(convertedNum.toString())
+
         val end = translateX(text.boundingBox.right.toFloat())
         val bottom = translateY(text.boundingBox.bottom.toFloat())
         canvas.drawBitmap(
@@ -84,8 +86,8 @@ class OcrGraphic(
             textPaint
         )
         canvas.drawText(
-            number.toString(),
-            (end + (graphic.width / 2 - (number.toString().length / 2 * 35))),
+            convertedSting,
+            (end + 64),
             (bottom - (text.boundingBox.height() / 2 - 10)),
             textPaint!!
         )

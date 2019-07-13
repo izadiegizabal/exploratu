@@ -46,7 +46,8 @@ import java.util.*
  * from the preview's coordinate system to the view coordinate system.
  *
  */
-class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: AttributeSet) : View(context, attrs) {
+class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: AttributeSet) :
+    View(context, attrs) {
     private val lock = Any()
     private var previewWidth: Int = 0
     private var widthScaleFactor = 1.0f

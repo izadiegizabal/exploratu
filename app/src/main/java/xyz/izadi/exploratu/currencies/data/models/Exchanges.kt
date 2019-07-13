@@ -51,7 +51,7 @@ data class Exchanges(
         EUR = 1.0f
     }
 
-    fun resetEur(){
+    fun resetEur() {
         EUR = 1.0f
     }
 

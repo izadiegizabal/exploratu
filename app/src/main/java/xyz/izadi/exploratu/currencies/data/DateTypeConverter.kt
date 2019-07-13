@@ -1,8 +1,7 @@
 package xyz.izadi.exploratu.currencies.data
 
 import androidx.room.TypeConverter
-
-import java.util.Date
+import java.util.*
 
 class DateTypeConverter {
     @TypeConverter

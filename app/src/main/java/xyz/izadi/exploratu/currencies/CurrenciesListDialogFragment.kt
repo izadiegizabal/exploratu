@@ -1,11 +1,13 @@
 package xyz.izadi.exploratu.currencies
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,8 +23,6 @@ import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Currency
 import java.util.*
 import kotlin.collections.ArrayList
-import android.app.Activity
-import android.view.inputmethod.InputMethodManager
 
 
 const val ARG_CURRENCIES = "currencies_object"

@@ -8,7 +8,11 @@ import xyz.izadi.exploratu.R
 
 class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_bottom_navigation_drawer, container, false)
     }
 

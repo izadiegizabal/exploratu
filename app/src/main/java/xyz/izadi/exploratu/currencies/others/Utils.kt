@@ -1,13 +1,10 @@
 package xyz.izadi.exploratu.currencies.others
 
 import android.content.Context
+import com.google.gson.Gson
+import xyz.izadi.exploratu.currencies.data.models.Currencies
+import java.io.IOException
 import java.math.BigDecimal
-import java.net.InetAddress
-import android.net.NetworkInfo
-import android.content.Context.CONNECTIVITY_SERVICE
-import androidx.core.content.ContextCompat.getSystemService
-import android.net.ConnectivityManager
-
 
 
 object Utils {
@@ -48,7 +45,7 @@ object Utils {
         }
 
         // Add 1,000 thousand comma
-       quantityRes = addCommas(quantityRes)
+        quantityRes = addCommas(quantityRes)
 
         // Remove unwanted leading zeros
         if (amountParts[0].length == 2) {
@@ -87,10 +84,29 @@ object Utils {
             }
         }
 
-        if (quantityRes == "0.0"){
+        if (quantityRes == "0.0") {
             quantityRes = "0"
         }
 
         return quantityRes
+    }
+
+
+    fun getCurrencies(context: Context): Currencies? {
+        try {
+            val gson = Gson()
+
+            val jsonString =
+                context.assets.open("currencyInfo.json").bufferedReader().use {
+                    it.readText()
+                }
+
+            return gson.fromJson(jsonString, Currencies::class.java)
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return null
     }
 }

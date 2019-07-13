@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:keepScreenOn="true">
 
-    <!-- Other components and views -->
     <xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview
             android:id="@+id/preview"
             android:layout_width="match_parent"
@@ -15,9 +13,30 @@
         <xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
                 android:id="@+id/graphicOverlay"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
 
     </xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview>
+
+    <!-- Other components and views -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <LinearLayout
+                android:id="@+id/linearLayout"
+                style="@style/CurrencyInfo"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HOLA HOLITA" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/bottomAppBar"
@@ -25,13 +44,73 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             app:backgroundTint="@color/color_primary"
-            app:fabAlignmentMode="end"/>
+            app:fabAlignmentMode="end">
+
+        <LinearLayout
+                style="@style/CurrencyInfo"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginEnd="104dp"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+            <LinearLayout
+                    android:id="@+id/ll_currency_from"
+                    style="@style/LLCurrenciesFromTo">
+
+                <ImageView
+                        android:id="@+id/iv_currency_from_flag"
+                        style="@style/CurrencyFlagAR"
+                        android:contentDescription="@string/flag_of_the_second_currency" />
+
+                <TextView
+                        android:id="@+id/tv_currency_from_code"
+                        style="@style/CurrencyCodeAR"
+                        android:text="EUR" />
+
+                <ImageView
+                        android:id="@+id/iv_currency_from_arrow"
+                        style="@style/CurrencyArrow" />
+            </LinearLayout>
+
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:rotation="270"
+                    android:src="@drawable/ic_twotone_expand_more"
+                    android:tint="@color/color_secondary" />
+
+            <LinearLayout
+                    android:id="@+id/ll_currency_to"
+                    style="@style/LLCurrenciesFromTo"
+                    android:layout_marginStart="20dp">
+
+                <ImageView
+                        android:id="@+id/iv_currency_to_flag"
+                        style="@style/CurrencyFlagAR"
+                        android:contentDescription="@string/flag_of_the_second_currency" />
+
+                <TextView
+                        android:id="@+id/tv_currency_to_code"
+                        style="@style/CurrencyCodeAR"
+                        android:text="USD" />
+
+                <ImageView
+                        android:id="@+id/iv_currency_to_arrow"
+                        style="@style/CurrencyArrow" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/cameraFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_twotone_pause"
-            app:layout_anchor="@id/bottomAppBar"/>
+            app:layout_anchor="@id/bottomAppBar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

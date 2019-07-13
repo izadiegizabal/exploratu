@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/cl_rv_item"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/cl_rv_item">
+        android:layout_height="wrap_content">
 
     <ImageView
             android:id="@+id/iv_currency_flag"
@@ -31,8 +31,8 @@
     <TextView
             android:id="@+id/tv_currency_desc"
             style="@style/CurrencyDesc"
-            android:textSize="14sp"
             android:layout_marginStart="16dp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/tv_currency_code"
             app:layout_constraintStart_toEndOf="@+id/tv_currency_code"
             app:layout_constraintTop_toTopOf="@+id/tv_currency_code"

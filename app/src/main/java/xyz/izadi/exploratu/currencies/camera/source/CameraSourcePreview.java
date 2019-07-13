@@ -8,11 +8,14 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
+
 import androidx.annotation.RequiresPermission;
+
 import com.google.android.gms.common.images.Size;
-import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay;
 
 import java.io.IOException;
+
+import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay;
 
 public class CameraSourcePreview extends ViewGroup {
     private static final String TAG = "CameraSourcePreview";

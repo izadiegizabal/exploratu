@@ -21,4 +21,11 @@ data class Rates(
         val roundedString = Utils.round(conversion, 4).toString()
         return Utils.addCommas(roundedString)
     }
+
+    fun convertFloat(quantity: Float, from: String, to: String): Float {
+        // from --> euro --> to
+        val fromRate = rates.getRate(from)
+        val toRate = rates.getRate(to)
+        return (quantity / fromRate!!) * toRate!!
+    }
 }

@@ -3,6 +3,7 @@ package xyz.izadi.exploratu.currencies.camera
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
@@ -10,7 +11,12 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.hardware.Camera
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkInfo
+import android.net.NetworkRequest
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -24,12 +30,24 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.vision.text.Text
 import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.ocr_capture.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import xyz.izadi.exploratu.R
+import xyz.izadi.exploratu.currencies.CurrenciesListDialogFragment
 import xyz.izadi.exploratu.currencies.camera.source.CameraSource
 import xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
 import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
+import xyz.izadi.exploratu.currencies.data.RatesDatabase
+import xyz.izadi.exploratu.currencies.data.api.ApiFactory
+import xyz.izadi.exploratu.currencies.data.models.Currencies
+import xyz.izadi.exploratu.currencies.data.models.Rates
+import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
 import java.io.IOException
 
 /**
@@ -37,8 +55,7 @@ import java.io.IOException
  * rear facing camera. During detection overlay graphics are drawn to indicate the position,
  * size, and contents of each TextBlock.
  */
-class OcrCaptureActivity : AppCompatActivity() {
-
+class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener {
     private var cameraSource: CameraSource? = null
     private var preview: CameraSourcePreview? = null
     private var graphicOverlay: GraphicOverlay<OcrGraphic>? = null
@@ -46,6 +63,15 @@ class OcrCaptureActivity : AppCompatActivity() {
     // Helper objects for detecting taps and pinches.
     private var scaleGestureDetector: ScaleGestureDetector? = null
     private var gestureDetector: GestureDetector? = null
+
+    // Helper variables to check the state of the activity
+    private val LOG_TAG = this.javaClass.simpleName
+    private var ratesDB: RatesDatabase? = null
+    private var currencies: Currencies? = null
+    private var currencyRates: Rates? = null
+    private var activeCurrencyIndex = 0
+    private var selectingCurrencyIndex = -1
+    private val activeCurCodes = ArrayList<String>()
 
     /**
      * Initializes the UI and creates the detector pipeline.
@@ -80,8 +106,210 @@ class OcrCaptureActivity : AppCompatActivity() {
                 startCameraSource()
             }
         }
+
+        // Initialise conversion data
+        ratesDB = RatesDatabase.getInstance(applicationContext)
+
+        currencies = getCurrencies(applicationContext)
+        setPreferredCurrencies()
+        updateRates()
+        setUpCurrencySelectorListeners()
+        setUpNetworkChangeListener()
     }
 
+    private fun setUpCurrencySelectorListeners() {
+        ll_currency_from.setOnClickListener {
+            selectingCurrencyIndex = 0
+            CurrenciesListDialogFragment.newInstance(currencies)
+                .show(supportFragmentManager, "dialog")
+        }
+        ll_currency_to.setOnClickListener {
+            selectingCurrencyIndex = 1
+            CurrenciesListDialogFragment.newInstance(currencies)
+                .show(supportFragmentManager, "dialog")
+        }
+    }
+
+    private fun setPreferredCurrencies() {
+        // read preferences to load
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        activeCurCodes.add(sharedPref.getString("currency_code_from", "EUR") ?: return)
+        activeCurCodes.add(sharedPref.getString("currency_code_to", "USD") ?: return)
+
+        // load them
+        loadCurrencyTo(activeCurCodes[0], 0)
+        loadCurrencyTo(activeCurCodes[1], 1)
+    }
+
+    private fun loadCurrencyTo(code: String, listPos: Int) {
+        // change global variable
+        activeCurCodes[listPos] = code
+
+        // update tv
+        val curr = currencies?.getCurrency(code)
+        val flagPath = "file:///android_asset/flags/${curr?.code}.png"
+        val transformation = RoundedCornersTransformation(32, 0)
+        when (listPos) {
+            0 -> {
+                Picasso
+                    .get()
+                    .load(flagPath)
+                    .placeholder(R.drawable.ic_dollar_placeholder)
+                    .transform(transformation)
+                    .into(iv_currency_from_flag)
+                tv_currency_from_code.text = curr?.code
+
+                val sharedPref = getPreferences(Context.MODE_PRIVATE)
+                getPreferences(Context.MODE_PRIVATE) ?: return
+                with(sharedPref.edit()) {
+                    putString("currency_code_from", code)
+                    apply()
+                }
+            }
+            1 -> {
+                Picasso
+                    .get()
+                    .load(flagPath)
+                    .placeholder(R.drawable.ic_dollar_placeholder)
+                    .transform(transformation)
+                    .into(iv_currency_to_flag)
+                tv_currency_to_code.text = curr?.code
+
+                val sharedPref = getPreferences(Context.MODE_PRIVATE)
+                getPreferences(Context.MODE_PRIVATE) ?: return
+                with(sharedPref.edit()) {
+                    putString("currency_code_to", code)
+                    apply()
+                }
+            }
+        }
+
+        calculateConversions()
+    }
+
+    override fun onCurrencyClicked(code: String) {
+        loadCurrencyTo(code, selectingCurrencyIndex)
+        calculateConversions()
+    }
+
+    private fun setUpNetworkChangeListener() {
+        val connectivityManager =
+            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.registerNetworkCallback(
+            NetworkRequest.Builder().build(),
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    updateRates()
+                }
+
+                override fun onLost(network: Network?) {
+                    //take action when network connection is lost
+                }
+            })
+    }
+
+    private fun calculateConversions() {
+        // Get conversions rates an calculate rates
+        if (activeCurrencyIndex != -1) {
+            makeConversions()
+        }
+    }
+
+    private fun makeConversions() {
+        if (currencyRates != null) {
+            val rates = currencyRates
+            val from = activeCurCodes[activeCurrencyIndex]
+            val rateIndex = rates?.convertFloat(1f, from, activeCurCodes[1])
+            val sharedPref = getPreferences(Context.MODE_PRIVATE)
+            getPreferences(Context.MODE_PRIVATE) ?: return
+            with(sharedPref.edit()) {
+                putFloat("currency_conversion_rate_AR", rateIndex!!)
+                apply()
+            }
+        }
+    }
+
+    private fun updateRates() {
+        GlobalScope.launch {
+            // If there are no conversion rates or if they are older than today
+            if (currencyRates == null || !DateUtils.isToday(currencyRates?.date?.time!!)) {
+                // get the latest from db
+                val latestRatesFromDB = ratesDB?.ratesDao()?.getLatestRates()
+                // if there isn't any on db or if they are older than today
+                if (latestRatesFromDB == null || !DateUtils.isToday(latestRatesFromDB.date.time)) {
+                    // check for internet
+                    if (isInternetAvailable()) {
+                        // Try to fetch from the API
+                        val response = ApiFactory.exchangeRatesAPI.getLatestRates()
+                        withContext(Dispatchers.Main) {
+                            try {
+                                if (response.isSuccessful) {
+                                    currencyRates = response.body()
+                                    currencyRates?.rates?.resetEur()
+                                    ratesDB?.ratesDao()?.insertRates(response.body()!!)
+                                    runOnUiThread {
+                                        makeConversions()
+                                    }
+                                } else {
+                                    Log.d(
+                                        LOG_TAG,
+                                        "Error while getting new data: ${response.code()}"
+                                    )
+                                    // DB fallback in case of error, no connection...
+                                    if (latestRatesFromDB == null) {
+                                        saveRatesFallbackInDB()
+                                    } else {
+                                        currencyRates = latestRatesFromDB
+                                    }
+                                    runOnUiThread {
+                                        makeConversions()
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    } else {
+                        // DB fallback in case of no connection...
+                        if (latestRatesFromDB == null) {
+                            saveRatesFallbackInDB()
+                        } else {
+                            currencyRates = latestRatesFromDB
+                        }
+                        runOnUiThread {
+                            makeConversions()
+                        }
+                    }
+                } else {
+                    // if they are from today we just use them
+                    currencyRates = latestRatesFromDB
+                    runOnUiThread {
+                        makeConversions()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun isInternetAvailable(): Boolean {
+        val cm =
+            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+        return activeNetwork?.isConnected == true
+    }
+
+    private suspend fun insertRateInDB(rates: Rates) {
+        rates.rates.resetEur()
+        ratesDB?.ratesDao()?.insertRates(rates)
+    }
+
+    private suspend fun saveRatesFallbackInDB() {
+        currencyRates = currencies?.getRates() //fallback from JSON
+        insertRateInDB(currencyRates!!)
+    }
+//////////////////////////////////////////////////////////////////////////////////////////
+//    CAMERA STUFF ///////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Handles the requesting of the camera permission.  This includes
      * showing a "Snackbar" message of why the permission is needed then
@@ -149,7 +377,13 @@ class OcrCaptureActivity : AppCompatActivity() {
         val inputStream = assets.open("priceTag.png")
         val icon: Bitmap = BitmapFactory.decodeStream(inputStream)
 
-        textRecognizer.setProcessor(OcrDetectorProcessor(graphicOverlay, icon))
+        textRecognizer.setProcessor(
+            OcrDetectorProcessor(
+                graphicOverlay,
+                icon,
+                getPreferences(Context.MODE_PRIVATE)
+            )
+        )
 
         if (!textRecognizer.isOperational) {
             // Note: The first time that an app using a Vision API is installed on a

@@ -134,4 +134,20 @@
         <item name="android:insetBottom">0dp</item>
     </style>
 
+    <!-- Currency AR Mode-->
+    <style name="LLCurrenciesFromTo">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="CurrencyFlagAR" parent="CurrencyFlag">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_marginStart">0dp</item>
+    </style>
+
+    <style name="CurrencyCodeAR" parent="CurrencyCode">
+        <item name="android:layout_marginStart">8dp</item>
+    </style>
 </resources>

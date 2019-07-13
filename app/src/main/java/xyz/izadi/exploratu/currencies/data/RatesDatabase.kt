@@ -15,14 +15,17 @@ import xyz.izadi.exploratu.currencies.data.models.Rates
 @TypeConverters(DateTypeConverter::class)
 abstract class RatesDatabase : RoomDatabase() {
     abstract fun ratesDao(): RatesDao
+
     companion object {
         private var INSTANCE: RatesDatabase? = null
 
         fun getInstance(context: Context): RatesDatabase? {
             if (INSTANCE == null) {
                 synchronized(RatesDatabase::class) {
-                    INSTANCE = Room.databaseBuilder(context.applicationContext,
-                        RatesDatabase::class.java, "rates.db")
+                    INSTANCE = Room.databaseBuilder(
+                        context.applicationContext,
+                        RatesDatabase::class.java, "rates.db"
+                    )
                         .fallbackToDestructiveMigration()
                         .build()
                 }
