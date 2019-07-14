@@ -96,7 +96,7 @@
 
                 <ImageView
                         android:id="@+id/iv_currency_from_arrow"
-                        style="@style/CurrencyArrow" />
+                        style="@style/CurrencyArrowAR" />
             </LinearLayout>
 
             <ImageButton
@@ -124,7 +124,7 @@
 
                 <ImageView
                         android:id="@+id/iv_currency_to_arrow"
-                        style="@style/CurrencyArrow" />
+                        style="@style/CurrencyArrowAR" />
             </LinearLayout>
 
         </LinearLayout>
