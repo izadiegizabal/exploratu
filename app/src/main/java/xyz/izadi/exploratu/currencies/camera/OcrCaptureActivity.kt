@@ -2,6 +2,7 @@ package xyz.izadi.exploratu.currencies.camera
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.ActivityOptions
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -17,13 +18,11 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.View
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.vision.text.Text
@@ -31,11 +30,13 @@ import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.ocr_capture.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import xyz.izadi.exploratu.MainActivity
 import xyz.izadi.exploratu.R
 import xyz.izadi.exploratu.currencies.CurrenciesListDialogFragment
 import xyz.izadi.exploratu.currencies.camera.source.CameraSource
@@ -50,6 +51,7 @@ import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencyCodeFromDeviceLocale
 import xyz.izadi.exploratu.currencies.others.Utils.getDetectedCurrency
 import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
+import xyz.izadi.exploratu.currencies.others.Utils.revealActivity
 import java.io.IOException
 import java.security.Policy
 
@@ -116,8 +118,27 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         currencies = getCurrencies(applicationContext)
         setPreferredCurrencies()
         updateRates()
+        setUpOptionsListeners()
         setUpCurrencySelectorListeners()
         setUpNetworkChangeListener()
+    }
+
+    private fun setUpOptionsListeners() {
+       ib_reverse_currencies.setOnClickListener {
+           reverseCurrencies()
+       }
+
+        ib_locate_from_currency.setOnClickListener {
+            locateFromCurrency()
+        }
+
+        ib_flash_toggle.setOnClickListener {
+            turnOnOffFlash()
+        }
+
+        ib_go_to_list.setOnClickListener {
+            goToListView(it)
+        }
     }
 
     private fun setUpCurrencySelectorListeners() {
@@ -309,13 +330,13 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         }
     }
 
-    fun locateFromCurrency(view: View?) {
+    private fun locateFromCurrency() {
         val fromCode = getDetectedCurrency(applicationContext)
         activeCurCodes[0] = fromCode ?: activeCurCodes[0]
         loadCurrencyTo(activeCurCodes[0], 0)
     }
 
-    fun turnOnOffFlash(view: View?) {
+    private fun turnOnOffFlash() {
         if (cameraSource?.flashMode == Camera.Parameters.FLASH_MODE_OFF) {
             cameraSource?.flashMode = Camera.Parameters.FLASH_MODE_TORCH
             ib_flash_toggle.setImageResource(R.drawable.ic_flash_on)
@@ -323,16 +344,20 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
             cameraSource?.flashMode = Camera.Parameters.FLASH_MODE_OFF
             ib_flash_toggle.setImageResource(R.drawable.ic_flash_off)
         }
-        Log.d(LOG_TAG, "The flash mode is: ${cameraSource?.flashMode}")
     }
 
-    fun reverseCurrencies(view: View?) {
+    private fun reverseCurrencies() {
         val aux = activeCurCodes[0]
         activeCurCodes[0] = activeCurCodes[1]
         activeCurCodes[1] = aux
 
         loadCurrencyTo(activeCurCodes[0], 0)
         loadCurrencyTo(activeCurCodes[1], 1)
+    }
+
+    private fun goToListView(view: View) {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
     private suspend fun insertRateInDB(rates: Rates) {

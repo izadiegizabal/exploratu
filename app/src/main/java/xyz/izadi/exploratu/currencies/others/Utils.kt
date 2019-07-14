@@ -1,15 +1,22 @@
 package xyz.izadi.exploratu.currencies.others
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.app.Activity
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.telephony.TelephonyManager
 import android.util.Log
+import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.animation.AccelerateInterpolator
 import com.google.gson.Gson
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import java.io.IOException
 import java.math.BigDecimal
 import java.util.*
+import kotlin.math.max
 
 
 object Utils {
@@ -37,9 +44,15 @@ object Utils {
      * @return
      */
     fun round(numberToRound: Float, decimalPlaces: Int): Float {
-        var bd = BigDecimal(numberToRound.toString())
-        bd = bd.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP)
-        return bd.toFloat()
+        try {
+            var bd = BigDecimal(numberToRound.toString())
+            bd = bd.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP)
+            return bd.toFloat()
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
+
+        return 0f
     }
 
     fun reformatIfNeeded(quantity: String): String {
@@ -124,10 +137,6 @@ object Utils {
         try {
             val telephonyManager =
                 context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            Log.d(
-                LOG_TAG,
-                "Sim country iso: ${telephonyManager.simCountryIso} Network: ${telephonyManager.networkCountryIso}"
-            )
             currentCountry = if(!telephonyManager.simCountryIso.isNullOrBlank()) {
                 telephonyManager.simCountryIso
             } else {
@@ -136,11 +145,6 @@ object Utils {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-        Log.d(
-            LOG_TAG,
-            "Current country code is: $currentCountry"
-        )
 
         return if (!currentCountry.isBlank()) {
             getCurrencyCodeFromCountryISO(currentCountry)
@@ -172,5 +176,36 @@ object Utils {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
         return activeNetwork?.isConnected == true
+    }
+
+    fun revealActivity(x: Int, y: Int, rootLayout: View) {
+        val finalRadius = (max(rootLayout.width, rootLayout.height) * 1.1).toFloat()
+
+        // create the animator for this view (the start radius is zero)
+        val circularReveal =
+            ViewAnimationUtils.createCircularReveal(rootLayout, x, y, 0f, finalRadius)
+        circularReveal.duration = 400
+        circularReveal.interpolator = AccelerateInterpolator()
+
+        // make the view visible and start the animation
+        rootLayout.visibility = View.VISIBLE
+        circularReveal.start()
+    }
+
+    fun unRevealActivity(rootLayout: View, revealX: Int, revealY: Int, activity: Activity) {
+        val finalRadius = (max(rootLayout.width, rootLayout.height) * 1.1).toFloat()
+        val circularReveal = ViewAnimationUtils.createCircularReveal(
+            rootLayout, revealX, revealY, finalRadius, 0f
+        )
+
+        circularReveal.duration = 400
+        circularReveal.addListener(object: AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                rootLayout.visibility = View.INVISIBLE
+                activity.finish()
+            }
+        })
+
+        circularReveal.start()
     }
 }

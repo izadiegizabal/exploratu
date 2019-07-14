@@ -84,7 +84,6 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-                Log.d(LOG_TAG, "It works! $query")
                 mAdapter?.filter?.filter(query)
                 return false
             }
@@ -95,7 +94,6 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-                Log.d(LOG_TAG, "It works! $newText")
                 mAdapter?.filter?.filter(newText)
                 return false
             }

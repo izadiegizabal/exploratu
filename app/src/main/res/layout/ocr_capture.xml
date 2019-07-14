@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/cl_ocr_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:keepScreenOn="true">
@@ -34,9 +35,18 @@
                 app:layout_constraintTop_toTopOf="parent">
 
             <ImageButton
+                    android:id="@+id/ib_go_to_list"
+                    style="@style/OptionsAR"
+                    android:layout_marginStart="8dp"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_list_alt"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
                     android:id="@+id/ib_locate_from_currency"
                     style="@style/OptionsAR"
-                    android:onClick="locateFromCurrency"
                     android:src="@drawable/ic_twotone_my_location"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -45,7 +55,6 @@
             <ImageButton
                     android:id="@+id/ib_flash_toggle"
                     style="@style/OptionsAR"
-                    android:onClick="turnOnOffFlash"
                     android:src="@drawable/ic_flash_off"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/ib_locate_from_currency"
@@ -91,10 +100,10 @@
             </LinearLayout>
 
             <ImageButton
+                    android:id="@+id/ib_reverse_currencies"
                     android:layout_width="36dp"
                     android:layout_height="match_parent"
                     android:background="?actionBarItemBackground"
-                    android:onClick="reverseCurrencies"
                     android:src="@drawable/ic_twotone_chevron_right"
                     android:tint="@color/color_on_primary" />
 
