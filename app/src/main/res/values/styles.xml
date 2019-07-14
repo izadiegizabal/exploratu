@@ -150,4 +150,16 @@
     <style name="CurrencyCodeAR" parent="CurrencyCode">
         <item name="android:layout_marginStart">8dp</item>
     </style>
+
+    <style name="OptionsAR">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:background">?actionBarItemBackground</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:tint">@color/color_on_primary</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:padding">6dp</item>
+    </style>
+
 </resources>

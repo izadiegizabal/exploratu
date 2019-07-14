@@ -34,18 +34,21 @@
                 app:layout_constraintTop_toTopOf="parent">
 
             <ImageButton
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="?actionBarItemBackground"
+                    android:id="@+id/ib_locate_from_currency"
+                    style="@style/OptionsAR"
                     android:onClick="locateFromCurrency"
-                    android:scaleType="fitCenter"
                     android:src="@drawable/ic_twotone_my_location"
-                    android:tint="@color/color_on_primary"
-                    android:adjustViewBounds="true"
-                    android:padding="6dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                    android:id="@+id/ib_flash_toggle"
+                    style="@style/OptionsAR"
+                    android:onClick="turnOnOffFlash"
+                    android:src="@drawable/ic_flash_off"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/ib_locate_from_currency"
                     app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -91,8 +94,9 @@
                     android:layout_width="36dp"
                     android:layout_height="match_parent"
                     android:background="?actionBarItemBackground"
+                    android:onClick="reverseCurrencies"
                     android:src="@drawable/ic_twotone_chevron_right"
-                    android:tint="@color/color_secondary" />
+                    android:tint="@color/color_on_primary" />
 
             <LinearLayout
                     android:id="@+id/ll_currency_to"

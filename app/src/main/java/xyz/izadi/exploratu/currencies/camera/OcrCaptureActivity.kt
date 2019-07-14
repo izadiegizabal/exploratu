@@ -51,6 +51,7 @@ import xyz.izadi.exploratu.currencies.others.Utils.getCurrencyCodeFromDeviceLoca
 import xyz.izadi.exploratu.currencies.others.Utils.getDetectedCurrency
 import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
 import java.io.IOException
+import java.security.Policy
 
 /**
  * Activity for the Ocr Detecting app.  This app detects text and displays the value with the
@@ -308,10 +309,30 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         }
     }
 
-    fun locateFromCurrency(view: View) {
+    fun locateFromCurrency(view: View?) {
         val fromCode = getDetectedCurrency(applicationContext)
         activeCurCodes[0] = fromCode ?: activeCurCodes[0]
         loadCurrencyTo(activeCurCodes[0], 0)
+    }
+
+    fun turnOnOffFlash(view: View?) {
+        if (cameraSource?.flashMode == Camera.Parameters.FLASH_MODE_OFF) {
+            cameraSource?.flashMode = Camera.Parameters.FLASH_MODE_TORCH
+            ib_flash_toggle.setImageResource(R.drawable.ic_flash_on)
+        } else {
+            cameraSource?.flashMode = Camera.Parameters.FLASH_MODE_OFF
+            ib_flash_toggle.setImageResource(R.drawable.ic_flash_off)
+        }
+        Log.d(LOG_TAG, "The flash mode is: ${cameraSource?.flashMode}")
+    }
+
+    fun reverseCurrencies(view: View?) {
+        val aux = activeCurCodes[0]
+        activeCurCodes[0] = activeCurCodes[1]
+        activeCurCodes[1] = aux
+
+        loadCurrencyTo(activeCurCodes[0], 0)
+        loadCurrencyTo(activeCurCodes[1], 1)
     }
 
     private suspend fun insertRateInDB(rates: Rates) {

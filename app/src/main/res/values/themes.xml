@@ -67,6 +67,7 @@
         <item name="navigationViewStyle">@style/Widget.MyTheme.NavigationView</item>
         <item name="toolbarStyle">@style/Widget.MyTheme.Toolbar</item>
         <item name="bottomAppBarStyle">@style/Widget.MyTheme.BottomAppBar.Colored</item>
+        <item name="colorControlHighlight">@color/color_secondary</item>
     </style>
 
     <style name="Base.MaterialThemeBuilder" parent="Theme.MaterialComponents.DayNight.NoActionBar">
