@@ -21,6 +21,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import com.google.android.gms.common.ConnectionResult
@@ -107,8 +108,10 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         cameraFab.setOnClickListener {
             if (preview!!.isActive) {
                 onPause()
+                cameraFab.setImageResource(R.drawable.ic_play_arrow)
             } else {
                 startCameraSource()
+                cameraFab.setImageResource(R.drawable.ic_twotone_pause)
             }
         }
 
@@ -121,6 +124,17 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         setUpOptionsListeners()
         setUpCurrencySelectorListeners()
         setUpNetworkChangeListener()
+        setUpToolTips()
+    }
+
+    private fun setUpToolTips() {
+        TooltipCompat.setTooltipText(ib_go_to_list, getString(R.string.tt_go_to_list))
+        TooltipCompat.setTooltipText(ib_flash_toggle, getString(R.string.tt_flash_toggle))
+        TooltipCompat.setTooltipText(ib_locate_from_currency, getString(R.string.tt_locate_from_currency))
+        TooltipCompat.setTooltipText(ib_reverse_currencies, getString(R.string.tt_reverse_currencies))
+        TooltipCompat.setTooltipText(ll_currency_from, getString(R.string.tt_currency_from))
+        TooltipCompat.setTooltipText(ll_currency_to, getString(R.string.tt_currency_to))
+        TooltipCompat.setTooltipText(cameraFab, getString(R.string.tt_camera_fab))
     }
 
     private fun setUpOptionsListeners() {

@@ -12,10 +12,13 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.bottomAppBar
+import kotlinx.android.synthetic.main.ocr_capture.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -64,6 +67,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
         setUpPadListeners()
         setUpCurrencySelectorListeners()
         setUpNetworkChangeListener()
+        setUpToolTips()
 
         tv_currency_1_quantity.performClick()
     }
@@ -81,6 +85,16 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
             }
         }
         return true
+    }
+
+    private fun setUpToolTips() {
+        TooltipCompat.setTooltipText(ll_currency_1, getString(R.string.tt_currency_1))
+        TooltipCompat.setTooltipText(ll_currency_2, getString(R.string.tt_currency_2))
+        TooltipCompat.setTooltipText(ll_currency_3, getString(R.string.tt_currency_3))
+        TooltipCompat.setTooltipText(tv_currency_1_quantity, getString(R.string.tt_currency_active))
+        TooltipCompat.setTooltipText(tv_currency_2_quantity, getString(R.string.tt_currency_active))
+        TooltipCompat.setTooltipText(tv_currency_3_quantity, getString(R.string.tt_currency_active))
+        TooltipCompat.setTooltipText(fab, getString(R.string.tt_ar_fab))
     }
 
     private fun setPreferredCurrencies() {

@@ -13,12 +13,26 @@
     <string name="flag_of_the_second_currency">Flag of the second currency</string>
     <string name="flag_of_the_third_currency">Flag of the third currency</string>
     <string name="currency_desc">%1$s - %2$s</string>
+    <string name="tt_currency_1">Select First Currency</string>
+    <string name="tt_currency_2">Select Second Currency</string>
+    <string name="tt_currency_3">Select Third Currency</string>
+    <string name="tt_currency_active">Make Currency Active</string>
+    <string name="tt_ar_fab">Start AR Mode</string>
 
     <!-- Select Currency -->
     <string name="select_currency">Select Currency</string>
-    <string name="currency_query_hint">JPY, Yen, Japan…</string>
+    <string name="currency_query_hint">JPY, Yen, ¥, Japan…</string>
 
-    <!-- cosos prueba ocr-->
+    <!--  AR MODE  -->
+    <string name="tt_go_to_list">Manual Conversion</string>
+    <string name="tt_flash_toggle">Toggle Flashlight</string>
+    <string name="tt_locate_from_currency">Locate Origin Currency</string>
+    <string name="tt_reverse_currencies">Reverse Currencies</string>
+    <string name="tt_currency_from">Select Origin Currency</string>
+    <string name="tt_currency_to">Select Your Currency</string>
+    <string name="tt_camera_fab">Pause/Resume Preview</string>
+
+    <!-- Default ORC -->
     <string name="ok">OK</string>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
