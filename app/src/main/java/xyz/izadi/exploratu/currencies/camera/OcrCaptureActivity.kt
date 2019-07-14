@@ -48,6 +48,9 @@ import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
+import xyz.izadi.exploratu.currencies.others.Utils.getCurrencyCodeFromDeviceLocale
+import xyz.izadi.exploratu.currencies.others.Utils.getDetectedCurrency
+import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
 import java.io.IOException
 
 /**
@@ -133,8 +136,23 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
     private fun setPreferredCurrencies() {
         // read preferences to load
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
-        activeCurCodes.add(sharedPref.getString("currency_code_from", "EUR") ?: return)
-        activeCurCodes.add(sharedPref.getString("currency_code_to", "USD") ?: return)
+        val fromKey = "currency_code_from"
+        val toKey = "currency_code_to"
+        val defaultFromCurrencyCode = "EUR"
+        val defaultToCurrencyCode = "USD"
+
+        val fromCode = getDetectedCurrency(applicationContext)
+        if (fromCode != null){
+            activeCurCodes.add(fromCode)
+        } else {
+            activeCurCodes.add(sharedPref.getString(fromKey, defaultFromCurrencyCode) ?: return)
+        }
+
+        if (!sharedPref.contains(toKey)) {
+            activeCurCodes.add(getCurrencyCodeFromDeviceLocale())
+        } else {
+            activeCurCodes.add(sharedPref.getString(toKey, defaultToCurrencyCode) ?: return)
+        }
 
         // load them
         loadCurrencyTo(activeCurCodes[0], 0)
@@ -238,7 +256,7 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
                 // if there isn't any on db or if they are older than today
                 if (latestRatesFromDB == null || !DateUtils.isToday(latestRatesFromDB.date.time)) {
                     // check for internet
-                    if (isInternetAvailable()) {
+                    if (isInternetAvailable(applicationContext)) {
                         // Try to fetch from the API
                         val response = ApiFactory.exchangeRatesAPI.getLatestRates()
                         withContext(Dispatchers.Main) {
@@ -289,13 +307,6 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
                 }
             }
         }
-    }
-
-    private fun isInternetAvailable(): Boolean {
-        val cm =
-            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-        return activeNetwork?.isConnected == true
     }
 
     private suspend fun insertRateInDB(rates: Rates) {
@@ -476,7 +487,7 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
             return
         }
 
-        if (grantResults.size != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Camera permission granted - initialize the camera source")
             // we have permission, so create the camerasource
             val autoFocus = intent.getBooleanExtra(AutoFocus, true)
@@ -487,7 +498,7 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
 
         Log.e(
             TAG, "Permission not granted: results len = " + grantResults.size +
-                    " Result code = " + if (grantResults.size > 0) grantResults[0] else "(empty)"
+                    " Result code = " + if (grantResults.isNotEmpty()) grantResults[0] else "(empty)"
         )
 
         val listener = DialogInterface.OnClickListener { dialog, id -> finish() }
@@ -608,17 +619,17 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
     }
 
     companion object {
-        private val TAG = "OcrCaptureActivity"
+        private const val TAG = "OcrCaptureActivity"
 
         // Intent request code to handle updating play services if needed.
-        private val RC_HANDLE_GMS = 9001
+        private const val RC_HANDLE_GMS = 9001
 
         // Permission request codes need to be < 256
-        private val RC_HANDLE_CAMERA_PERM = 2
+        private const val RC_HANDLE_CAMERA_PERM = 2
 
         // Constants used to pass extra data in the intent
-        val AutoFocus = "AutoFocus"
-        val UseFlash = "UseFlash"
-        val TextBlockObject = "String"
+        const val AutoFocus = "AutoFocus"
+        const val UseFlash = "UseFlash"
+        const val TextBlockObject = "String"
     }
 }

@@ -85,8 +85,8 @@ class OcrDetectorProcessor internal constructor(
     private fun extractNumbers(originalString: String): String? {
         val regexNotNumbersCommaDot =
             Regex("([^0-9.,]+[.,])") // select everything except numbers with commas/dots
-        val onlyNumbers = originalString.replace(regexNotNumbersCommaDot, "")
-        val dottedPriceRegex = Regex("\\d+([.,])\\d{1,4}")
+        val onlyNumbers = originalString.replace(regexNotNumbersCommaDot, "") //remove irrelevant chars
+        val dottedPriceRegex = Regex("\\d+([.,])\\d{1,4}") // select numbers with decimals
         var value = dottedPriceRegex.find(onlyNumbers)?.value
         if (value != null) {
             val valueParts = value.split(Regex("[,.]"))

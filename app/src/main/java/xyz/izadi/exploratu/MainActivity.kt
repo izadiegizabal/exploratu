@@ -27,7 +27,9 @@ import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
+import xyz.izadi.exploratu.currencies.others.Utils
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
+import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
 import xyz.izadi.exploratu.currencies.others.Utils.reformatIfNeeded
 import java.util.*
 import kotlin.collections.ArrayList
@@ -443,7 +445,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                 // if there isn't any on db or if they are older than today
                 if (latestRatesFromDB == null || !DateUtils.isToday(latestRatesFromDB.date.time)) {
                     // check for internet
-                    if (isInternetAvailable()) {
+                    if (isInternetAvailable(applicationContext)) {
                         // Try to fetch from the API
                         val response = ApiFactory.exchangeRatesAPI.getLatestRates()
                         withContext(Dispatchers.Main) {
@@ -494,13 +496,6 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                 }
             }
         }
-    }
-
-    private fun isInternetAvailable(): Boolean {
-        val cm =
-            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-        return activeNetwork?.isConnected == true
     }
 
     private suspend fun insertRateInDB(rates: Rates) {

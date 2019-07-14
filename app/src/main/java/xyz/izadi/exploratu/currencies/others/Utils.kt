@@ -1,13 +1,20 @@
 package xyz.izadi.exploratu.currencies.others
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
+import android.telephony.TelephonyManager
+import android.util.Log
 import com.google.gson.Gson
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import java.io.IOException
 import java.math.BigDecimal
+import java.util.*
 
 
 object Utils {
+
+    private val LOG_TAG = this.javaClass.simpleName
 
     fun insertPeriodically(text: String, insert: String, period: Int): String {
         val builder = StringBuilder(text)
@@ -108,5 +115,62 @@ object Utils {
         }
 
         return null
+    }
+
+    fun getDetectedCurrency(context: Context): String? {
+
+        var currentCountry = ""
+
+        try {
+            val telephonyManager =
+                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            Log.d(
+                LOG_TAG,
+                "Sim country iso: ${telephonyManager.simCountryIso} Network: ${telephonyManager.networkCountryIso}"
+            )
+            currentCountry = if(!telephonyManager.simCountryIso.isNullOrBlank()) {
+                telephonyManager.simCountryIso
+            } else {
+                telephonyManager.networkCountryIso
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        Log.d(
+            LOG_TAG,
+            "Current country code is: $currentCountry"
+        )
+
+        return if (!currentCountry.isBlank()) {
+            getCurrencyCodeFromCountryISO(currentCountry)
+        } else {
+            null
+        }
+    }
+
+    private fun getCurrencyCodeFromCountryISO(countryISO: String): String? {
+        try {
+            val locale = Locale("", countryISO)
+            return getCurrencyCodeFromLocale(locale)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    fun getCurrencyCodeFromDeviceLocale(): String {
+        val currentLocale = Locale.getDefault()
+        return getCurrencyCodeFromLocale(currentLocale)
+    }
+
+    private fun getCurrencyCodeFromLocale(locale: Locale): String {
+        return Currency.getInstance(locale).currencyCode
+    }
+
+    fun isInternetAvailable(context: Context): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+        return activeNetwork?.isConnected == true
     }
 }
