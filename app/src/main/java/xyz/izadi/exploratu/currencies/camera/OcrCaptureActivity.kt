@@ -308,6 +308,12 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         }
     }
 
+    fun locateFromCurrency(view: View) {
+        val fromCode = getDetectedCurrency(applicationContext)
+        activeCurCodes[0] = fromCode ?: activeCurCodes[0]
+        loadCurrencyTo(activeCurCodes[0], 0)
+    }
+
     private suspend fun insertRateInDB(rates: Rates) {
         rates.rates.resetEur()
         ratesDB?.ratesDao()?.insertRates(rates)
