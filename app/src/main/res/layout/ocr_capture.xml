@@ -79,7 +79,7 @@
             <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="8dp"
                     android:rotation="270"
                     android:src="@drawable/ic_twotone_expand_more"
                     android:tint="@color/color_secondary" />
@@ -87,7 +87,7 @@
             <LinearLayout
                     android:id="@+id/ll_currency_to"
                     style="@style/LLCurrenciesFromTo"
-                    android:layout_marginStart="20dp">
+                    android:layout_marginStart="12dp">
 
                 <ImageView
                         android:id="@+id/iv_currency_to_flag"

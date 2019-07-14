@@ -13,7 +13,6 @@ import android.graphics.BitmapFactory
 import android.hardware.Camera
 import android.net.ConnectivityManager
 import android.net.Network
-import android.net.NetworkInfo
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.text.format.DateUtils
@@ -141,9 +140,9 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         val defaultFromCurrencyCode = "EUR"
         val defaultToCurrencyCode = "USD"
 
-        val fromCode = getDetectedCurrency(applicationContext)
-        if (fromCode != null){
-            activeCurCodes.add(fromCode)
+        if (!sharedPref.contains(fromKey)) {
+            val fromCode = getDetectedCurrency(applicationContext)
+            activeCurCodes.add(fromCode ?: defaultFromCurrencyCode)
         } else {
             activeCurCodes.add(sharedPref.getString(fromKey, defaultFromCurrencyCode) ?: return)
         }
