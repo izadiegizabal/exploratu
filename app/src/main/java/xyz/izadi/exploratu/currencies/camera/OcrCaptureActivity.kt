@@ -184,7 +184,7 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         }
 
         if (!sharedPref.contains(toKey)) {
-            activeCurCodes.add(getCurrencyCodeFromDeviceLocale())
+            activeCurCodes.add(getCurrencyCodeFromDeviceLocale()?: defaultFromCurrencyCode)
         } else {
             activeCurCodes.add(sharedPref.getString(toKey, defaultToCurrencyCode) ?: return)
         }

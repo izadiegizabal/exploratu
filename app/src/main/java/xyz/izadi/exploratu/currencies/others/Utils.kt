@@ -7,7 +7,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.telephony.TelephonyManager
-import android.util.Log
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateInterpolator
@@ -163,13 +162,18 @@ object Utils {
         return null
     }
 
-    fun getCurrencyCodeFromDeviceLocale(): String {
+    fun getCurrencyCodeFromDeviceLocale(): String? {
         val currentLocale = Locale.getDefault()
         return getCurrencyCodeFromLocale(currentLocale)
     }
 
-    private fun getCurrencyCodeFromLocale(locale: Locale): String {
-        return Currency.getInstance(locale).currencyCode
+    private fun getCurrencyCodeFromLocale(locale: Locale): String? {
+        try {
+            return Currency.getInstance(locale).currencyCode
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
+        return null
     }
 
     fun isInternetAvailable(context: Context): Boolean {
