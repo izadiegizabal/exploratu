@@ -2,7 +2,6 @@ package xyz.izadi.exploratu.currencies.camera
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.ActivityOptions
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -18,20 +17,22 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
-import android.view.*
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityOptionsCompat
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.vision.text.Text
 import com.google.android.gms.vision.text.TextRecognizer
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.ocr_capture.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -52,9 +53,7 @@ import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencyCodeFromDeviceLocale
 import xyz.izadi.exploratu.currencies.others.Utils.getDetectedCurrency
 import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
-import xyz.izadi.exploratu.currencies.others.Utils.revealActivity
 import java.io.IOException
-import java.security.Policy
 
 /**
  * Activity for the Ocr Detecting app.  This app detects text and displays the value with the
@@ -125,22 +124,65 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         setUpCurrencySelectorListeners()
         setUpNetworkChangeListener()
         setUpToolTips()
+
+        showWarnModalIfRequired()
+    }
+
+    private fun showWarnModalIfRequired() {
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        val hideArWarnModalPrefKey = "hideARWarnModal"
+
+        if (!sharedPref.contains(hideArWarnModalPrefKey)) {
+            with(sharedPref.edit()) {
+                putBoolean(hideArWarnModalPrefKey, false)
+                apply()
+            }
+        } else {
+            if (sharedPref.getBoolean(hideArWarnModalPrefKey, false)) {
+                // if pref is hide modal --> return
+                return
+            }
+        }
+
+        // TODO: show modal
+        val actionButtonListener = DialogInterface.OnClickListener { dialog, which ->
+            when(which) {
+                (DialogInterface.BUTTON_POSITIVE) -> {
+                    with(sharedPref.edit()) {
+                        putBoolean(hideArWarnModalPrefKey, true)
+                        apply()
+                    }
+                }
+            }
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.ar_warning_title))
+            .setMessage(getString(R.string.ar_warning_message))
+            .setPositiveButton(getString(R.string.ar_warning_hide_next_time), actionButtonListener)
+            .setNegativeButton(getString(R.string.ar_warning_dismiss), actionButtonListener)
+            .show()
     }
 
     private fun setUpToolTips() {
         TooltipCompat.setTooltipText(ib_go_to_list, getString(R.string.tt_go_to_list))
         TooltipCompat.setTooltipText(ib_flash_toggle, getString(R.string.tt_flash_toggle))
-        TooltipCompat.setTooltipText(ib_locate_from_currency, getString(R.string.tt_locate_from_currency))
-        TooltipCompat.setTooltipText(ib_reverse_currencies, getString(R.string.tt_reverse_currencies))
+        TooltipCompat.setTooltipText(
+            ib_locate_from_currency,
+            getString(R.string.tt_locate_from_currency)
+        )
+        TooltipCompat.setTooltipText(
+            ib_reverse_currencies,
+            getString(R.string.tt_reverse_currencies)
+        )
         TooltipCompat.setTooltipText(ll_currency_from, getString(R.string.tt_currency_from))
         TooltipCompat.setTooltipText(ll_currency_to, getString(R.string.tt_currency_to))
         TooltipCompat.setTooltipText(cameraFab, getString(R.string.tt_camera_fab))
     }
 
     private fun setUpOptionsListeners() {
-       ib_reverse_currencies.setOnClickListener {
-           reverseCurrencies()
-       }
+        ib_reverse_currencies.setOnClickListener {
+            reverseCurrencies()
+        }
 
         ib_locate_from_currency.setOnClickListener {
             locateFromCurrency()
@@ -184,7 +226,7 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         }
 
         if (!sharedPref.contains(toKey)) {
-            activeCurCodes.add(getCurrencyCodeFromDeviceLocale()?: defaultFromCurrencyCode)
+            activeCurCodes.add(getCurrencyCodeFromDeviceLocale() ?: defaultFromCurrencyCode)
         } else {
             activeCurCodes.add(sharedPref.getString(toKey, defaultToCurrencyCode) ?: return)
         }

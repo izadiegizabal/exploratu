@@ -31,6 +31,10 @@
     <string name="tt_currency_from">Select Origin Currency</string>
     <string name="tt_currency_to">Select Your Currency</string>
     <string name="tt_camera_fab">Pause/Resume Preview</string>
+    <string name="ar_warning_title">AR Mode</string>
+    <string name="ar_warning_message">Be aware of your surroundings and remember to be properly supervised if required.</string>
+    <string name="ar_warning_hide_next_time">I understand</string>
+    <string name="ar_warning_dismiss">Remind me next time</string>
 
     <!-- Default ORC -->
     <string name="ok">OK</string>
