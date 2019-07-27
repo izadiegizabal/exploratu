@@ -42,9 +42,14 @@ data class Exchanges(
     val ZAR: Float
 ) {
     fun getRate(from: String): Float? {
-        val field = Exchanges::class.java.getDeclaredField(from)
-        field.isAccessible
-        return field.getFloat(this)
+        try{
+            val field = Exchanges::class.java.getDeclaredField(from)
+            field.isAccessible
+            return field.getFloat(this)
+        } catch (e: Exception){
+            e.printStackTrace() // to catch NoSuchFieldException
+        }
+        return null
     }
 
     init {
