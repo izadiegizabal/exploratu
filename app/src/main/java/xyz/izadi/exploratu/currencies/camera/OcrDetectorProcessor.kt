@@ -31,7 +31,8 @@ import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 class OcrDetectorProcessor internal constructor(
     private val graphicOverlay: GraphicOverlay<OcrGraphic>?,
     private val drawable: Bitmap,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    private val isDarkTheme: Boolean = false
 ) :
     Detector.Processor<TextBlock> {
 
@@ -57,14 +58,14 @@ class OcrDetectorProcessor internal constructor(
                         for (word in words) {
                             if (word != null && word.value != null) {
                                 val number = extractNumbers(word.value)
-                                Log.d(LOG_TAG, "number extracted: $number")
                                 if (number != null && number.toDoubleOrNull() != null) {
                                     val graphic = OcrGraphic(
                                         graphicOverlay,
                                         word,
                                         number.toDouble(),
                                         drawable,
-                                        sharedPreferences
+                                        sharedPreferences,
+                                        isDarkTheme
                                     )
                                     graphicOverlay?.add(graphic)
                                 }
@@ -87,7 +88,8 @@ class OcrDetectorProcessor internal constructor(
     private fun extractNumbers(originalString: String): String? {
         val regexNotNumbersCommaDot =
             Regex("([^0-9.,]+[.,])") // select everything except numbers with commas/dots
-        val onlyNumbers = originalString.replace(regexNotNumbersCommaDot, "") //remove irrelevant chars
+        val onlyNumbers =
+            originalString.replace(regexNotNumbersCommaDot, "") //remove irrelevant chars
         val dottedPriceRegex = Regex("\\d+([.,])\\d{1,4}") // select numbers with decimals
         var value = dottedPriceRegex.find(onlyNumbers)?.value
         if (value != null) {

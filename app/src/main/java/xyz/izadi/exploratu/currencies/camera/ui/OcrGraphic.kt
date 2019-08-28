@@ -32,7 +32,8 @@ class OcrGraphic(
     val text: Text,
     private val number: Double,
     private val graphic: Bitmap,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    private val isDarkTheme: Boolean = false
 ) : GraphicOverlay.Graphic(overlay) {
     var id: Int = 0
 
@@ -47,7 +48,11 @@ class OcrGraphic(
 
         if (textPaint == null) {
             textPaint = Paint()
-            textPaint!!.color = PRICE_COLOR
+            textPaint!!.color = if (isDarkTheme) {
+                TEXT_COLOR
+            } else {
+                PRICE_COLOR
+            }
             textPaint!!.textSize = 52.0f
             textPaint!!.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
         }
@@ -73,7 +78,11 @@ class OcrGraphic(
      * Draws the text block annotations for position, size, and raw value on the supplied canvas.
      */
     override fun draw(canvas: Canvas) {
-
+        textPaint!!.color = if (isDarkTheme) {
+            TEXT_COLOR
+        } else {
+            PRICE_COLOR
+        }
 
         val conversionRate = sharedPreferences.getFloat("currency_conversion_rate_AR", 1f)
         val symbol = sharedPreferences.getString("currency_to_symbol", "")

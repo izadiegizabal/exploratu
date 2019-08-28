@@ -8,6 +8,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.hardware.Camera
@@ -49,6 +50,7 @@ import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
+import xyz.izadi.exploratu.currencies.others.Utils
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencyCodeFromDeviceLocale
 import xyz.izadi.exploratu.currencies.others.Utils.getDetectedCurrency
@@ -501,14 +503,20 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         val textRecognizer = TextRecognizer.Builder(context).build()
 
         // Load bitmap that will be shown alongside the price
-        val inputStream = assets.open("priceTag_material.png")
+        val isDarkMode = Utils.isDarkTheme(this)
+        val inputStream = if (isDarkMode) {
+            assets.open("priceTag_material_dark.png")
+        } else {
+            assets.open("priceTag_material.png")
+        }
         val icon: Bitmap = BitmapFactory.decodeStream(inputStream)
 
         textRecognizer.setProcessor(
             OcrDetectorProcessor(
                 graphicOverlay,
                 icon,
-                getPreferences(Context.MODE_PRIVATE)
+                getPreferences(Context.MODE_PRIVATE),
+                isDarkMode
             )
         )
 
