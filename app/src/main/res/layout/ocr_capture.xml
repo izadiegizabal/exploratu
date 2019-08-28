@@ -29,7 +29,7 @@
                 style="@style/CurrencyInfo"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
-                android:background="#63131313"
+                android:background="@color/color_ocr_topbar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -39,6 +39,7 @@
                     style="@style/OptionsAR"
                     android:layout_marginStart="8dp"
                     android:padding="4dp"
+                    android:tint="@color/color_on_surface"
                     android:src="@drawable/ic_list_alt"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -47,6 +48,7 @@
             <ImageButton
                     android:id="@+id/ib_locate_from_currency"
                     style="@style/OptionsAR"
+                    android:tint="@color/color_on_surface"
                     android:src="@drawable/ic_twotone_my_location"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -56,6 +58,7 @@
                     android:id="@+id/ib_flash_toggle"
                     style="@style/OptionsAR"
                     android:src="@drawable/ic_flash_off"
+                    android:tint="@color/color_on_surface"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/ib_locate_from_currency"
                     app:layout_constraintTop_toTopOf="parent" />

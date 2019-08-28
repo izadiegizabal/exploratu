@@ -65,5 +65,6 @@
     <color name="color_pad">#FFFFFF</color>
     <color name="color_pad_bg">#fafafa</color>
     <color name="color_placeholder">#0D000000</color>
+    <color name="color_ocr_topbar">#99FFFFFF</color>
 
 </resources>
