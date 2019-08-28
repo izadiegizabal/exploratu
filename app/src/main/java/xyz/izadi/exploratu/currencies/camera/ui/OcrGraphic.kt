@@ -19,6 +19,8 @@ import android.content.SharedPreferences
 import android.graphics.*
 import com.google.android.gms.vision.text.Text
 import xyz.izadi.exploratu.currencies.others.Utils
+import android.graphics.Typeface
+import java.text.DecimalFormat
 
 
 /**
@@ -75,8 +77,13 @@ class OcrGraphic(
 
         val conversionRate = sharedPreferences.getFloat("currency_conversion_rate_AR", 1f)
         val symbol = sharedPreferences.getString("currency_to_symbol", "")
-        val convertedNum = Utils.round((number * conversionRate).toFloat(), 2)
-        val commasString = Utils.addCommas(convertedNum.toString())
+        val convertedNum = (number * conversionRate).toFloat()
+        val roundedNum = if (convertedNum < 100000) {
+            Utils.round(convertedNum, 2)
+        } else {
+            Utils.round(convertedNum, 0)
+        }
+        val commasString = Utils.addCommas(DecimalFormat("#.##").format(roundedNum))
         val convertedSting = "$symbol$commasString"
 
         val end = translateX(text.boundingBox.right.toFloat())
@@ -89,7 +96,8 @@ class OcrGraphic(
         )
         canvas.drawText(
             convertedSting,
-            (end + 64),
+            end + 64 + getApproxXToCenterText(convertedSting, textPaint!!, graphic.width - 56),
+            // (end + 64 + ((convertedSting.length + 1)/2 * 12)),
             (bottom - (text.boundingBox.height() / 2 - 4)),
             textPaint!!
         )
@@ -100,5 +108,14 @@ class OcrGraphic(
         private const val PRICE_COLOR = Color.BLACK
         private var rectPaint: Paint? = null
         private var textPaint: Paint? = null
+    }
+
+    fun getApproxXToCenterText(
+        text: String,
+        p: Paint,
+        widthToFitStringInto: Int
+    ): Float {
+        val textWidth = p.measureText(text)
+        return ((widthToFitStringInto - textWidth) / 2f) - (p.textSize / 2f)
     }
 }
