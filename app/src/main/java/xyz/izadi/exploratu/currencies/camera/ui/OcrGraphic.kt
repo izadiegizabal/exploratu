@@ -87,7 +87,9 @@ class OcrGraphic(
         val conversionRate = sharedPreferences.getFloat("currency_conversion_rate_AR", 1f)
         val symbol = sharedPreferences.getString("currency_to_symbol", "")
         val convertedNum = (number * conversionRate).toFloat()
-        val roundedNum = if (convertedNum < 100000) {
+        val roundedNum = if (convertedNum < 10000) {
+            Utils.round(convertedNum, 1)
+        } else if (convertedNum < 100) {
             Utils.round(convertedNum, 2)
         } else {
             Utils.round(convertedNum, 0)
@@ -105,7 +107,7 @@ class OcrGraphic(
         )
         canvas.drawText(
             convertedSting,
-            end + 64 + getApproxXToCenterText(convertedSting, textPaint!!, graphic.width - 56),
+            end + 72 + getApproxXToCenterText(convertedSting, textPaint!!, graphic.width - 56),
             // (end + 64 + ((convertedSting.length + 1)/2 * 12)),
             (bottom - (text.boundingBox.height() / 2 - 4)),
             textPaint!!

@@ -44,8 +44,7 @@ data class Exchanges(
     fun getRate(from: String): Float? {
         try{
             val field = Exchanges::class.java.getDeclaredField(from)
-            field.isAccessible
-            return field.getFloat(this)
+            return field!!.getFloat(this)
         } catch (e: Exception){
             e.printStackTrace() // to catch NoSuchFieldException
         }
