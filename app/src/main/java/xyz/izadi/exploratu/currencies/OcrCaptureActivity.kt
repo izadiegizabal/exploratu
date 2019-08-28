@@ -240,9 +240,13 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         // change global variable
         activeCurCodes[listPos] = code
 
+        // key values
+        val currencySymbolKey = "currency_to_symbol"
+
         // update tv
         val curr = currencies?.getCurrency(code)
-        val flagPath = "file:///android_asset/flags/${curr?.code}.png"
+        val currSign = curr?.sign?.split("/")!![0]
+        val flagPath = "file:///android_asset/flags/${code}.png"
         val transformation = RoundedCornersTransformation(32, 0)
         when (listPos) {
             0 -> {
@@ -252,7 +256,7 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
                     .placeholder(R.drawable.ic_dollar_placeholder)
                     .transform(transformation)
                     .into(iv_currency_from_flag)
-                tv_currency_from_code.text = curr?.code
+                tv_currency_from_code.text = code
 
                 val sharedPref = getPreferences(Context.MODE_PRIVATE)
                 getPreferences(Context.MODE_PRIVATE) ?: return
@@ -268,14 +272,17 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
                     .placeholder(R.drawable.ic_dollar_placeholder)
                     .transform(transformation)
                     .into(iv_currency_to_flag)
-                tv_currency_to_code.text = curr?.code
+                tv_currency_to_code.text = code
 
                 val sharedPref = getPreferences(Context.MODE_PRIVATE)
                 getPreferences(Context.MODE_PRIVATE) ?: return
                 with(sharedPref.edit()) {
                     putString("currency_code_to", code)
+                    putString(currencySymbolKey, currSign)
                     apply()
                 }
+
+
             }
         }
 

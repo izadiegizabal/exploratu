@@ -46,8 +46,8 @@ class OcrGraphic(
         if (textPaint == null) {
             textPaint = Paint()
             textPaint!!.color = PRICE_COLOR
-            textPaint!!.textSize = 56.0f
-            textPaint!!.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+            textPaint!!.textSize = 52.0f
+            textPaint!!.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
         }
         // Redraw the overlay, as this graphic has been added.
         postInvalidate()
@@ -74,8 +74,10 @@ class OcrGraphic(
 
 
         val conversionRate = sharedPreferences.getFloat("currency_conversion_rate_AR", 1f)
+        val symbol = sharedPreferences.getString("currency_to_symbol", "")
         val convertedNum = Utils.round((number * conversionRate).toFloat(), 2)
-        val convertedSting = Utils.addCommas(convertedNum.toString())
+        val commasString = Utils.addCommas(convertedNum.toString())
+        val convertedSting = "$symbol$commasString"
 
         val end = translateX(text.boundingBox.right.toFloat())
         val bottom = translateY(text.boundingBox.bottom.toFloat())
@@ -88,7 +90,7 @@ class OcrGraphic(
         canvas.drawText(
             convertedSting,
             (end + 64),
-            (bottom - (text.boundingBox.height() / 2 - 10)),
+            (bottom - (text.boundingBox.height() / 2 - 4)),
             textPaint!!
         )
     }
