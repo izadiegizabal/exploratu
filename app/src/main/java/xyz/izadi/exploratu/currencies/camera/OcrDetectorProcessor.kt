@@ -17,6 +17,7 @@ package xyz.izadi.exploratu.currencies.camera
 
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.util.Log
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.text.TextBlock
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
@@ -56,6 +57,7 @@ class OcrDetectorProcessor internal constructor(
                         for (word in words) {
                             if (word != null && word.value != null) {
                                 val number = extractNumbers(word.value)
+                                Log.d(LOG_TAG, "number extracted: $number")
                                 if (number != null && number.toDoubleOrNull() != null) {
                                     val graphic = OcrGraphic(
                                         graphicOverlay,
@@ -89,7 +91,8 @@ class OcrDetectorProcessor internal constructor(
         val dottedPriceRegex = Regex("\\d+([.,])\\d{1,4}") // select numbers with decimals
         var value = dottedPriceRegex.find(onlyNumbers)?.value
         if (value != null) {
-            val valueParts = value.split(Regex("[,.]"))
+            value = value.replace(',', '.')
+            val valueParts = value.split(".")
             if (valueParts.size > 1 && valueParts[1].length > 2) { // if more than two decimals --> is not decimal, is 1.000s
                 value = valueParts[0] + valueParts[1]
             }
