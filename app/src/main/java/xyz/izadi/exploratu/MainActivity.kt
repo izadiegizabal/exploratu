@@ -18,13 +18,12 @@ import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.bottomAppBar
-import kotlinx.android.synthetic.main.ocr_capture.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xyz.izadi.exploratu.currencies.CurrenciesListDialogFragment
-import xyz.izadi.exploratu.currencies.camera.OcrCaptureActivity
+import xyz.izadi.exploratu.currencies.OcrCaptureActivity
 import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies

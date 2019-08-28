@@ -136,11 +136,7 @@ object Utils {
         try {
             val telephonyManager =
                 context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            currentCountry = if(!telephonyManager.simCountryIso.isNullOrBlank()) {
-                telephonyManager.simCountryIso
-            } else {
-                telephonyManager.networkCountryIso
-            }
+            currentCountry = telephonyManager.networkCountryIso
         } catch (e: Exception) {
             e.printStackTrace()
         }

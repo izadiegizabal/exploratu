@@ -1,4 +1,4 @@
-package xyz.izadi.exploratu.currencies.camera
+package xyz.izadi.exploratu.currencies
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xyz.izadi.exploratu.MainActivity
 import xyz.izadi.exploratu.R
-import xyz.izadi.exploratu.currencies.CurrenciesListDialogFragment
+import xyz.izadi.exploratu.currencies.camera.OcrDetectorProcessor
 import xyz.izadi.exploratu.currencies.camera.source.CameraSource
 import xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
@@ -443,7 +443,9 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
                 Manifest.permission.CAMERA
             )
         ) {
-            ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM)
+            ActivityCompat.requestPermissions(this, permissions,
+                RC_HANDLE_CAMERA_PERM
+            )
             return
         }
 
@@ -492,7 +494,7 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
         val textRecognizer = TextRecognizer.Builder(context).build()
 
         // Load bitmap that will be shown alongside the price
-        val inputStream = assets.open("priceTag.png")
+        val inputStream = assets.open("priceTag_material.png")
         val icon: Bitmap = BitmapFactory.decodeStream(inputStream)
 
         textRecognizer.setProcessor(
@@ -629,7 +631,9 @@ class OcrCaptureActivity : AppCompatActivity(), CurrenciesListDialogFragment.Lis
             applicationContext
         )
         if (code != ConnectionResult.SUCCESS) {
-            val dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS)
+            val dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code,
+                RC_HANDLE_GMS
+            )
             dlg.show()
         }
 

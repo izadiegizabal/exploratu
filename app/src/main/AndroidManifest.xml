@@ -19,7 +19,7 @@
             android:theme="@style/MyTheme.DayNight"
             tools:ignore="GoogleAppIndexingWarning">
         <activity
-                android:name=".currencies.camera.OcrCaptureActivity"
+                android:name=".currencies.OcrCaptureActivity"
                 android:label="@string/app_name"
                 android:launchMode="singleInstance">
             <intent-filter>
