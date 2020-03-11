@@ -16,7 +16,7 @@ data class Currencies(
         parcel.readFloat(),
         Date(parcel.readLong()),
         parcel.readInt(),
-        parcel.createTypedArray(Currency)
+        parcel.createTypedArray(Currency)!!
     )
 
     override fun equals(other: Any?): Boolean {
