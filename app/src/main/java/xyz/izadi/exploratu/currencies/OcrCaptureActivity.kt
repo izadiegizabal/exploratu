@@ -32,6 +32,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
@@ -95,6 +96,10 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
     private var selectingCurrencyIndex = -1
     private val activeCurCodes = ArrayList<String>()
 
+    // Control camera state
+    private var isPreviewPaused = false
+    private lateinit var isFlashOn: LiveData<Int>
+
     /**
      * Initializes the UI and creates the detector pipeline.
      */
@@ -121,11 +126,10 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
         }
 
 //        cameraFab.setOnClickListener {
-//            if (viewFinder!!.isActive) {
-//                onPause()
+//            if (!isPreviewPaused) {
+//                isPreviewPaused = true
 //                cameraFab.setImageResource(R.drawable.ic_play_arrow)
 //            } else {
-//                startCameraSource()
 //                cameraFab.setImageResource(R.drawable.ic_twotone_pause)
 //            }
 //        }
@@ -141,7 +145,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
         setUpNetworkChangeListener()
         setUpToolTips()
 
-        // showWarnModalIfRequired()
+        showWarnModalIfRequired()
     }
 
     private fun showWarnModalIfRequired() {
@@ -416,13 +420,13 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
     }
 
     private fun turnOnOffFlash() {
-//        if (cameraSource?.flashMode == Camera.Parameters.FLASH_MODE_OFF) {
-//            cameraSource?.flashMode = Camera.Parameters.FLASH_MODE_TORCH
-//            ib_flash_toggle.setImageResource(R.drawable.ic_flash_on)
-//        } else {
-//            cameraSource?.flashMode = Camera.Parameters.FLASH_MODE_OFF
-//            ib_flash_toggle.setImageResource(R.drawable.ic_flash_off)
-//        }
+        if (isFlashOn.value == 0) {
+            camera?.cameraControl?.enableTorch(true)
+            ib_flash_toggle.setImageResource(R.drawable.ic_flash_on)
+        } else {
+            camera?.cameraControl?.enableTorch(false)
+            ib_flash_toggle.setImageResource(R.drawable.ic_flash_off)
+        }
     }
 
     private fun reverseCurrencies() {
@@ -510,6 +514,10 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
                 // camera provides access to CameraControl & CameraInfo
                 camera = cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview)
+
+                // set up livedata for camera info
+                isFlashOn = camera?.cameraInfo?.torchState!!
+                isPreviewPaused = false
             } catch(exc: Exception) {
                 Log.e(LOG_TAG, "Use case binding failed", exc)
             }
