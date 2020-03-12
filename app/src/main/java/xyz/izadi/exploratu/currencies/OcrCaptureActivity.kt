@@ -502,8 +502,9 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
             try {
                 // A variable number of use-cases can be passed here -
                 // camera provides access to CameraControl & CameraInfo
-                camera = cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview)
+                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview)
+
+                setUpPinchToZoom()
 
                 // set up livedata for camera info
                 isFlashOn = camera?.cameraInfo?.torchState!!
@@ -552,6 +553,25 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
         if (isPreviewPaused){
             // TODO: maintain preview image after resuming
             startPreviewPause(false)
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setUpPinchToZoom() {
+        val listener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                val currentZoomRatio: Float = camera?.cameraInfo?.zoomState?.value?.zoomRatio ?: 0F
+                val delta = detector.scaleFactor
+                camera?.cameraControl?.setZoomRatio(currentZoomRatio * delta)
+                return true
+            }
+        }
+
+        val scaleGestureDetector = ScaleGestureDetector(this, listener)
+
+        viewFinder.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
+            return@setOnTouchListener true
         }
     }
 
