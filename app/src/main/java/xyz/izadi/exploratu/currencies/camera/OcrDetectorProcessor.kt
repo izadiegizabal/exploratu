@@ -60,15 +60,15 @@ class OcrDetectorProcessor internal constructor(
                                 val number = extractNumbers(word.value)
                                 val numberDouble = number!!.toDoubleOrNull()
                                 if (numberDouble != null) {
-                                    val graphic = OcrGraphic(
-                                        graphicOverlay,
-                                        word,
-                                        numberDouble,
-                                        drawable,
-                                        sharedPreferences,
-                                        isDarkTheme
-                                    )
-                                    graphicOverlay?.add(graphic)
+//                                    val graphic = OcrGraphic(
+//                                        graphicOverlay,
+//                                        word,
+//                                        numberDouble,
+//                                        drawable,
+//                                        sharedPreferences,
+//                                        isDarkTheme
+//                                    )
+//                                    graphicOverlay?.add(graphic)
                                 }
                             }
                         }

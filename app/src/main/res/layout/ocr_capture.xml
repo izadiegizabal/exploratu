@@ -7,8 +7,8 @@
         android:layout_height="match_parent"
         android:keepScreenOn="true">
 
-    <xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview
-            android:id="@+id/preview"
+    <androidx.camera.view.PreviewView
+            android:id="@+id/preview_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -17,7 +17,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-    </xyz.izadi.exploratu.currencies.camera.source.CameraSourcePreview>
+    </androidx.camera.view.PreviewView>
 
     <!-- Other components and views -->
     <androidx.constraintlayout.widget.ConstraintLayout

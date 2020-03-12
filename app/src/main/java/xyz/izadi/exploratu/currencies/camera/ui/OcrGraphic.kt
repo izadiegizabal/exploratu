@@ -17,7 +17,7 @@ package xyz.izadi.exploratu.currencies.camera.ui
 
 import android.content.SharedPreferences
 import android.graphics.*
-import com.google.android.gms.vision.text.Text
+import com.google.firebase.ml.vision.text.FirebaseVisionText
 import xyz.izadi.exploratu.currencies.others.Utils
 import android.graphics.Typeface
 import java.text.DecimalFormat
@@ -29,7 +29,7 @@ import java.text.DecimalFormat
  */
 class OcrGraphic(
     overlay: GraphicOverlay<*>?,
-    val text: Text,
+    val text: FirebaseVisionText.Element,
     private val number: Double,
     private val graphic: Bitmap,
     private val sharedPreferences: SharedPreferences,
@@ -97,19 +97,19 @@ class OcrGraphic(
         val commasString = Utils.addCommas(DecimalFormat("#.##").format(roundedNum))
         val convertedSting = "$symbol$commasString"
 
-        val end = translateX(text.boundingBox.right.toFloat())
-        val bottom = translateY(text.boundingBox.bottom.toFloat())
+        val end = translateX(text.boundingBox?.right?.toFloat()!!)
+        val bottom = translateY(text.boundingBox?.bottom?.toFloat()!!)
         canvas.drawBitmap(
             graphic,
             end,
-            (bottom - (text.boundingBox.height() / 2 + graphic.height / 2 + 15)),
+            (bottom - (text.boundingBox!!.height() / 2 + graphic.height / 2 + 15)),
             textPaint
         )
         canvas.drawText(
             convertedSting,
             end + 72 + getApproxXToCenterText(convertedSting, textPaint!!, graphic.width - 56),
             // (end + 64 + ((convertedSting.length + 1)/2 * 12)),
-            (bottom - (text.boundingBox.height() / 2 - 4)),
+            (bottom - (text.boundingBox!!.height() / 2 - 4)),
             textPaint!!
         )
     }

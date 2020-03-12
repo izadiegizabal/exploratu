@@ -27,8 +27,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = "1.8"
-        targetCompatibility = 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildToolsVersion = '29.0.3'
 }
@@ -48,6 +48,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation 'com.google.firebase:firebase-perf:19.0.5'
+
+    def camerax_version = '1.0.0-beta01'
+    implementation "androidx.camera:camera-core:${camerax_version}"
+    implementation "androidx.camera:camera-camera2:${camerax_version}"
+    implementation "androidx.camera:camera-view:1.0.0-alpha08"
+    implementation "androidx.camera:camera-lifecycle:${camerax_version}"
 
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'
