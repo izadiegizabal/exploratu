@@ -83,6 +83,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
     private var graphicOverlay: GraphicOverlay<OcrGraphic>? = null
     private var camera: Camera? = null
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
+    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private var imageAnalyzer: ImageAnalysis? = null
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -125,14 +126,13 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-//        cameraFab.setOnClickListener {
-//            if (!isPreviewPaused) {
-//                isPreviewPaused = true
-//                cameraFab.setImageResource(R.drawable.ic_play_arrow)
-//            } else {
-//                cameraFab.setImageResource(R.drawable.ic_twotone_pause)
-//            }
-//        }
+        cameraFab.setOnClickListener {
+            if (!isPreviewPaused) {
+                startPreviewPause(true)
+            } else {
+                startPreviewPause(false)
+            }
+        }
 
         // Initialise conversion data
         ratesDB = RatesDatabase.getInstance(applicationContext)
@@ -419,16 +419,6 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
         loadCurrencyTo(activeCurCodes[0], 0)
     }
 
-    private fun turnOnOffFlash() {
-        if (isFlashOn.value == 0) {
-            camera?.cameraControl?.enableTorch(true)
-            ib_flash_toggle.setImageResource(R.drawable.ic_flash_on)
-        } else {
-            camera?.cameraControl?.enableTorch(false)
-            ib_flash_toggle.setImageResource(R.drawable.ic_flash_off)
-        }
-    }
-
     private fun reverseCurrencies() {
         val aux = activeCurCodes[0]
         activeCurCodes[0] = activeCurCodes[1]
@@ -471,7 +461,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
 
         // Bind the CameraProvider to the LifeCycleOwner
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener(Runnable {
 
             // CameraProvider
@@ -559,6 +549,31 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
+        if (isPreviewPaused){
+            // TODO: maintain preview image after resuming
+            startPreviewPause(false)
+        }
+    }
+
+    private fun startPreviewPause(pauseIt: Boolean) {
+        if (pauseIt) {
+            isPreviewPaused = true
+            cameraProviderFuture.get().unbindAll()
+            cameraFab.setImageResource(R.drawable.ic_play_arrow)
+        } else {
+            startCamera()
+            cameraFab.setImageResource(R.drawable.ic_twotone_pause)
+        }
+    }
+
+    private fun turnOnOffFlash() {
+        if (isFlashOn.value == 0) {
+            camera?.cameraControl?.enableTorch(true)
+            ib_flash_toggle.setImageResource(R.drawable.ic_flash_on)
+        } else {
+            camera?.cameraControl?.enableTorch(false)
+            ib_flash_toggle.setImageResource(R.drawable.ic_flash_off)
+        }
     }
 
     /**
@@ -571,10 +586,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
             if (allPermissionsGranted()) {
                 viewFinder.post { startCamera() }
             } else {
-                Toast.makeText(this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
-                finish()
+                // TODO: handle not having permission better
             }
         }
     }
