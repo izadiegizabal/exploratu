@@ -18,8 +18,6 @@ package xyz.izadi.exploratu.currencies.camera
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.util.Log
-import com.google.android.gms.vision.Detector
-import com.google.android.gms.vision.text.TextBlock
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
 import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 
@@ -28,13 +26,12 @@ import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
  * A very simple Processor which gets detected TextBlocks and adds them to the overlay
  * as OcrGraphics.
  */
-class OcrDetectorProcessor internal constructor(
+abstract class OcrDetectorProcessor internal constructor(
     private val graphicOverlay: GraphicOverlay<OcrGraphic>?,
     private val drawable: Bitmap,
     private val sharedPreferences: SharedPreferences,
     private val isDarkTheme: Boolean = false
-) :
-    Detector.Processor<TextBlock> {
+) {
 
     /**
      * Called by the detector to deliver detection results.
@@ -45,21 +42,21 @@ class OcrDetectorProcessor internal constructor(
      */
     val LOG_TAG = this.javaClass.simpleName
 
-    override fun receiveDetections(detections: Detector.Detections<TextBlock>) {
-        graphicOverlay?.clear()
-        val items = detections.detectedItems
-        for (i in 0 until items.size()) {
-            val item = items.valueAt(i)
-            if (item != null && item.value != null) {
-                val lines = item.components
-                for (line in lines) {
-                    if (line != null && line.value != null) {
-                        val words = line.components
-                        for (word in words) {
-                            if (word != null && word.value != null) {
-                                val number = extractNumbers(word.value)
-                                val numberDouble = number!!.toDoubleOrNull()
-                                if (numberDouble != null) {
+//    override fun receiveDetections(detections: Detector.Detections<TextBlock>) {
+//        graphicOverlay?.clear()
+//        val items = detections.detectedItems
+//        for (i in 0 until items.size()) {
+//            val item = items.valueAt(i)
+//            if (item != null && item.value != null) {
+//                val lines = item.components
+//                for (line in lines) {
+//                    if (line != null && line.value != null) {
+//                        val words = line.components
+//                        for (word in words) {
+//                            if (word != null && word.value != null) {
+//                                val number = extractNumbers(word.value)
+//                                val numberDouble = number!!.toDoubleOrNull()
+//                                if (numberDouble != null) {
 //                                    val graphic = OcrGraphic(
 //                                        graphicOverlay,
 //                                        word,
@@ -69,21 +66,21 @@ class OcrDetectorProcessor internal constructor(
 //                                        isDarkTheme
 //                                    )
 //                                    graphicOverlay?.add(graphic)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Frees the resources associated with this detection processor.
      */
-    override fun release() {
-        graphicOverlay?.clear()
-    }
+//    override fun release() {
+//        graphicOverlay?.clear()
+//    }
 
     // Extracts numbers from the passed string, returns null if there aren't
     private fun extractNumbers(originalString: String): String? {

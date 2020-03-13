@@ -20,7 +20,7 @@ import android.graphics.Canvas
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
-import com.google.android.gms.vision.CameraSource
+import androidx.camera.core.CameraSelector
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay.Graphic
 import java.util.*
 
@@ -53,7 +53,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
     private var widthScaleFactor = 1.0f
     private var previewHeight: Int = 0
     private var heightScaleFactor = 1.0f
-    private var facing = CameraSource.CAMERA_FACING_BACK
+    private var facing = CameraSelector.LENS_FACING_BACK
     private val graphics = HashSet<T>()
 
     /**
@@ -102,7 +102,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
          * system.
          */
         fun translateX(x: Float): Float {
-            return if (mOverlay!!.facing == CameraSource.CAMERA_FACING_FRONT) {
+            return if (mOverlay!!.facing == CameraSelector.LENS_FACING_FRONT) {
                 mOverlay.width - scaleX(x)
             } else {
                 scaleX(x)

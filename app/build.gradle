@@ -10,6 +10,8 @@ apply plugin: 'io.fabric'
 
 apply plugin: 'com.google.firebase.firebase-perf'
 
+apply plugin: 'com.google.gms.google-services'
+
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -73,6 +75,3 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 }
-
-apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
-

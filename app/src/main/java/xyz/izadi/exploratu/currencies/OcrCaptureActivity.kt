@@ -5,35 +5,29 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.text.format.DateUtils
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Size
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.app.ActivityCompat
-import com.google.firebase.ml.vision.text.FirebaseVisionText
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.*
+import androidx.camera.core.impl.ImageAnalysisConfig
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.picasso.Picasso
@@ -45,21 +39,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xyz.izadi.exploratu.MainActivity
 import xyz.izadi.exploratu.R
-import xyz.izadi.exploratu.currencies.camera.OcrDetectorProcessor
-import xyz.izadi.exploratu.currencies.camera.source.CameraSource
+import xyz.izadi.exploratu.currencies.camera.OcrAnalyzer
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
 import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
-import xyz.izadi.exploratu.currencies.others.Utils
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencyCodeFromDeviceLocale
 import xyz.izadi.exploratu.currencies.others.Utils.getDetectedCurrency
 import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
 import java.lang.Math.*
-import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -479,22 +470,19 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
             preview?.setSurfaceProvider(viewFinder.previewSurfaceProvider)
 
             // ImageAnalysis
-//            imageAnalyzer = ImageAnalysis.Builder()
-//                // We request aspect ratio but no resolution
-//                .setTargetAspectRatio(screenAspectRatio)
-//                // Set initial target rotation, we will have to call this again if rotation changes
-//                // during the lifecycle of this use case
-//                .setTargetRotation(rotation)
-//                .build()
-//                // The analyzer can then be assigned to the instance
-//                .also {
-//                    it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-//                        // Values returned from our analyzer are passed to the attached listener
-//                        // We log image analysis results here - you should do something useful
-//                        // instead!
-//                        Log.d(LOG_TAG, "Average luminosity: $luma")
-//                    })
-//                }
+            imageAnalyzer = ImageAnalysis.Builder()
+                // We request aspect ratio but no resolution
+                .setTargetAspectRatio(screenAspectRatio)
+                // Set initial target rotation, we will have to call this again if rotation changes
+                // during the lifecycle of this use case
+                .setTargetRotation(rotation)
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+
+            // Build the image analysis use case and instantiate our analyzer
+            val analyzerUseCase = imageAnalyzer?.apply {
+                setAnalyzer(cameraExecutor, OcrAnalyzer())
+            }
 
             // Must unbind the use-cases before rebinding them
             cameraProvider.unbindAll()
@@ -502,7 +490,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
             try {
                 // A variable number of use-cases can be passed here -
                 // camera provides access to CameraControl & CameraInfo
-                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview)
+                camera = cameraProvider.bindToLifecycle(this, cameraSelector, analyzerUseCase,  preview)
 
                 setUpPinchToZoom()
 
@@ -598,7 +586,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
 
     /**
      * Process result from permission request dialog box, has the request
-     * been granted? If yes, start Camera. Otherwise display a toast
+     * been granted? If yes, start Camera
      */
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
