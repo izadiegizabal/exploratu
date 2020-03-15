@@ -481,7 +481,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
 
             // Build the image analysis use case and instantiate our analyzer
             val analyzerUseCase = imageAnalyzer?.apply {
-                setAnalyzer(cameraExecutor, OcrAnalyzer())
+                setAnalyzer(cameraExecutor, OcrAnalyzer(applicationContext))
             }
 
             // Must unbind the use-cases before rebinding them

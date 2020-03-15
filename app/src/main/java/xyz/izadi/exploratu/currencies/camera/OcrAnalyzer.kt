@@ -1,15 +1,18 @@
 package xyz.izadi.exploratu.currencies.camera
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 
-class OcrAnalyzer() : ImageAnalysis.Analyzer {
+class OcrAnalyzer(private val context: Context) : ImageAnalysis.Analyzer {
     private val LOG_TAG = this.javaClass.simpleName
+    private var toast = Toast(context)
 
     private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
         0 -> FirebaseVisionImageMetadata.ROTATION_0
@@ -32,29 +35,8 @@ class OcrAnalyzer() : ImageAnalysis.Analyzer {
                     // Task completed successfully
                     // Logic
                     Log.d(LOG_TAG, "Text detected! ${firebaseVisionText.text}")
+                    showAToast(firebaseVisionText.text)
                     val resultText = firebaseVisionText.text
-                    for (block in firebaseVisionText.textBlocks) {
-                        val blockText = block.text
-                        val blockConfidence = block.confidence
-                        val blockLanguages = block.recognizedLanguages
-                        val blockCornerPoints = block.cornerPoints
-                        val blockFrame = block.boundingBox
-                        for (line in block.lines) {
-                            val lineText = line.text
-                            val lineConfidence = line.confidence
-                            val lineLanguages = line.recognizedLanguages
-                            val lineCornerPoints = line.cornerPoints
-                            val lineFrame = line.boundingBox
-                            for (element in line.elements) {
-                                val elementText = element.text
-                                val elementConfidence = element.confidence
-                                val elementLanguages = element.recognizedLanguages
-                                val elementCornerPoints = element.cornerPoints
-                                val elementFrame = element.boundingBox
-                                Log.d(LOG_TAG, "Text detected: $elementText")
-                            }
-                        }
-                    }
 
                     // Close img for next use
                     imageProxy.close()
@@ -63,10 +45,23 @@ class OcrAnalyzer() : ImageAnalysis.Analyzer {
                     // Task failed with an exception
                     // ...
                     Log.d(LOG_TAG, "What is going on $e")
+                    e.printStackTrace()
+                    showAToast("Error trying to perform OCR, use the manual mode instead.")
 
                     // Close img for next use
                     imageProxy.close()
                 }
         }
+    }
+
+    @SuppressLint("ShowToast")
+    private fun showAToast(st: String?) {
+        try {
+            toast.view.isShown // true if visible
+            toast.setText(st)
+        } catch (e: java.lang.Exception) {         // invisible if exception
+            toast = Toast.makeText(context, st, Toast.LENGTH_LONG)
+        }
+        toast.show() //finally display it
     }
 }
