@@ -65,9 +65,6 @@ private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 private const val RATIO_4_3_VALUE = 4.0 / 3.0
 private const val RATIO_16_9_VALUE = 16.0 / 9.0
 
-// REMOVE rm
-typealias LumaListener = (luma: Double) -> Unit
-
 class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, CurrenciesListDialogFragment.Listener {
     private lateinit var viewFinder: PreviewView
     private var preview: Preview? = null
