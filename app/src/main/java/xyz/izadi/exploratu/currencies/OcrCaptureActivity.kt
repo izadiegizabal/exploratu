@@ -464,7 +464,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
                 .build()
 
             // Attach the viewfinder's surface provider to preview use case
-            preview?.setSurfaceProvider(viewFinder.previewSurfaceProvider)
+            preview?.setSurfaceProvider(viewFinder.createSurfaceProvider(null))
 
             // ImageAnalysis
             imageAnalyzer = ImageAnalysis.Builder()
