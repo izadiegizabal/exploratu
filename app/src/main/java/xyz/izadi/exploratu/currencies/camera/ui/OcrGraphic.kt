@@ -20,6 +20,7 @@ import android.graphics.*
 import com.google.firebase.ml.vision.text.FirebaseVisionText
 import xyz.izadi.exploratu.currencies.others.Utils
 import android.graphics.Typeface
+import android.util.Log
 import java.text.DecimalFormat
 
 
@@ -87,12 +88,16 @@ class OcrGraphic(
         val conversionRate = sharedPreferences.getFloat("currency_conversion_rate_AR", 1f)
         val symbol = sharedPreferences.getString("currency_to_symbol", "")
         val convertedNum = (number * conversionRate).toFloat()
-        val roundedNum = if (convertedNum < 10000) {
-            Utils.round(convertedNum, 1)
-        } else if (convertedNum < 100) {
-            Utils.round(convertedNum, 2)
-        } else {
-            Utils.round(convertedNum, 0)
+        val roundedNum = when {
+            convertedNum < 10000 -> {
+                Utils.round(convertedNum, 1)
+            }
+            convertedNum < 100 -> {
+                Utils.round(convertedNum, 2)
+            }
+            else -> {
+                Utils.round(convertedNum, 0)
+            }
         }
         val commasString = Utils.addCommas(DecimalFormat("#.##").format(roundedNum))
         val convertedSting = "$symbol$commasString"
@@ -121,7 +126,7 @@ class OcrGraphic(
         private var textPaint: Paint? = null
     }
 
-    fun getApproxXToCenterText(
+    private fun getApproxXToCenterText(
         text: String,
         p: Paint,
         widthToFitStringInto: Int

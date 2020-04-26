@@ -19,6 +19,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.camera.core.CameraSelector
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay.Graphic
@@ -152,6 +153,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
      */
     fun add(graphic: T) {
         synchronized(lock) {
+            Log.d("OCRCapture", "Adding graphic ${graphic.hashCode()}")
             graphics.add(graphic)
         }
         postInvalidate()
@@ -205,13 +207,17 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        Log.d("OCRCapture", "Trying to draw on canvas")
+
         synchronized(lock) {
+            Log.d("OCRCapture", "Canvas is ${canvas.width} x ${canvas.height}")
             if (previewWidth != 0 && previewHeight != 0) {
                 widthScaleFactor = canvas.width.toFloat() / previewWidth.toFloat()
                 heightScaleFactor = canvas.height.toFloat() / previewHeight.toFloat()
             }
 
             for (graphic in graphics) {
+                Log.d("OCRCapture", "Drawing graphic ${graphic.hashCode()}")
                 graphic.draw(canvas)
             }
         }

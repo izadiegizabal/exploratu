@@ -74,3 +74,5 @@ lint/tmp/
 .settings/
 
 app/.classpath
+
+app/.DS_Store

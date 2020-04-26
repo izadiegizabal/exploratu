@@ -16,7 +16,7 @@
             android:supportsRtl="true"
             android:theme="@style/MyTheme.DayNight"
             android:configChanges="uiMode"
-            tools:ignore="GoogleAppIndexingWarning">
+            android:fullBackupContent="@xml/backup_descriptor">
         <!-- To download on-device API of ML Kit OCR -->
         <meta-data
                 android:name="com.google.firebase.ml.vision.DEPENDENCIES"

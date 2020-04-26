@@ -210,7 +210,7 @@ object Utils {
         circularReveal.start()
     }
 
-    fun isDarkTheme(activity: Activity): Boolean {
+    fun isDarkTheme(activity: Context): Boolean {
         return activity.resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }

@@ -5,13 +5,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
 import android.text.format.DateUtils
 import android.util.DisplayMetrics
 import android.util.Log
@@ -20,12 +21,11 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
-import androidx.core.app.ActivityCompat
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.*
-import androidx.camera.core.impl.ImageAnalysisConfig
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -46,13 +46,16 @@ import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
+import xyz.izadi.exploratu.currencies.others.Utils
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencyCodeFromDeviceLocale
 import xyz.izadi.exploratu.currencies.others.Utils.getDetectedCurrency
 import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
-import java.lang.Math.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 // This is an arbitrary number we are using to keep track of the permission
 // request. Where an app has multiple context for requesting permission,
@@ -84,6 +87,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
     private var activeCurrencyIndex = 0
     private var selectingCurrencyIndex = -1
     private val activeCurCodes = ArrayList<String>()
+    private lateinit var sharedPref: SharedPreferences
 
     // Control camera state
     private var isPreviewPaused = false
@@ -98,6 +102,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
 
         graphicOverlay = findViewById(R.id.graphicOverlay)
         viewFinder = findViewById(R.id.preview_view)
+        sharedPref = getPreferences(Context.MODE_PRIVATE)
 
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -137,7 +142,6 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
     }
 
     private fun showWarnModalIfRequired() {
-        val sharedPref = getPreferences(Context.MODE_PRIVATE)
         val hideArWarnModalPrefKey = "hideARWarnModal"
 
         if (!sharedPref.contains(hideArWarnModalPrefKey)) {
@@ -220,7 +224,6 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
 
     private fun setPreferredCurrencies() {
         // read preferences to load
-        val sharedPref = getPreferences(Context.MODE_PRIVATE)
         val fromKey = "currency_code_from"
         val toKey = "currency_code_to"
         val defaultFromCurrencyCode = "EUR"
@@ -266,7 +269,6 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
                     .into(iv_currency_from_flag)
                 tv_currency_from_code.text = code
 
-                val sharedPref = getPreferences(Context.MODE_PRIVATE)
                 getPreferences(Context.MODE_PRIVATE) ?: return
                 with(sharedPref.edit()) {
                     putString("currency_code_from", code)
@@ -282,7 +284,6 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
                     .into(iv_currency_to_flag)
                 tv_currency_to_code.text = code
 
-                val sharedPref = getPreferences(Context.MODE_PRIVATE)
                 getPreferences(Context.MODE_PRIVATE) ?: return
                 with(sharedPref.edit()) {
                     putString("currency_code_to", code)
@@ -330,7 +331,6 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
             val rates = currencyRates
             val from = activeCurCodes[activeCurrencyIndex]
             val rateIndex = rates?.convertFloat(1f, from, activeCurCodes[1])
-            val sharedPref = getPreferences(Context.MODE_PRIVATE)
             getPreferences(Context.MODE_PRIVATE) ?: return
             with(sharedPref.edit()) {
                 putFloat("currency_conversion_rate_AR", rateIndex!!)
@@ -477,8 +477,31 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
                 .build()
 
             // Build the image analysis use case and instantiate our analyzer
+            val isDarkMode = Utils.isDarkTheme(this)
+            val inputStream = if (isDarkMode) {
+                assets.open("priceTag_material_dark.png")
+            } else {
+                assets.open("priceTag_material.png")
+            }
+            val icon: Bitmap = BitmapFactory.decodeStream(inputStream)
+            if (graphicOverlay != null) {
+                val metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
+                Log.d("OCRCapture", "Screen metrics: ${metrics.widthPixels} x ${metrics.heightPixels}")
+                graphicOverlay!!.setCameraInfo(
+                    metrics.widthPixels,
+                    metrics.heightPixels,
+                    CameraSelector.LENS_FACING_BACK
+                )
+                graphicOverlay!!.clear()
+            }
             val analyzerUseCase = imageAnalyzer?.apply {
-                setAnalyzer(cameraExecutor, OcrAnalyzer(applicationContext))
+                setAnalyzer(cameraExecutor, OcrAnalyzer(
+                    applicationContext,
+                    graphicOverlay,
+                    icon,
+                    sharedPref,
+                    isDarkMode)
+                )
             }
 
             // Must unbind the use-cases before rebinding them
