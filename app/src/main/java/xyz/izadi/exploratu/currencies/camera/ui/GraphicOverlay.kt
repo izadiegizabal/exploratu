@@ -210,10 +210,10 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
         Log.d("OCRCapture", "Trying to draw on canvas")
 
         synchronized(lock) {
-            Log.d("OCRCapture", "Canvas is ${canvas.width} x ${canvas.height}")
+            Log.d("OCRCapture", "Canvas is $width x $height")
             if (previewWidth != 0 && previewHeight != 0) {
-                widthScaleFactor = canvas.width.toFloat() / previewWidth.toFloat()
-                heightScaleFactor = canvas.height.toFloat() / previewHeight.toFloat()
+                widthScaleFactor = width.toFloat() / previewWidth.toFloat()
+                heightScaleFactor = height.toFloat() / previewHeight.toFloat()
             }
 
             for (graphic in graphics) {
