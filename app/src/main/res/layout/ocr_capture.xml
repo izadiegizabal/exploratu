@@ -12,17 +12,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
-                android:id="@+id/graphicOverlay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
     </androidx.camera.view.PreviewView>
 
     <!-- Other components and views -->
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+        <xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
+            android:id="@+id/graphicOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/linearLayout"

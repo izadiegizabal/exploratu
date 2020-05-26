@@ -15,13 +15,18 @@ import com.google.firebase.ml.vision.text.FirebaseVisionText
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
 import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 
-class OcrAnalyzer(private val context: Context,
-                  private val graphicOverlay: GraphicOverlay<OcrGraphic>?,
-                  private val drawable: Bitmap,
-                  private val sharedPreferences: SharedPreferences,
-                  private val isDarkTheme: Boolean = false) : ImageAnalysis.Analyzer {
+/** Helper type alias used for analysis use case callbacks */
+typealias OCRListener = (price: FirebaseVisionText.Element) -> Unit
+
+class OcrAnalyzer(private val context: Context, private val overlay: GraphicOverlay<OcrGraphic>, listener: OCRListener? = null) : ImageAnalysis.Analyzer {
     private val mTAG = this.javaClass.simpleName
     private var mToast = Toast(context)
+    private val mListeners = ArrayList<OCRListener>().apply { listener?.let { add(it) } }
+
+    /**
+     * Used to add listeners that will be called with each frame is computed
+     */
+    fun onFrameAnalyzed(listener: OCRListener) = mListeners.add(listener)
 
     private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
         0 -> FirebaseVisionImageMetadata.ROTATION_0
@@ -33,6 +38,12 @@ class OcrAnalyzer(private val context: Context,
 
     @SuppressLint("UnsafeExperimentalUsageError")
     override fun analyze(imageProxy: ImageProxy) {
+        // If there are no listeners attached, we don't need to perform analysis
+        if (mListeners.isEmpty()) {
+            imageProxy.close()
+            return
+        }
+
         val mediaImage = imageProxy.image
         val imageRotation = degreesToFirebaseRotation(imageProxy.imageInfo.rotationDegrees)
         if (mediaImage != null) {
@@ -40,6 +51,7 @@ class OcrAnalyzer(private val context: Context,
             val detector = FirebaseVision.getInstance().onDeviceTextRecognizer
             val result = detector.processImage(firebaseImage)
                 .addOnSuccessListener { firebaseVisionText ->
+                    overlay.clear()
                     // Task completed successfully
                     // Logic
                     detectNumbers(firebaseVisionText.textBlocks)
@@ -70,7 +82,6 @@ class OcrAnalyzer(private val context: Context,
     }
 
     private fun detectNumbers(items: List<FirebaseVisionText.TextBlock>) {
-        graphicOverlay?.clear()
         for (i in items.indices) {
             val item = items[i]
                 val lines = item.lines
@@ -82,15 +93,14 @@ class OcrAnalyzer(private val context: Context,
                                 val number = extractNumbers(word.text)
                                 val numberDouble = number!!.toDoubleOrNull()
                                 if (numberDouble != null) {
-                                    val graphic = OcrGraphic(
-                                        graphicOverlay,
-                                        word,
-                                        numberDouble,
-                                        drawable,
-                                        sharedPreferences,
-                                        isDarkTheme
+                                    val extracted = FirebaseVisionText.Element(
+                                        numberDouble.toString(),
+                                        word.boundingBox,
+                                        word.recognizedLanguages,
+                                        word.confidence
                                     )
-                                    graphicOverlay?.add(graphic)
+                                    // Call all listeners with new value
+                                    mListeners.forEach { it(extracted) }
                                 }
                             }
                         }

@@ -13,12 +13,16 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.format.DateUtils
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Size
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
 import androidx.camera.camera2.Camera2Config
@@ -71,7 +75,7 @@ private const val RATIO_16_9_VALUE = 16.0 / 9.0
 class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, CurrenciesListDialogFragment.Listener {
     private lateinit var viewFinder: PreviewView
     private var preview: Preview? = null
-    private var graphicOverlay: GraphicOverlay<OcrGraphic>? = null
+    private lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
     private var camera: Camera? = null
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
@@ -484,24 +488,29 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
                 assets.open("priceTag_material.png")
             }
             val icon: Bitmap = BitmapFactory.decodeStream(inputStream)
-            if (graphicOverlay != null) {
-                val metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
-                Log.d("OCRCapture", "Screen metrics: ${metrics.widthPixels} x ${metrics.heightPixels}")
-                graphicOverlay!!.setCameraInfo(
-                    metrics.widthPixels,
-                    metrics.heightPixels,
-                    CameraSelector.LENS_FACING_BACK
-                )
-                graphicOverlay!!.clear()
-            }
+            Log.d("OCRCapture", "Screen metrics: ${metrics.widthPixels} x ${metrics.heightPixels}")
+            graphicOverlay.setCameraInfo(
+                metrics.widthPixels,
+                metrics.heightPixels,
+                CameraSelector.LENS_FACING_BACK
+            )
+            graphicOverlay.clear()
             val analyzerUseCase = imageAnalyzer?.apply {
-                setAnalyzer(cameraExecutor, OcrAnalyzer(
-                    applicationContext,
-                    graphicOverlay,
-                    icon,
-                    sharedPref,
-                    isDarkMode)
-                )
+                setAnalyzer(cameraExecutor, OcrAnalyzer(applicationContext, graphicOverlay){
+                    word ->
+                    run {
+                        val graphic = OcrGraphic(
+                            graphicOverlay,
+                            word,
+                            word.text.toDouble(),
+                            icon,
+                            sharedPref,
+                            isDarkMode
+                        )
+                        // Toast.makeText(applicationContext, word.text, Toast.LENGTH_SHORT).show()
+                        graphicOverlay.add(graphic)
+                    }
+                })
             }
 
             // Must unbind the use-cases before rebinding them
