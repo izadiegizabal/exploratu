@@ -7,61 +7,69 @@
         android:layout_height="match_parent"
         android:keepScreenOn="true">
 
-    <androidx.camera.view.PreviewView
-            android:id="@+id/preview_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-    </androidx.camera.view.PreviewView>
-
     <!-- Other components and views -->
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+        <androidx.camera.view.PreviewView
+            android:id="@+id/preview_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </androidx.camera.view.PreviewView>
+
         <xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
             android:id="@+id/graphicOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/linearLayout"
-                style="@style/CurrencyInfo"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:background="@color/color_ocr_topbar"
-                app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/linearLayout"
+            style="@style/CurrencyInfo"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@color/color_primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/ib_go_to_list"
+                style="@style/OptionsAR"
+                android:layout_marginStart="8dp"
+                android:padding="4dp"
+                android:src="@drawable/ic_list_alt"
+                android:tint="@color/color_on_primary"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
-                    android:id="@+id/ib_go_to_list"
-                    style="@style/OptionsAR"
-                    android:layout_marginStart="8dp"
-                    android:padding="4dp"
-                    android:tint="@color/color_on_surface"
-                    android:src="@drawable/ic_list_alt"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/ib_locate_from_currency"
+                style="@style/OptionsAR"
+                android:src="@drawable/ic_twotone_my_location"
+                android:tint="@color/color_on_primary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
-                    android:id="@+id/ib_locate_from_currency"
-                    style="@style/OptionsAR"
-                    android:tint="@color/color_on_surface"
-                    android:src="@drawable/ic_twotone_my_location"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                    android:id="@+id/ib_flash_toggle"
-                    style="@style/OptionsAR"
-                    android:src="@drawable/ic_flash_off"
-                    android:tint="@color/color_on_surface"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ib_locate_from_currency"
-                    app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/ib_flash_toggle"
+                style="@style/OptionsAR"
+                android:src="@drawable/ic_flash_off"
+                android:tint="@color/color_on_primary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ib_locate_from_currency"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
