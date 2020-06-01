@@ -113,7 +113,6 @@ class OcrGraphic(
         canvas.drawText(
             convertedSting,
             end + 72 + getApproxXToCenterText(convertedSting, textPaint!!, graphic.width - 56),
-            // (end + 64 + ((convertedSting.length + 1)/2 * 12)),
             (bottom - (text.boundingBox!!.height() / 2 - 4)),
             textPaint!!
         )

@@ -13,16 +13,11 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.format.DateUtils
 import android.util.DisplayMetrics
 import android.util.Log
-import android.util.Size
 import android.view.ScaleGestureDetector
 import android.view.View
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
 import androidx.camera.camera2.Camera2Config
@@ -58,8 +53,6 @@ import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 // This is an arbitrary number we are using to keep track of the permission
 // request. Where an app has multiple context for requesting permission,
@@ -444,10 +437,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
     private fun startCamera() {
         // Get screen metrics used to setup camera for full screen resolution
         val metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
-        Log.d(LOG_TAG, "Screen metrics: ${metrics.widthPixels} x ${metrics.heightPixels}")
-
         val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
-        Log.d(LOG_TAG, "Preview aspect ratio: $screenAspectRatio")
 
         val rotation = viewFinder.display.rotation
 
@@ -488,7 +478,6 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
                 assets.open("priceTag_material.png")
             }
             val icon: Bitmap = BitmapFactory.decodeStream(inputStream)
-            Log.d("OCRCapture", "Screen metrics: ${metrics.widthPixels} x ${metrics.heightPixels}")
             graphicOverlay.setCameraInfo(
                 metrics.widthPixels,
                 metrics.heightPixels,

@@ -60,7 +60,6 @@ class OcrAnalyzer(private val context: Context, private val overlay: GraphicOver
                 }
                 .addOnFailureListener { e ->
                     // Task failed with an exception
-                    Log.d(mTAG, "What is going on $e")
                     e.printStackTrace()
                     showAToast("Error trying to perform OCR, use the manual mode instead.")
 

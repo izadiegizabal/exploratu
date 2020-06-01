@@ -153,7 +153,6 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
      */
     fun add(graphic: T) {
         synchronized(lock) {
-            Log.d("OCRCapture", "Adding graphic ${graphic.hashCode()}")
             graphics.add(graphic)
         }
         postInvalidate()
@@ -207,17 +206,13 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        Log.d("OCRCapture", "Trying to draw on canvas")
-
         synchronized(lock) {
-            Log.d("OCRCapture", "Canvas is $width x $height")
             if (previewWidth != 0 && previewHeight != 0) {
-                widthScaleFactor = width.toFloat() / previewWidth.toFloat()
-                heightScaleFactor = height.toFloat() / previewHeight.toFloat()
+                widthScaleFactor = ((previewWidth.toFloat() / width.toFloat()) * 1.55).toFloat()
+                heightScaleFactor = ((previewHeight.toFloat() / height.toFloat()) * 1.55).toFloat()
             }
 
             for (graphic in graphics) {
-                Log.d("OCRCapture", "Drawing graphic ${graphic.hashCode()}")
                 graphic.draw(canvas)
             }
         }
