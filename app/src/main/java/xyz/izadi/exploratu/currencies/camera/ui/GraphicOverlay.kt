@@ -19,7 +19,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import androidx.camera.core.CameraSelector
 import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay.Graphic

@@ -17,7 +17,6 @@ import androidx.core.content.ContextCompat
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.bottomAppBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -432,13 +431,15 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                 }
             }
 
-            val formattedDate = getFormattedDate(rates?.date)
-            tv_exchange_provider.text =
-                getString(R.string.exchanges_provided_by_at, formattedDate)
+            if(rates != null) {
+                val formattedDate = getFormattedDate(rates.date)
+                tv_exchange_provider.text =
+                    getString(R.string.exchanges_provided_by_at, formattedDate)
+            }
         }
     }
 
-    private fun getFormattedDate(timestamp: Date?): String {
+    private fun getFormattedDate(timestamp: Date): String {
         val df = android.text.format.DateFormat.getDateFormat(this)
         return df.format(timestamp)
     }

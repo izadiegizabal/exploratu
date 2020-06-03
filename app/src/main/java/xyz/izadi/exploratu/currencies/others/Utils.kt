@@ -48,7 +48,7 @@ object Utils {
             var bd = BigDecimal(numberToRound.toString())
             bd = bd.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP)
             return bd.toFloat()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
@@ -167,7 +167,7 @@ object Utils {
     private fun getCurrencyCodeFromLocale(locale: Locale): String? {
         try {
             return Currency.getInstance(locale).currencyCode
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         return null
@@ -200,7 +200,7 @@ object Utils {
         )
 
         circularReveal.duration = 400
-        circularReveal.addListener(object: AnimatorListenerAdapter() {
+        circularReveal.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
                 rootLayout.visibility = View.INVISIBLE
                 activity.finish()

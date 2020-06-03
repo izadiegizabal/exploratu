@@ -65,7 +65,8 @@ private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 private const val RATIO_4_3_VALUE = 4.0 / 3.0
 private const val RATIO_16_9_VALUE = 16.0 / 9.0
 
-class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, CurrenciesListDialogFragment.Listener {
+class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
+    CurrenciesListDialogFragment.Listener {
     private lateinit var viewFinder: PreviewView
     private var preview: Preview? = null
     private lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
@@ -73,6 +74,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private var imageAnalyzer: ImageAnalysis? = null
+
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
 
@@ -113,7 +115,8 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
             }
         } else {
             ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+            )
         }
 
         cameraFab.setOnClickListener {
@@ -155,7 +158,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
 
         // TODO: show modal
         val actionButtonListener = DialogInterface.OnClickListener { dialog, which ->
-            when(which) {
+            when (which) {
                 (DialogInterface.BUTTON_POSITIVE) -> {
                     with(sharedPref.edit()) {
                         putBoolean(hideArWarnModalPrefKey, true)
@@ -427,7 +430,8 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
         currencyRates = currencies?.getRates() //fallback from JSON
         insertRateInDB(currencyRates!!)
     }
-//////////////////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////////////////
 //    CAMERA STUFF ///////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
     override fun getCameraXConfig(): CameraXConfig {
@@ -458,7 +462,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
                 .build()
 
             // Attach the viewfinder's surface provider to preview use case
-            preview?.setSurfaceProvider(viewFinder.createSurfaceProvider(null))
+            preview?.setSurfaceProvider(viewFinder.createSurfaceProvider())
 
             // ImageAnalysis
             imageAnalyzer = ImageAnalysis.Builder()
@@ -485,21 +489,22 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
             )
             graphicOverlay.clear()
             val analyzerUseCase = imageAnalyzer?.apply {
-                setAnalyzer(cameraExecutor, OcrAnalyzer(applicationContext, graphicOverlay){
-                    word ->
-                    run {
-                        val graphic = OcrGraphic(
-                            graphicOverlay,
-                            word,
-                            word.text.toDouble(),
-                            icon,
-                            sharedPref,
-                            isDarkMode
-                        )
-                        // Toast.makeText(applicationContext, word.text, Toast.LENGTH_SHORT).show()
-                        graphicOverlay.add(graphic)
-                    }
-                })
+                setAnalyzer(
+                    cameraExecutor,
+                    OcrAnalyzer(applicationContext, graphicOverlay) { word ->
+                        run {
+                            val graphic = OcrGraphic(
+                                graphicOverlay,
+                                word,
+                                word.text.toDouble(),
+                                icon,
+                                sharedPref,
+                                isDarkMode
+                            )
+                            // Toast.makeText(applicationContext, word.text, Toast.LENGTH_SHORT).show()
+                            graphicOverlay.add(graphic)
+                        }
+                    })
             }
 
             // Must unbind the use-cases before rebinding them
@@ -508,14 +513,15 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
             try {
                 // A variable number of use-cases can be passed here -
                 // camera provides access to CameraControl & CameraInfo
-                camera = cameraProvider.bindToLifecycle(this, cameraSelector, analyzerUseCase,  preview)
+                camera =
+                    cameraProvider.bindToLifecycle(this, cameraSelector, analyzerUseCase, preview)
 
                 setUpPinchToZoom()
 
                 // set up livedata for camera info
                 isFlashOn = camera?.cameraInfo?.torchState!!
                 isPreviewPaused = false
-            } catch(exc: Exception) {
+            } catch (exc: Exception) {
                 Log.e(LOG_TAG, "Use case binding failed", exc)
             }
 
@@ -554,9 +560,10 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
         // user could have removed them while the app was in paused state.
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+            )
         }
-        if (isPreviewPaused){
+        if (isPreviewPaused) {
             // TODO: maintain preview image after resuming
             startPreviewPause(false)
         }
@@ -607,7 +614,8 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
      * been granted? If yes, start Camera
      */
     override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
+    ) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 viewFinder.post { startCamera() }
@@ -622,7 +630,8 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider, Currenci
      */
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
-            baseContext, it) == PackageManager.PERMISSION_GRANTED
+            baseContext, it
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
 }

@@ -19,8 +19,6 @@ import android.content.SharedPreferences
 import android.graphics.*
 import com.google.firebase.ml.vision.text.FirebaseVisionText
 import xyz.izadi.exploratu.currencies.others.Utils
-import android.graphics.Typeface
-import android.util.Log
 import java.text.DecimalFormat
 
 

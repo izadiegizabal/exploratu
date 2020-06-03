@@ -2,9 +2,6 @@ package xyz.izadi.exploratu.currencies.camera
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
-import android.graphics.Bitmap
-import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -18,7 +15,11 @@ import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 /** Helper type alias used for analysis use case callbacks */
 typealias OCRListener = (price: FirebaseVisionText.Element) -> Unit
 
-class OcrAnalyzer(private val context: Context, private val overlay: GraphicOverlay<OcrGraphic>, listener: OCRListener? = null) : ImageAnalysis.Analyzer {
+class OcrAnalyzer(
+    private val context: Context,
+    private val overlay: GraphicOverlay<OcrGraphic>,
+    listener: OCRListener? = null
+) : ImageAnalysis.Analyzer {
     private val mTAG = this.javaClass.simpleName
     private var mToast = Toast(context)
     private val mListeners = ArrayList<OCRListener>().apply { listener?.let { add(it) } }
@@ -28,7 +29,7 @@ class OcrAnalyzer(private val context: Context, private val overlay: GraphicOver
      */
     fun onFrameAnalyzed(listener: OCRListener) = mListeners.add(listener)
 
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
+    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
         0 -> FirebaseVisionImageMetadata.ROTATION_0
         90 -> FirebaseVisionImageMetadata.ROTATION_90
         180 -> FirebaseVisionImageMetadata.ROTATION_180
@@ -83,28 +84,28 @@ class OcrAnalyzer(private val context: Context, private val overlay: GraphicOver
     private fun detectNumbers(items: List<FirebaseVisionText.TextBlock>) {
         for (i in items.indices) {
             val item = items[i]
-                val lines = item.lines
-                for (line in lines) {
-                    if (line != null) {
-                        val words = line.elements
-                        for (word in words) {
-                            if (word != null) {
-                                val number = extractNumbers(word.text)
-                                val numberDouble = number!!.toDoubleOrNull()
-                                if (numberDouble != null) {
-                                    val extracted = FirebaseVisionText.Element(
-                                        numberDouble.toString(),
-                                        word.boundingBox,
-                                        word.recognizedLanguages,
-                                        word.confidence
-                                    )
-                                    // Call all listeners with new value
-                                    mListeners.forEach { it(extracted) }
-                                }
+            val lines = item.lines
+            for (line in lines) {
+                if (line != null) {
+                    val words = line.elements
+                    for (word in words) {
+                        if (word != null) {
+                            val number = extractNumbers(word.text)
+                            val numberDouble = number!!.toDoubleOrNull()
+                            if (numberDouble != null) {
+                                val extracted = FirebaseVisionText.Element(
+                                    numberDouble.toString(),
+                                    word.boundingBox,
+                                    word.recognizedLanguages,
+                                    word.confidence
+                                )
+                                // Call all listeners with new value
+                                mListeners.forEach { it(extracted) }
                             }
                         }
                     }
                 }
+            }
         }
     }
 
