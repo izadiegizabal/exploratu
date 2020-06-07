@@ -23,7 +23,7 @@
 
         </androidx.camera.view.PreviewView>
 
-        <xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
+        <xyz.izadi.exploratu.currencies.camera.GraphicOverlay
             android:id="@+id/graphicOverlay"
             android:layout_width="0dp"
             android:layout_height="0dp"

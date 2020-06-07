@@ -1,60 +1,38 @@
-/*
- * Copyright (C) The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package xyz.izadi.exploratu.currencies.camera.ui
+package xyz.izadi.exploratu.currencies.camera
 
 import android.content.SharedPreferences
 import android.graphics.*
+import android.util.Size
 import com.google.firebase.ml.vision.text.FirebaseVisionText
 import xyz.izadi.exploratu.currencies.others.Utils
 import java.text.DecimalFormat
 
-
-/**
- * Graphic instance for rendering TextBlock position, size, and ID within an associated graphic
- * overlay view.
- */
 class OcrGraphic(
-    overlay: GraphicOverlay<*>?,
+    overlay: GraphicOverlay<*>,
     val text: FirebaseVisionText.Element,
     private val number: Double,
     private val graphic: Bitmap,
     private val sharedPreferences: SharedPreferences,
-    private val isDarkTheme: Boolean = false
+    private val isDarkTheme: Boolean = false,
+    bufferSize: Size
 ) : GraphicOverlay.Graphic(overlay) {
     var id: Int = 0
 
     init {
 
-        if (rectPaint == null) {
-            rectPaint = Paint()
-            rectPaint!!.color = TEXT_COLOR
-            rectPaint!!.style = Paint.Style.STROKE
-            rectPaint!!.strokeWidth = 4.0f
-        }
+        rectPaint = Paint()
+        rectPaint.color = TEXT_COLOR
+        rectPaint.style = Paint.Style.STROKE
+        rectPaint.strokeWidth = 4.0f
 
-        if (textPaint == null) {
-            textPaint = Paint()
-            textPaint!!.color = if (isDarkTheme) {
-                TEXT_COLOR
-            } else {
-                PRICE_COLOR
-            }
-            textPaint!!.textSize = 52.0f
-            textPaint!!.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
-        }
+        textPaint = Paint()
+        textPaint.color = if (isDarkTheme) TEXT_COLOR else PRICE_COLOR
+        textPaint.textSize = 52.0f
+        textPaint.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
+
+        // update the bufferSize to scale bitmap correctly
+        setScaleFactor(bufferSize)
+
         // Redraw the overlay, as this graphic has been added.
         postInvalidate()
     }
@@ -73,11 +51,11 @@ class OcrGraphic(
         return rect.contains(x, y)
     }
 
-    /**
-     * Draws the text block annotations for position, size, and raw value on the supplied canvas.
-     */
+    // Draws the text block annotations for position, size, and raw value on the supplied canvas.
     override fun draw(canvas: Canvas) {
-        textPaint!!.color = if (isDarkTheme) {
+        if (text.boundingBox == null || text.boundingBox !is Rect) return
+
+        textPaint.color = if (isDarkTheme) {
             TEXT_COLOR
         } else {
             PRICE_COLOR
@@ -100,8 +78,8 @@ class OcrGraphic(
         val commasString = Utils.addCommas(DecimalFormat("#.##").format(roundedNum))
         val convertedSting = "$symbol$commasString"
 
-        val end = translateX(text.boundingBox?.right?.toFloat()!!)
-        val bottom = translateY(text.boundingBox?.bottom?.toFloat()!!)
+        val end = translateX(text.boundingBox!!.right.toFloat())
+        val bottom = translateY(text.boundingBox!!.bottom.toFloat())
         canvas.drawBitmap(
             graphic,
             end,
@@ -110,17 +88,17 @@ class OcrGraphic(
         )
         canvas.drawText(
             convertedSting,
-            end + 72 + getApproxXToCenterText(convertedSting, textPaint!!, graphic.width - 56),
+            end + getApproxXToCenterText(convertedSting, textPaint, graphic.width),
             (bottom - (text.boundingBox!!.height() / 2 - 4)),
-            textPaint!!
+            textPaint
         )
     }
 
     companion object {
         private const val TEXT_COLOR = Color.WHITE
         private const val PRICE_COLOR = Color.BLACK
-        private var rectPaint: Paint? = null
-        private var textPaint: Paint? = null
+        private lateinit var rectPaint: Paint
+        private lateinit var textPaint: Paint
     }
 
     private fun getApproxXToCenterText(
@@ -129,6 +107,6 @@ class OcrGraphic(
         widthToFitStringInto: Int
     ): Float {
         val textWidth = p.measureText(text)
-        return ((widthToFitStringInto - textWidth) / 2f) - (p.textSize / 2f)
+        return 72 + ((widthToFitStringInto - textWidth - 56) / 2f) - (p.textSize / 2f)
     }
 }

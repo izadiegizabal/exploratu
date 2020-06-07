@@ -39,8 +39,8 @@ import kotlinx.coroutines.withContext
 import xyz.izadi.exploratu.MainActivity
 import xyz.izadi.exploratu.R
 import xyz.izadi.exploratu.currencies.camera.OcrAnalyzer
-import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
-import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
+import xyz.izadi.exploratu.currencies.camera.GraphicOverlay
+import xyz.izadi.exploratu.currencies.camera.OcrGraphic
 import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
@@ -79,7 +79,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
     private lateinit var cameraExecutor: ExecutorService
 
     // Helper variables to check the state of the activity
-    private val LOG_TAG = this.javaClass.simpleName
+    private val mTAG = this.javaClass.simpleName
     private var ratesDB: RatesDatabase? = null
     private var currencies: Currencies? = null
     private var currencyRates: Rates? = null
@@ -92,9 +92,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
     private var isPreviewPaused = false
     private lateinit var isFlashOn: LiveData<Int>
 
-    /**
-     * Initializes the UI and creates the detector pipeline.
-     */
+    // Initializes the UI and creates the detector pipeline.
     public override fun onCreate(bundle: Bundle?) {
         super.onCreate(bundle)
         setContentView(R.layout.ocr_capture)
@@ -157,7 +155,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
         }
 
         // TODO: show modal
-        val actionButtonListener = DialogInterface.OnClickListener { dialog, which ->
+        val actionButtonListener = DialogInterface.OnClickListener { _, which ->
             when (which) {
                 (DialogInterface.BUTTON_POSITIVE) -> {
                     with(sharedPref.edit()) {
@@ -167,6 +165,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
                 }
             }
         }
+        // TODO: replace the strings from resources
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.ar_warning_title))
             .setMessage(getString(R.string.ar_warning_message))
@@ -175,38 +174,22 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
             .show()
     }
 
+    // TODO: replace the strings from resources
     private fun setUpToolTips() {
         TooltipCompat.setTooltipText(ib_go_to_list, getString(R.string.tt_go_to_list))
         TooltipCompat.setTooltipText(ib_flash_toggle, getString(R.string.tt_flash_toggle))
-        TooltipCompat.setTooltipText(
-            ib_locate_from_currency,
-            getString(R.string.tt_locate_from_currency)
-        )
-        TooltipCompat.setTooltipText(
-            ib_reverse_currencies,
-            getString(R.string.tt_reverse_currencies)
-        )
+        TooltipCompat.setTooltipText(ib_locate_from_currency, getString(R.string.tt_locate_from_currency))
+        TooltipCompat.setTooltipText( ib_reverse_currencies, getString(R.string.tt_reverse_currencies))
         TooltipCompat.setTooltipText(ll_currency_from, getString(R.string.tt_currency_from))
         TooltipCompat.setTooltipText(ll_currency_to, getString(R.string.tt_currency_to))
         TooltipCompat.setTooltipText(cameraFab, getString(R.string.tt_camera_fab))
     }
 
     private fun setUpOptionsListeners() {
-        ib_reverse_currencies.setOnClickListener {
-            reverseCurrencies()
-        }
-
-        ib_locate_from_currency.setOnClickListener {
-            locateFromCurrency()
-        }
-
-        ib_flash_toggle.setOnClickListener {
-            turnOnOffFlash()
-        }
-
-        ib_go_to_list.setOnClickListener {
-            goToListView(it)
-        }
+        ib_reverse_currencies.setOnClickListener { reverseCurrencies() }
+        ib_locate_from_currency.setOnClickListener { locateFromCurrency() }
+        ib_flash_toggle.setOnClickListener { turnOnOffFlash() }
+        ib_go_to_list.setOnClickListener { goToListView(it) }
     }
 
     private fun setUpCurrencySelectorListeners() {
@@ -362,7 +345,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
                                     }
                                 } else {
                                     Log.d(
-                                        LOG_TAG,
+                                        mTAG,
                                         "Error while getting new data: ${response.code()}"
                                     )
                                     // DB fallback in case of error, no connection...
@@ -431,7 +414,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
         insertRateInDB(currencyRates!!)
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 //    CAMERA STUFF ///////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
     override fun getCameraXConfig(): CameraXConfig {
@@ -482,25 +465,23 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
                 assets.open("priceTag_material.png")
             }
             val icon: Bitmap = BitmapFactory.decodeStream(inputStream)
-            graphicOverlay.setCameraInfo(
-                metrics.widthPixels,
-                metrics.heightPixels,
-                CameraSelector.LENS_FACING_BACK
-            )
+            graphicOverlay.setCameraFacing(CameraSelector.LENS_FACING_BACK)
             graphicOverlay.clear()
             val analyzerUseCase = imageAnalyzer?.apply {
                 setAnalyzer(
                     cameraExecutor,
-                    OcrAnalyzer(applicationContext, graphicOverlay) { word ->
+                    OcrAnalyzer(applicationContext, graphicOverlay) { word, bufferSize ->
                         run {
-                            val graphic = OcrGraphic(
-                                graphicOverlay,
-                                word,
-                                word.text.toDouble(),
-                                icon,
-                                sharedPref,
-                                isDarkMode
-                            )
+                            val graphic =
+                                OcrGraphic(
+                                    graphicOverlay,
+                                    word,
+                                    word.text.toDouble(),
+                                    icon,
+                                    sharedPref,
+                                    isDarkMode,
+                                    bufferSize
+                                )
                             // Toast.makeText(applicationContext, word.text, Toast.LENGTH_SHORT).show()
                             graphicOverlay.add(graphic)
                         }
@@ -518,11 +499,11 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
 
                 setUpPinchToZoom()
 
-                // set up livedata for camera info
+                // set up live data for camera info
                 isFlashOn = camera?.cameraInfo?.torchState!!
                 isPreviewPaused = false
             } catch (exc: Exception) {
-                Log.e(LOG_TAG, "Use case binding failed", exc)
+                Log.e(mTAG, "Use case binding failed", exc)
             }
 
         }, ContextCompat.getMainExecutor(this))
@@ -625,13 +606,9 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
         }
     }
 
-    /**
-     * Check if all permission specified in the manifest have been granted
-     */
+    // Check if all permission specified in the manifest have been granted
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            baseContext, it
-        ) == PackageManager.PERMISSION_GRANTED
+        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
 }

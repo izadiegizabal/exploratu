@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package xyz.izadi.exploratu.currencies.camera.ui
+package xyz.izadi.exploratu.currencies.camera
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.Size
 import android.view.View
 import androidx.camera.core.CameraSelector
-import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay.Graphic
+import xyz.izadi.exploratu.currencies.camera.GraphicOverlay.Graphic
 import java.util.*
 
 /**
@@ -46,12 +47,10 @@ import java.util.*
  * from the preview's coordinate system to the view coordinate system.
  *
  */
-class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: AttributeSet) :
+class GraphicOverlay<T : Graphic>(context: Context, attrs: AttributeSet) :
     View(context, attrs) {
     private val lock = Any()
-    private var previewWidth: Int = 0
     private var widthScaleFactor = 1.0f
-    private var previewHeight: Int = 0
     private var heightScaleFactor = 1.0f
     private var facing = CameraSelector.LENS_FACING_BACK
     private val graphics = HashSet<T>()
@@ -61,7 +60,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
      * this and implement the [Graphic.draw] method to define the
      * graphics element.  Add instances to the overlay using [GraphicOverlay.add].
      */
-    abstract class Graphic(private val mOverlay: GraphicOverlay<*>?) {
+    abstract class Graphic(private val mOverlay: GraphicOverlay<*>) {
 
         /**
          * Draw the graphic on the supplied canvas.  Drawing should use the following methods to
@@ -77,9 +76,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
          */
         abstract fun draw(canvas: Canvas)
 
-        /**
-         * Returns true if the supplied coordinates are within this graphic.
-         */
+        // Returns true if the supplied coordinates are within this graphic.
         abstract fun contains(x: Float, y: Float): Boolean
 
         /**
@@ -87,14 +84,12 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
          * scale.
          */
         fun scaleX(horizontal: Float): Float {
-            return horizontal * mOverlay!!.widthScaleFactor
+            return horizontal * mOverlay.widthScaleFactor
         }
 
-        /**
-         * Adjusts a vertical value of the supplied value from the preview scale to the view scale.
-         */
+        // Adjusts a vertical value of the supplied value from the preview scale to the view scale.
         fun scaleY(vertical: Float): Float {
-            return vertical * mOverlay!!.heightScaleFactor
+            return vertical * mOverlay.heightScaleFactor
         }
 
         /**
@@ -102,7 +97,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
          * system.
          */
         fun translateX(x: Float): Float {
-            return if (mOverlay!!.facing == CameraSelector.LENS_FACING_FRONT) {
+            return if (mOverlay.facing == CameraSelector.LENS_FACING_FRONT) {
                 mOverlay.width - scaleX(x)
             } else {
                 scaleX(x)
@@ -132,14 +127,17 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
             return returnRect
         }
 
+        fun setScaleFactor(bufferSize: Size) {
+            mOverlay.widthScaleFactor = (mOverlay.width.toFloat() / bufferSize.height.toFloat())
+            mOverlay.heightScaleFactor = (mOverlay.height.toFloat() / bufferSize.width.toFloat())
+        }
+
         fun postInvalidate() {
-            mOverlay?.postInvalidate()
+            mOverlay.postInvalidate()
         }
     }
 
-    /**
-     * Removes all graphics from the overlay.
-     */
+    // Removes all graphics from the overlay.
     fun clear() {
         synchronized(lock) {
             graphics.clear()
@@ -147,9 +145,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
         postInvalidate()
     }
 
-    /**
-     * Adds a graphic to the overlay.
-     */
+    // Adds a graphic to the overlay.
     fun add(graphic: T) {
         synchronized(lock) {
             graphics.add(graphic)
@@ -157,9 +153,7 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
         postInvalidate()
     }
 
-    /**
-     * Removes a graphic from the overlay.
-     */
+    // Removes a graphic from the overlay.
     fun remove(graphic: T) {
         synchronized(lock) {
             graphics.remove(graphic)
@@ -190,27 +184,18 @@ class GraphicOverlay<T : GraphicOverlay.Graphic>(context: Context, attrs: Attrib
      * Sets the camera attributes for size and facing direction, which informs how to transform
      * image coordinates later.
      */
-    fun setCameraInfo(previewWidth: Int, previewHeight: Int, facing: Int) {
+    fun setCameraFacing(facing: Int) {
         synchronized(lock) {
-            this.previewWidth = previewWidth
-            this.previewHeight = previewHeight
             this.facing = facing
         }
         postInvalidate()
     }
 
-    /**
-     * Draws the overlay with its associated graphic objects.
-     */
+    // Draws the overlay with its associated graphic objects.
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         synchronized(lock) {
-            if (previewWidth != 0 && previewHeight != 0) {
-                widthScaleFactor = ((previewWidth.toFloat() / width.toFloat()) * 1.55).toFloat()
-                heightScaleFactor = ((previewHeight.toFloat() / height.toFloat()) * 1.55).toFloat()
-            }
-
             for (graphic in graphics) {
                 graphic.draw(canvas)
             }

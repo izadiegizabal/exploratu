@@ -2,6 +2,7 @@ package xyz.izadi.exploratu.currencies.camera
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Size
 import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -9,11 +10,9 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.text.FirebaseVisionText
-import xyz.izadi.exploratu.currencies.camera.ui.GraphicOverlay
-import xyz.izadi.exploratu.currencies.camera.ui.OcrGraphic
 
 /** Helper type alias used for analysis use case callbacks */
-typealias OCRListener = (price: FirebaseVisionText.Element) -> Unit
+typealias OCRListener = (price: FirebaseVisionText.Element, bufferSize: Size) -> Unit
 
 class OcrAnalyzer(
     private val context: Context,
@@ -23,11 +22,6 @@ class OcrAnalyzer(
     private val mTAG = this.javaClass.simpleName
     private var mToast = Toast(context)
     private val mListeners = ArrayList<OCRListener>().apply { listener?.let { add(it) } }
-
-    /**
-     * Used to add listeners that will be called with each frame is computed
-     */
-    fun onFrameAnalyzed(listener: OCRListener) = mListeners.add(listener)
 
     private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
         0 -> FirebaseVisionImageMetadata.ROTATION_0
@@ -55,7 +49,7 @@ class OcrAnalyzer(
                     overlay.clear()
                     // Task completed successfully
                     // Logic
-                    detectNumbers(firebaseVisionText.textBlocks)
+                    detectNumbers(firebaseVisionText.textBlocks, Size(mediaImage.width, mediaImage.height))
                     // Close img for next use
                     imageProxy.close()
                 }
@@ -81,7 +75,7 @@ class OcrAnalyzer(
         mToast.show() //finally display it
     }
 
-    private fun detectNumbers(items: List<FirebaseVisionText.TextBlock>) {
+    private fun detectNumbers(items: List<FirebaseVisionText.TextBlock>, bufferSize: Size) {
         for (i in items.indices) {
             val item = items[i]
             val lines = item.lines
@@ -100,7 +94,7 @@ class OcrAnalyzer(
                                     word.confidence
                                 )
                                 // Call all listeners with new value
-                                mListeners.forEach { it(extracted) }
+                                mListeners.forEach { it(extracted, bufferSize) }
                             }
                         }
                     }
