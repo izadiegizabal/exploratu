@@ -13,11 +13,6 @@
 
     <dimen name="elevation_default_top_app_bar">4dp</dimen>
 
-    <!--Emphasis modifiers for "on" colors-->
-    <dimen name="alpha_emphasis_high">@dimen/mtrl_emphasis_high_type</dimen>
-    <dimen name="alpha_emphasis_medium">@dimen/mtrl_emphasis_medium</dimen>
-    <dimen name="alpha_emphasis_disabled">@dimen/mtrl_emphasis_disabled</dimen>
-
     <!--  Font sizes  -->
     <dimen name="label">12sp</dimen>
     <dimen name="list_item_spacing">16dp</dimen>

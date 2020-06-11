@@ -1,6 +1,5 @@
 package xyz.izadi.exploratu
 
-import BottomNavigationDrawerFragment
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -17,7 +16,6 @@ import androidx.core.content.ContextCompat
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.bottomAppBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -36,7 +34,7 @@ import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener {
-    private val LOG_TAG = this.javaClass.simpleName
+    private val mLog = this.javaClass.simpleName
     private var ratesDB: RatesDatabase? = null
     private var currencies: Currencies? = null
     private var currencyRates: Rates? = null
@@ -432,13 +430,15 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                 }
             }
 
-            val formattedDate = getFormattedDate(rates?.date)
-            tv_exchange_provider.text =
-                getString(R.string.exchanges_provided_by_at, formattedDate)
+            if (rates != null) {
+                val formattedDate = getFormattedDate(rates.date)
+                tv_exchange_provider.text =
+                    getString(R.string.exchanges_provided_by_at, formattedDate)
+            }
         }
     }
 
-    private fun getFormattedDate(timestamp: Date?): String {
+    private fun getFormattedDate(timestamp: Date): String {
         val df = android.text.format.DateFormat.getDateFormat(this)
         return df.format(timestamp)
     }
@@ -470,7 +470,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                                     }
                                 } else {
                                     Log.d(
-                                        LOG_TAG,
+                                        mLog,
                                         "Error while getting new data: ${response.code()}"
                                     )
                                     // DB fallback in case of error, no connection...

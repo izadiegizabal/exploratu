@@ -67,3 +67,12 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+.idea/
+
+.project
+
+.settings/
+
+app/.classpath
+
+app/.DS_Store

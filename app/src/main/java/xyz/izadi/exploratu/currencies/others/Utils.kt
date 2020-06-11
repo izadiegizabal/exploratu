@@ -21,34 +21,12 @@ import kotlin.math.max
 
 object Utils {
 
-    private val LOG_TAG = this.javaClass.simpleName
-
-    fun insertPeriodically(text: String, insert: String, period: Int): String {
-        val builder = StringBuilder(text)
-
-        var idx = builder.length - period
-
-        while (idx > 0) {
-            builder.insert(idx, insert)
-            idx -= period
-        }
-
-        return builder.toString()
-    }
-
-    /**
-     * Round to certain number of decimals
-     *
-     * @param numberToRound
-     * @param decimalPlaces
-     * @return
-     */
     fun round(numberToRound: Float, decimalPlaces: Int): Float {
         try {
             var bd = BigDecimal(numberToRound.toString())
             bd = bd.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP)
             return bd.toFloat()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
@@ -90,6 +68,19 @@ object Utils {
         return quantityRes
     }
 
+    private fun insertPeriodically(text: String, insert: String, period: Int): String {
+        val builder = StringBuilder(text)
+
+        var idx = builder.length - period
+
+        while (idx > 0) {
+            builder.insert(idx, insert)
+            idx -= period
+        }
+
+        return builder.toString()
+    }
+
     fun addCommas(numberString: String): String {
         var quantityRes = numberString
         val amountParts = quantityRes.split(".")
@@ -110,7 +101,6 @@ object Utils {
 
         return quantityRes
     }
-
 
     fun getCurrencies(context: Context): Currencies? {
         try {
@@ -167,7 +157,7 @@ object Utils {
     private fun getCurrencyCodeFromLocale(locale: Locale): String? {
         try {
             return Currency.getInstance(locale).currencyCode
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         return null
@@ -200,7 +190,7 @@ object Utils {
         )
 
         circularReveal.duration = 400
-        circularReveal.addListener(object: AnimatorListenerAdapter() {
+        circularReveal.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
                 rootLayout.visibility = View.INVISIBLE
                 activity.finish()
@@ -210,7 +200,7 @@ object Utils {
         circularReveal.start()
     }
 
-    fun isDarkTheme(activity: Activity): Boolean {
+    fun isDarkTheme(activity: Context): Boolean {
         return activity.resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }

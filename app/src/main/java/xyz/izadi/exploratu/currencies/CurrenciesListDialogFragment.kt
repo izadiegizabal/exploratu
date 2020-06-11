@@ -3,7 +3,6 @@ package xyz.izadi.exploratu.currencies
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +39,6 @@ const val ARG_CURRENCIES = "currencies_object"
  */
 class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
-    private val LOG_TAG = this.javaClass.simpleName
     private var mListener: Listener? = null
     private var mAdapter: CurrenciesAdapter? = null
 
@@ -54,7 +52,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val layoutManager = LinearLayoutManager(context)
         rv_currency_list.layoutManager = layoutManager
-        mAdapter = CurrenciesAdapter(arguments!!.getParcelable(ARG_CURRENCIES))
+        mAdapter = CurrenciesAdapter(arguments!!.getParcelable(ARG_CURRENCIES)!!)
         rv_currency_list.adapter = mAdapter
 
         setUpQueryListener()
@@ -178,16 +176,16 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         override fun getFilter(): Filter {
             return object : Filter() {
                 override fun performFiltering(charSequence: CharSequence): FilterResults {
-                    val charString = charSequence.toString().toLowerCase()
+                    val charString = charSequence.toString().toLowerCase(Locale.ROOT)
 
                     mCurrenciesFiltered = if (charString.isEmpty()) {
                         mCurrencies
                     } else {
                         val filteredList = ArrayList<Currency>()
                         for (currency in mCurrencies.currencies) {
-                            if (currency.name.toLowerCase().contains(charString)
-                                || currency.code.toLowerCase().contains(charString)
-                                || currency.sign.toLowerCase().contains(charString)
+                            if (currency.name.toLowerCase(Locale.ROOT).contains(charString)
+                                || currency.code.toLowerCase(Locale.ROOT).contains(charString)
+                                || currency.sign.toLowerCase(Locale.ROOT).contains(charString)
                                 || countryNameMatch(currency.countries, charString)
                             ) {
                                 filteredList.add(currency)
@@ -217,7 +215,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
     private fun countryNameMatch(countries: Array<String>, query: String): Boolean {
         for (country in countries) {
-            if (country.toLowerCase().contains(query)) {
+            if (country.toLowerCase(Locale.ROOT).contains(query)) {
                 return true
             }
         }

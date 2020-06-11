@@ -1,8 +1,13 @@
 <resources>
     <string name="app_name">Exploratu</string>
+
+    <!-- Mode selector -->
     <string name="bottom_sheet_title">Modes</string>
     <string name="bottom_sheet_subtitle">Choose your converter</string>
     <string name="mode_title_currency">Currency</string>
+    <string name="follow_me_twitter">Updates at @izadiegizabal, follow us!</string>
+    <string name="cd_mode_selection_icon">Mode Selection Icon</string>
+    <string name="cd_close_mode_selector">Close mode selector</string>
     <string name="mode_title_more">More to come!</string>
     <string name="menu_settings">Settings</string>
 
@@ -36,17 +41,5 @@
     <string name="ar_warning_hide_next_time">I understand</string>
     <string name="ar_warning_dismiss">Remind me next time</string>
 
-    <!-- Default ORC -->
-    <string name="ok">OK</string>
-    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
-    <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
-    <string name="low_storage_error">Ocr dependencies cannot be downloaded due to low device storage</string>
-    <string name="title_activity_main">Ocr Detector Sample</string>
-    <string name="ocr_header">Click &quot;Detect Text&quot; to detect text</string>
-    <string name="read_text">Detect Text</string>
-    <string name="auto_focus">Auto Focus</string>
-    <string name="use_flash">Use Flash</string>
-    <string name="ocr_success">Text read successfully</string>
-    <string name="ocr_failure">No text captured</string>
-    <string name="ocr_error">"Error reading text: %1$s"</string>
+
 </resources>
