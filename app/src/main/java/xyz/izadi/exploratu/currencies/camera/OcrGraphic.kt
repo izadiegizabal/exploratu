@@ -29,6 +29,8 @@ class OcrGraphic(
         textPaint.color = if (isDarkTheme) TEXT_COLOR else PRICE_COLOR
         textPaint.textSize = 52.0f
         textPaint.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
+        textPaint.isAntiAlias = true
+        textPaint.isSubpixelText = true
 
         // update the bufferSize to scale bitmap correctly
         setScaleFactor(bufferSize)
@@ -55,11 +57,7 @@ class OcrGraphic(
     override fun draw(canvas: Canvas) {
         if (text.boundingBox == null || text.boundingBox !is Rect) return
 
-        textPaint.color = if (isDarkTheme) {
-            TEXT_COLOR
-        } else {
-            PRICE_COLOR
-        }
+        textPaint.color = if (isDarkTheme) TEXT_COLOR else PRICE_COLOR
 
         val conversionRate = sharedPreferences.getFloat("currency_conversion_rate_AR", 1f)
         val symbol = sharedPreferences.getString("currency_to_symbol", "")
