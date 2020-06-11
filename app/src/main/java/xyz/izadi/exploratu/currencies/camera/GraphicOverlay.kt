@@ -128,8 +128,8 @@ class GraphicOverlay<T : Graphic>(context: Context, attrs: AttributeSet) :
         }
 
         fun setScaleFactor(bufferSize: Size) {
-            mOverlay.widthScaleFactor = (mOverlay.width.toFloat() / bufferSize.height.toFloat())
-            mOverlay.heightScaleFactor = (mOverlay.height.toFloat() / bufferSize.width.toFloat())
+            mOverlay.widthScaleFactor = mOverlay.width.toFloat() / bufferSize.height.toFloat()
+            mOverlay.heightScaleFactor = mOverlay.height.toFloat() / bufferSize.width.toFloat()
         }
 
         fun postInvalidate() {

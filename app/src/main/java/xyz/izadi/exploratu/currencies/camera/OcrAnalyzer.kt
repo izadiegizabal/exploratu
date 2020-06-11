@@ -49,7 +49,10 @@ class OcrAnalyzer(
                     overlay.clear()
                     // Task completed successfully
                     // Logic
-                    detectNumbers(firebaseVisionText.textBlocks, Size(mediaImage.width, mediaImage.height))
+                    detectNumbers(
+                        firebaseVisionText.textBlocks,
+                        Size(mediaImage.width, mediaImage.height)
+                    )
                     // Close img for next use
                     imageProxy.close()
                 }

@@ -38,8 +38,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xyz.izadi.exploratu.MainActivity
 import xyz.izadi.exploratu.R
-import xyz.izadi.exploratu.currencies.camera.OcrAnalyzer
 import xyz.izadi.exploratu.currencies.camera.GraphicOverlay
+import xyz.izadi.exploratu.currencies.camera.OcrAnalyzer
 import xyz.izadi.exploratu.currencies.camera.OcrGraphic
 import xyz.izadi.exploratu.currencies.data.RatesDatabase
 import xyz.izadi.exploratu.currencies.data.api.ApiFactory
@@ -178,8 +178,14 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
     private fun setUpToolTips() {
         TooltipCompat.setTooltipText(ib_go_to_list, getString(R.string.tt_go_to_list))
         TooltipCompat.setTooltipText(ib_flash_toggle, getString(R.string.tt_flash_toggle))
-        TooltipCompat.setTooltipText(ib_locate_from_currency, getString(R.string.tt_locate_from_currency))
-        TooltipCompat.setTooltipText( ib_reverse_currencies, getString(R.string.tt_reverse_currencies))
+        TooltipCompat.setTooltipText(
+            ib_locate_from_currency,
+            getString(R.string.tt_locate_from_currency)
+        )
+        TooltipCompat.setTooltipText(
+            ib_reverse_currencies,
+            getString(R.string.tt_reverse_currencies)
+        )
         TooltipCompat.setTooltipText(ll_currency_from, getString(R.string.tt_currency_from))
         TooltipCompat.setTooltipText(ll_currency_to, getString(R.string.tt_currency_to))
         TooltipCompat.setTooltipText(cameraFab, getString(R.string.tt_camera_fab))
@@ -414,7 +420,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
         insertRateInDB(currencyRates!!)
     }
 
-//////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
 //    CAMERA STUFF ///////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
     override fun getCameraXConfig(): CameraXConfig {

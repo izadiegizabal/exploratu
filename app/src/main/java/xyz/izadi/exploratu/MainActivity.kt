@@ -431,7 +431,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                 }
             }
 
-            if(rates != null) {
+            if (rates != null) {
                 val formattedDate = getFormattedDate(rates.date)
                 tv_exchange_provider.text =
                     getString(R.string.exchanges_provided_by_at, formattedDate)
