@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/cl_ocr_root"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_ocr_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true">
 
     <!-- Other components and views -->
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <androidx.camera.view.PreviewView
             android:id="@+id/preview_view"
@@ -36,7 +36,7 @@
             android:id="@+id/linearLayout"
             style="@style/CurrencyInfo"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
+            android:layout_height="?attr/actionBarSize"
             android:background="@color/color_primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -46,6 +46,7 @@
                 android:id="@+id/ib_go_to_list"
                 style="@style/OptionsAR"
                 android:layout_marginStart="8dp"
+                android:contentDescription="@string/tt_go_to_list"
                 android:padding="4dp"
                 android:src="@drawable/ic_list_alt"
                 android:tint="@color/color_on_primary"
@@ -56,6 +57,7 @@
             <ImageButton
                 android:id="@+id/ib_locate_from_currency"
                 style="@style/OptionsAR"
+                android:contentDescription="@string/tt_locate_from_currency"
                 android:src="@drawable/ic_twotone_my_location"
                 android:tint="@color/color_on_primary"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -65,6 +67,7 @@
             <ImageButton
                 android:id="@+id/ib_flash_toggle"
                 style="@style/OptionsAR"
+                android:contentDescription="@string/tt_flash_toggle"
                 android:src="@drawable/ic_flash_off"
                 android:tint="@color/color_on_primary"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -74,78 +77,81 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bottomAppBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            app:backgroundTint="@color/color_primary"
-            app:fabAlignmentMode="end">
+        android:id="@+id/bottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:backgroundTint="@color/color_primary"
+        app:fabAlignmentMode="end">
 
         <LinearLayout
-                style="@style/CurrencyInfo"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_marginEnd="104dp"
-                android:gravity="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+            style="@style/CurrencyInfo"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginEnd="104dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
-                    android:id="@+id/ll_currency_from"
-                    style="@style/LLCurrenciesFromTo">
+                android:id="@+id/ll_currency_from"
+                style="@style/LLCurrenciesFromTo">
 
                 <ImageView
-                        android:id="@+id/iv_currency_from_flag"
-                        style="@style/CurrencyFlagAR"
-                        android:contentDescription="@string/flag_of_the_second_currency" />
+                    android:id="@+id/iv_currency_from_flag"
+                    style="@style/CurrencyFlagAR"
+                    android:contentDescription="@string/flag_of_the_second_currency" />
 
                 <TextView
-                        android:id="@+id/tv_currency_from_code"
-                        style="@style/CurrencyCodeAR"
-                        tools:text="EUR" />
+                    android:id="@+id/tv_currency_from_code"
+                    style="@style/CurrencyCodeAR"
+                    tools:text="EUR" />
 
                 <ImageView
-                        android:id="@+id/iv_currency_from_arrow"
-                        style="@style/CurrencyArrowAR" />
+                    android:id="@+id/iv_currency_from_arrow"
+                    style="@style/CurrencyArrowAR"
+                    android:contentDescription="@string/tt_currency_from" />
             </LinearLayout>
 
             <ImageButton
-                    android:id="@+id/ib_reverse_currencies"
-                    android:layout_width="36dp"
-                    android:layout_height="match_parent"
-                    android:background="?actionBarItemBackground"
-                    android:src="@drawable/ic_twotone_chevron_right"
-                    android:tint="@color/color_on_primary" />
+                android:id="@+id/ib_reverse_currencies"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:background="?actionBarItemBackground"
+                android:contentDescription="@string/tt_reverse_currencies"
+                android:src="@drawable/ic_twotone_chevron_right"
+                android:tint="@color/color_on_primary" />
 
             <LinearLayout
-                    android:id="@+id/ll_currency_to"
-                    style="@style/LLCurrenciesFromTo"
-                    android:layout_marginStart="4dp">
+                android:id="@+id/ll_currency_to"
+                style="@style/LLCurrenciesFromTo"
+                android:layout_marginStart="4dp">
 
                 <ImageView
-                        android:id="@+id/iv_currency_to_flag"
-                        style="@style/CurrencyFlagAR"
-                        android:contentDescription="@string/flag_of_the_second_currency" />
+                    android:id="@+id/iv_currency_to_flag"
+                    style="@style/CurrencyFlagAR"
+                    android:contentDescription="@string/flag_of_the_second_currency" />
 
                 <TextView
-                        android:id="@+id/tv_currency_to_code"
-                        style="@style/CurrencyCodeAR"
-                        tools:text="USD" />
+                    android:id="@+id/tv_currency_to_code"
+                    style="@style/CurrencyCodeAR"
+                    tools:text="USD" />
 
                 <ImageView
-                        android:id="@+id/iv_currency_to_arrow"
-                        style="@style/CurrencyArrowAR" />
+                    android:id="@+id/iv_currency_to_arrow"
+                    style="@style/CurrencyArrowAR"
+                    android:contentDescription="@string/tt_currency_to" />
             </LinearLayout>
 
         </LinearLayout>
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/cameraFab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_twotone_pause"
-            app:layout_anchor="@id/bottomAppBar" />
+        android:id="@+id/cameraFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_twotone_pause"
+        app:layout_anchor="@id/bottomAppBar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
