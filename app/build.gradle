@@ -18,8 +18,8 @@ android {
         applicationId "xyz.izadi.exploratu"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 8
-        versionName "0.16"
+        versionCode 10
+        versionName "0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
