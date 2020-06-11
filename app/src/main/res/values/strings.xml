@@ -40,6 +40,8 @@
     <string name="ar_warning_message">Be aware of your surroundings and remember to be properly supervised if required.</string>
     <string name="ar_warning_hide_next_time">I understand</string>
     <string name="ar_warning_dismiss">Remind me next time</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
