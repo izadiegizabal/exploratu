@@ -39,7 +39,6 @@ const val ARG_CURRENCIES = "currencies_object"
  */
 class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
-    private val LOG_TAG = this.javaClass.simpleName
     private var mListener: Listener? = null
     private var mAdapter: CurrenciesAdapter? = null
 
@@ -177,16 +176,16 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         override fun getFilter(): Filter {
             return object : Filter() {
                 override fun performFiltering(charSequence: CharSequence): FilterResults {
-                    val charString = charSequence.toString().toLowerCase()
+                    val charString = charSequence.toString().toLowerCase(Locale.ROOT)
 
                     mCurrenciesFiltered = if (charString.isEmpty()) {
                         mCurrencies
                     } else {
                         val filteredList = ArrayList<Currency>()
                         for (currency in mCurrencies.currencies) {
-                            if (currency.name.toLowerCase().contains(charString)
-                                || currency.code.toLowerCase().contains(charString)
-                                || currency.sign.toLowerCase().contains(charString)
+                            if (currency.name.toLowerCase(Locale.ROOT).contains(charString)
+                                || currency.code.toLowerCase(Locale.ROOT).contains(charString)
+                                || currency.sign.toLowerCase(Locale.ROOT).contains(charString)
                                 || countryNameMatch(currency.countries, charString)
                             ) {
                                 filteredList.add(currency)
@@ -216,7 +215,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
     private fun countryNameMatch(countries: Array<String>, query: String): Boolean {
         for (country in countries) {
-            if (country.toLowerCase().contains(query)) {
+            if (country.toLowerCase(Locale.ROOT).contains(query)) {
                 return true
             }
         }
