@@ -1,10 +1,11 @@
+package xyz.izadi.exploratu
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_bottom_navigation_drawer.*
-import xyz.izadi.exploratu.R
 
 class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
 

@@ -1,6 +1,5 @@
 package xyz.izadi.exploratu
 
-import BottomNavigationDrawerFragment
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -35,7 +34,7 @@ import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener {
-    private val LOG_TAG = this.javaClass.simpleName
+    private val mLog = this.javaClass.simpleName
     private var ratesDB: RatesDatabase? = null
     private var currencies: Currencies? = null
     private var currencyRates: Rates? = null
@@ -471,7 +470,7 @@ class MainActivity : AppCompatActivity(), CurrenciesListDialogFragment.Listener 
                                     }
                                 } else {
                                     Log.d(
-                                        LOG_TAG,
+                                        mLog,
                                         "Error while getting new data: ${response.code()}"
                                     )
                                     // DB fallback in case of error, no connection...

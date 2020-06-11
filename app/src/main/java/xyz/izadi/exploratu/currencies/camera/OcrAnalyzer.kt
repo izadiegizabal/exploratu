@@ -19,7 +19,6 @@ class OcrAnalyzer(
     private val overlay: GraphicOverlay<OcrGraphic>,
     listener: OCRListener? = null
 ) : ImageAnalysis.Analyzer {
-    private val mTAG = this.javaClass.simpleName
     private var mToast = Toast(context)
     private val mListeners = ArrayList<OCRListener>().apply { listener?.let { add(it) } }
 
