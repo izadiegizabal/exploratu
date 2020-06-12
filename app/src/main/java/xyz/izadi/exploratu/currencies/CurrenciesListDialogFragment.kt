@@ -52,7 +52,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val layoutManager = LinearLayoutManager(context)
         rv_currency_list.layoutManager = layoutManager
-        mAdapter = CurrenciesAdapter(arguments!!.getParcelable(ARG_CURRENCIES)!!)
+        mAdapter = CurrenciesAdapter(requireArguments().getParcelable(ARG_CURRENCIES)!!)
         rv_currency_list.adapter = mAdapter
 
         setUpQueryListener()
