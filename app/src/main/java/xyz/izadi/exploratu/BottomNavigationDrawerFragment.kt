@@ -1,5 +1,6 @@
 package xyz.izadi.exploratu
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_bottom_navigation_drawer.*
 
 class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
+
+    private var mListener: Listener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -21,13 +24,28 @@ class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
         super.onActivityCreated(savedInstanceState)
 
         navigation_view.setNavigationItemSelectedListener { menuItem ->
-            // Bottom Navigation Drawer menu item clicks
-            when (menuItem.itemId) {
-                // R.id.nav1 -> context!!.toast(getString(R.string.nav1_clicked))
-            }
-            // Add code here to update the UI based on the item selected
-            // For example, swap UI fragments here
+            mListener?.onModeSelected(menuItem.itemId)
+            dismiss()
             true
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val parent = parentFragment
+        mListener = if (parent != null) {
+            parent as Listener
+        } else {
+            context as Listener
+        }
+    }
+
+    override fun onDetach() {
+        mListener = null
+        super.onDetach()
+    }
+
+    interface Listener {
+        fun onModeSelected(mode: Int)
     }
 }

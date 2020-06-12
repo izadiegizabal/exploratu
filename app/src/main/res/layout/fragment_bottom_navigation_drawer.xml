@@ -66,12 +66,14 @@
         android:contentDescription="@string/cd_close_mode_selector" />
 
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigation_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="61dp"
-        app:elevation="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/navigation_divider"
-        app:menu="@menu/bottom_nav_drawer_menu" />
+            android:id="@+id/navigation_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="300dp"
+            android:paddingBottom="0dp"
+            app:elevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/navigation_divider"
+            app:menu="@menu/bottom_nav_drawer_menu" />
 </androidx.constraintlayout.widget.ConstraintLayout>
