@@ -23,7 +23,6 @@ import androidx.appcompat.widget.TooltipCompat
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
@@ -31,14 +30,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.ocr_capture.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xyz.izadi.exploratu.MainActivity
 import xyz.izadi.exploratu.R
-import xyz.izadi.exploratu.currencies.camera.GraphicOverlay
 import xyz.izadi.exploratu.currencies.camera.OcrAnalyzer
 import xyz.izadi.exploratu.currencies.camera.OcrGraphic
 import xyz.izadi.exploratu.currencies.data.RatesDatabase
@@ -50,6 +47,7 @@ import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
 import xyz.izadi.exploratu.currencies.others.Utils.getCurrencyCodeFromDeviceLocale
 import xyz.izadi.exploratu.currencies.others.Utils.getDetectedCurrency
 import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
+import xyz.izadi.exploratu.databinding.OcrCaptureBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs
@@ -65,11 +63,14 @@ private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 private const val RATIO_4_3_VALUE = 4.0 / 3.0
 private const val RATIO_16_9_VALUE = 16.0 / 9.0
 
-class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
+class OcrCaptureActivity :
+    AppCompatActivity(),
+    CameraXConfig.Provider,
     CurrenciesListDialogFragment.Listener {
-    private lateinit var viewFinder: PreviewView
+
+    private lateinit var binding: OcrCaptureBinding
+
     private var preview: Preview? = null
-    private lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
     private var camera: Camera? = null
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
@@ -95,51 +96,54 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
     // Initializes the UI and creates the detector pipeline.
     public override fun onCreate(bundle: Bundle?) {
         super.onCreate(bundle)
-        setContentView(R.layout.ocr_capture)
 
-        graphicOverlay = findViewById(R.id.graphicOverlay)
-        viewFinder = findViewById(R.id.preview_view)
+        binding = OcrCaptureBinding.inflate(layoutInflater)
         sharedPref = getPreferences(Context.MODE_PRIVATE)
-
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        // Check for the camera permission before accessing the camera.  If the
-        // permission is not granted yet, request permission.
-        // Request camera permissions
-        if (allPermissionsGranted()) {
-            viewFinder.post {
-                startCamera()
-            }
-        } else {
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
-        }
-
-        cameraFab.setOnClickListener {
-            if (!isPreviewPaused) {
-                startPreviewPause(true)
+        binding.apply {
+            // Check for the camera permission before accessing the camera.  If the
+            // permission is not granted yet, request permission.
+            // Request camera permissions
+            if (allPermissionsGranted()) {
+                previewView.post {
+                    startCamera()
+                }
             } else {
-                startPreviewPause(false)
+                ActivityCompat.requestPermissions(
+                    this@OcrCaptureActivity,
+                    REQUIRED_PERMISSIONS,
+                    REQUEST_CODE_PERMISSIONS
+                )
             }
+
+            cameraFab.setOnClickListener {
+                if (!isPreviewPaused) {
+                    startPreviewPause(true)
+                } else {
+                    startPreviewPause(false)
+                }
+            }
+
+            // Initialise conversion data
+            ratesDB = RatesDatabase.getInstance(applicationContext)
+
+            currencies = getCurrencies(applicationContext)
+            setPreferredCurrencies()
+            updateRates()
+            setUpOptionsListeners()
+            setUpCurrencySelectorListeners()
+            setUpNetworkChangeListener()
+            setUpToolTips()
+
+            showWarnModalIfRequired()
         }
 
-        // Initialise conversion data
-        ratesDB = RatesDatabase.getInstance(applicationContext)
-
-        currencies = getCurrencies(applicationContext)
-        setPreferredCurrencies()
-        updateRates()
-        setUpOptionsListeners()
-        setUpCurrencySelectorListeners()
-        setUpNetworkChangeListener()
-        setUpToolTips()
-
-        showWarnModalIfRequired()
+        setContentView(binding.root)
     }
 
-    private fun showWarnModalIfRequired() {
+    private fun OcrCaptureBinding.showWarnModalIfRequired() {
         val hideArWarnModalPrefKey = "hideARWarnModal"
 
         if (!sharedPref.contains(hideArWarnModalPrefKey)) {
@@ -154,7 +158,6 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
             }
         }
 
-        // TODO: show modal
         val actionButtonListener = DialogInterface.OnClickListener { _, which ->
             when (which) {
                 (DialogInterface.BUTTON_POSITIVE) -> {
@@ -166,7 +169,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
             }
         }
         // TODO: replace the strings from resources
-        MaterialAlertDialogBuilder(this)
+        MaterialAlertDialogBuilder(this@OcrCaptureActivity)
             .setTitle(getString(R.string.ar_warning_title))
             .setMessage(getString(R.string.ar_warning_message))
             .setPositiveButton(getString(R.string.ar_warning_hide_next_time), actionButtonListener)
@@ -174,44 +177,43 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
             .show()
     }
 
-    // TODO: replace the strings from resources
-    private fun setUpToolTips() {
-        TooltipCompat.setTooltipText(ib_go_to_list, getString(R.string.tt_go_to_list))
-        TooltipCompat.setTooltipText(ib_flash_toggle, getString(R.string.tt_flash_toggle))
+    private fun OcrCaptureBinding.setUpToolTips() {
+        TooltipCompat.setTooltipText(ibGoToList, getString(R.string.tt_go_to_list))
+        TooltipCompat.setTooltipText(ibFlashToggle, getString(R.string.tt_flash_toggle))
         TooltipCompat.setTooltipText(
-            ib_locate_from_currency,
+            ibLocateFromCurrency,
             getString(R.string.tt_locate_from_currency)
         )
         TooltipCompat.setTooltipText(
-            ib_reverse_currencies,
+            ibReverseCurrencies,
             getString(R.string.tt_reverse_currencies)
         )
-        TooltipCompat.setTooltipText(ll_currency_from, getString(R.string.tt_currency_from))
-        TooltipCompat.setTooltipText(ll_currency_to, getString(R.string.tt_currency_to))
+        TooltipCompat.setTooltipText(llCurrencyFrom, getString(R.string.tt_currency_from))
+        TooltipCompat.setTooltipText(llCurrencyTo, getString(R.string.tt_currency_to))
         TooltipCompat.setTooltipText(cameraFab, getString(R.string.tt_camera_fab))
     }
 
-    private fun setUpOptionsListeners() {
-        ib_reverse_currencies.setOnClickListener { reverseCurrencies() }
-        ib_locate_from_currency.setOnClickListener { locateFromCurrency() }
-        ib_flash_toggle.setOnClickListener { turnOnOffFlash() }
-        ib_go_to_list.setOnClickListener { goToListView(it) }
+    private fun OcrCaptureBinding.setUpOptionsListeners() {
+        ibReverseCurrencies.setOnClickListener { reverseCurrencies() }
+        ibLocateFromCurrency.setOnClickListener { locateFromCurrency() }
+        ibFlashToggle.setOnClickListener { turnOnOffFlash() }
+        ibGoToList.setOnClickListener { goToListView(it) }
     }
 
-    private fun setUpCurrencySelectorListeners() {
-        ll_currency_from.setOnClickListener {
+    private fun OcrCaptureBinding.setUpCurrencySelectorListeners() {
+        llCurrencyFrom.setOnClickListener {
             selectingCurrencyIndex = 0
             CurrenciesListDialogFragment.newInstance(currencies)
                 .show(supportFragmentManager, "dialog")
         }
-        ll_currency_to.setOnClickListener {
+        llCurrencyTo.setOnClickListener {
             selectingCurrencyIndex = 1
             CurrenciesListDialogFragment.newInstance(currencies)
                 .show(supportFragmentManager, "dialog")
         }
     }
 
-    private fun setPreferredCurrencies() {
+    private fun OcrCaptureBinding.setPreferredCurrencies() {
         // read preferences to load
         val fromKey = "currency_code_from"
         val toKey = "currency_code_to"
@@ -222,7 +224,9 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
             val fromCode = getDetectedCurrency(applicationContext)
             activeCurCodes.add(fromCode ?: defaultFromCurrencyCode)
         } else {
-            activeCurCodes.add(sharedPref.getString(fromKey, defaultFromCurrencyCode) ?: return)
+            activeCurCodes.add(
+                sharedPref.getString(fromKey, defaultFromCurrencyCode) ?: return
+            )
         }
 
         if (!sharedPref.contains(toKey)) {
@@ -236,7 +240,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
         loadCurrencyTo(activeCurCodes[1], 1)
     }
 
-    private fun loadCurrencyTo(code: String, listPos: Int) {
+    private fun OcrCaptureBinding.loadCurrencyTo(code: String, listPos: Int) {
         // change global variable
         activeCurCodes[listPos] = code
 
@@ -255,8 +259,8 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
                     .load(flagPath)
                     .placeholder(R.drawable.ic_dollar_placeholder)
                     .transform(transformation)
-                    .into(iv_currency_from_flag)
-                tv_currency_from_code.text = code
+                    .into(ivCurrencyFromFlag)
+                tvCurrencyFromCode.text = code
 
                 getPreferences(Context.MODE_PRIVATE) ?: return
                 with(sharedPref.edit()) {
@@ -270,8 +274,8 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
                     .load(flagPath)
                     .placeholder(R.drawable.ic_dollar_placeholder)
                     .transform(transformation)
-                    .into(iv_currency_to_flag)
-                tv_currency_to_code.text = code
+                    .into(ivCurrencyToFlag)
+                tvCurrencyToCode.text = code
 
                 getPreferences(Context.MODE_PRIVATE) ?: return
                 with(sharedPref.edit()) {
@@ -288,7 +292,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
     }
 
     override fun onCurrencyClicked(code: String) {
-        loadCurrencyTo(code, selectingCurrencyIndex)
+        binding.loadCurrencyTo(code, selectingCurrencyIndex)
         calculateConversions()
     }
 
@@ -300,10 +304,6 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
             object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     updateRates()
-                }
-
-                override fun onLost(network: Network?) {
-                    //take action when network connection is lost
                 }
             })
     }
@@ -393,7 +393,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
     private fun locateFromCurrency() {
         val fromCode = getDetectedCurrency(applicationContext)
         activeCurCodes[0] = fromCode ?: activeCurCodes[0]
-        loadCurrencyTo(activeCurCodes[0], 0)
+        binding.loadCurrencyTo(activeCurCodes[0], 0)
     }
 
     private fun reverseCurrencies() {
@@ -401,8 +401,8 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
         activeCurCodes[0] = activeCurCodes[1]
         activeCurCodes[1] = aux
 
-        loadCurrencyTo(activeCurCodes[0], 0)
-        loadCurrencyTo(activeCurCodes[1], 1)
+        binding.loadCurrencyTo(activeCurCodes[0], 0)
+        binding.loadCurrencyTo(activeCurCodes[1], 1)
     }
 
     private fun goToListView(view: View) {
@@ -427,17 +427,17 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
         return Camera2Config.defaultConfig()
     }
 
-    private fun startCamera() {
+    private fun OcrCaptureBinding.startCamera() {
         // Get screen metrics used to setup camera for full screen resolution
-        val metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
+        val metrics = DisplayMetrics().also { previewView.display.getRealMetrics(it) }
         val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
 
-        val rotation = viewFinder.display.rotation
+        val rotation = previewView.display.rotation
 
         // Bind the CameraProvider to the LifeCycleOwner
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener(Runnable {
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this@OcrCaptureActivity)
+        cameraProviderFuture.addListener({
 
             // CameraProvider
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
@@ -450,8 +450,8 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
                 .setTargetRotation(rotation)
                 .build()
 
-            // Attach the viewfinder's surface provider to preview use case
-            preview?.setSurfaceProvider(viewFinder.createSurfaceProvider())
+            // Attach the previewView's surface provider to preview use case
+            preview?.setSurfaceProvider(previewView.surfaceProvider)
 
             // ImageAnalysis
             imageAnalyzer = ImageAnalysis.Builder()
@@ -464,7 +464,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
                 .build()
 
             // Build the image analysis use case and instantiate our analyzer
-            val isDarkMode = Utils.isDarkTheme(this)
+            val isDarkMode = Utils.isDarkTheme(this@OcrCaptureActivity)
             val inputStream = if (isDarkMode) {
                 assets.open("priceTag_material_dark.png")
             } else {
@@ -476,13 +476,13 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
             val analyzerUseCase = imageAnalyzer?.apply {
                 setAnalyzer(
                     cameraExecutor,
-                    OcrAnalyzer(applicationContext, graphicOverlay) { word, bufferSize ->
+                    OcrAnalyzer(applicationContext, graphicOverlay) { price, bufferSize ->
                         run {
                             val graphic =
                                 OcrGraphic(
                                     graphicOverlay,
-                                    word,
-                                    word.text.toDouble(),
+                                    price.boundingBox,
+                                    price.amount,
                                     icon,
                                     sharedPref,
                                     isDarkMode,
@@ -501,7 +501,12 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
                 // A variable number of use-cases can be passed here -
                 // camera provides access to CameraControl & CameraInfo
                 camera =
-                    cameraProvider.bindToLifecycle(this, cameraSelector, analyzerUseCase, preview)
+                    cameraProvider.bindToLifecycle(
+                        this@OcrCaptureActivity,
+                        cameraSelector,
+                        analyzerUseCase,
+                        preview
+                    )
 
                 setUpPinchToZoom()
 
@@ -512,7 +517,7 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
                 Log.e(mTAG, "Use case binding failed", exc)
             }
 
-        }, ContextCompat.getMainExecutor(this))
+        }, ContextCompat.getMainExecutor(this@OcrCaptureActivity))
     }
 
     private fun aspectRatio(width: Int, height: Int): Int {
@@ -540,13 +545,12 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
             )
         }
         if (isPreviewPaused) {
-            // TODO: maintain preview image after resuming
-            startPreviewPause(false)
+            binding.startPreviewPause(false)
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun setUpPinchToZoom() {
+    private fun OcrCaptureBinding.setUpPinchToZoom() {
         val listener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
             override fun onScale(detector: ScaleGestureDetector): Boolean {
                 val currentZoomRatio: Float = camera?.cameraInfo?.zoomState?.value?.zoomRatio ?: 0F
@@ -556,15 +560,15 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
             }
         }
 
-        val scaleGestureDetector = ScaleGestureDetector(this, listener)
+        val scaleGestureDetector = ScaleGestureDetector(this@OcrCaptureActivity, listener)
 
-        viewFinder.setOnTouchListener { _, event ->
+        previewView.setOnTouchListener { _, event ->
             scaleGestureDetector.onTouchEvent(event)
             return@setOnTouchListener true
         }
     }
 
-    private fun startPreviewPause(pauseIt: Boolean) {
+    private fun OcrCaptureBinding.startPreviewPause(pauseIt: Boolean) {
         if (pauseIt) {
             isPreviewPaused = true
             cameraProviderFuture.get().unbindAll()
@@ -575,13 +579,13 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
         }
     }
 
-    private fun turnOnOffFlash() {
+    private fun OcrCaptureBinding.turnOnOffFlash() {
         if (isFlashOn.value == 0) {
             camera?.cameraControl?.enableTorch(true)
-            ib_flash_toggle.setImageResource(R.drawable.ic_flash_on)
+            ibFlashToggle.setImageResource(R.drawable.ic_flash_on)
         } else {
             camera?.cameraControl?.enableTorch(false)
-            ib_flash_toggle.setImageResource(R.drawable.ic_flash_off)
+            ibFlashToggle.setImageResource(R.drawable.ic_flash_off)
         }
     }
 
@@ -594,7 +598,9 @@ class OcrCaptureActivity : AppCompatActivity(), CameraXConfig.Provider,
     ) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                viewFinder.post { startCamera() }
+                binding.apply {
+                    previewView.post { startCamera() }
+                }
             } else {
                 // TODO: handle not having permission better
             }

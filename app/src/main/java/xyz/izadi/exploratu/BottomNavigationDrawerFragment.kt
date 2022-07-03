@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.fragment_bottom_navigation_drawer.*
+import xyz.izadi.exploratu.databinding.FragmentBottomNavigationDrawerBinding
 
 class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
 
@@ -13,14 +13,8 @@ class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_bottom_navigation_drawer, container, false)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        navigation_view.setNavigationItemSelectedListener { menuItem ->
+    ): View = FragmentBottomNavigationDrawerBinding.inflate(inflater, container, false).apply {
+        navigationView.setNavigationItemSelectedListener { menuItem ->
             // Bottom Navigation Drawer menu item clicks
             when (menuItem.itemId) {
                 // R.id.nav1 -> context!!.toast(getString(R.string.nav1_clicked))
@@ -29,5 +23,5 @@ class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
             // For example, swap UI fragments here
             true
         }
-    }
+    }.root
 }

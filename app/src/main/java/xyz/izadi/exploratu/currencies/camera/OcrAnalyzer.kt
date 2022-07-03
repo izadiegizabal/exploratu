@@ -2,33 +2,32 @@ package xyz.izadi.exploratu.currencies.camera
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.util.Size
 import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
-import com.google.firebase.ml.vision.text.FirebaseVisionText
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.Text
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
 /** Helper type alias used for analysis use case callbacks */
-typealias OCRListener = (price: FirebaseVisionText.Element, bufferSize: Size) -> Unit
+typealias OCRListener = (price: Price, bufferSize: Size) -> Unit
+
+data class Price(
+    val amount: Double,
+    val boundingBox: Rect
+)
 
 class OcrAnalyzer(
     private val context: Context,
-    private val overlay: GraphicOverlay<OcrGraphic>,
+    private val overlay: GraphicOverlay<GraphicOverlay.Graphic>,
     listener: OCRListener? = null
 ) : ImageAnalysis.Analyzer {
     private var mToast = Toast(context)
     private val mListeners = ArrayList<OCRListener>().apply { listener?.let { add(it) } }
-
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
-        0 -> FirebaseVisionImageMetadata.ROTATION_0
-        90 -> FirebaseVisionImageMetadata.ROTATION_90
-        180 -> FirebaseVisionImageMetadata.ROTATION_180
-        270 -> FirebaseVisionImageMetadata.ROTATION_270
-        else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
-    }
+    private val detector = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     @SuppressLint("UnsafeExperimentalUsageError")
     override fun analyze(imageProxy: ImageProxy) {
@@ -39,17 +38,18 @@ class OcrAnalyzer(
         }
 
         val mediaImage = imageProxy.image
-        val imageRotation = degreesToFirebaseRotation(imageProxy.imageInfo.rotationDegrees)
         if (mediaImage != null) {
-            val firebaseImage = FirebaseVisionImage.fromMediaImage(mediaImage, imageRotation)
-            val detector = FirebaseVision.getInstance().onDeviceTextRecognizer
-            val result = detector.processImage(firebaseImage)
-                .addOnSuccessListener { firebaseVisionText ->
+            val image = InputImage.fromMediaImage(
+                mediaImage,
+                imageProxy.imageInfo.rotationDegrees
+            )
+            detector.process(image)
+                .addOnSuccessListener { text ->
                     overlay.clear()
                     // Task completed successfully
                     // Logic
                     detectNumbers(
-                        firebaseVisionText.textBlocks,
+                        text.textBlocks,
                         Size(mediaImage.width, mediaImage.height)
                     )
                     // Close img for next use
@@ -69,7 +69,7 @@ class OcrAnalyzer(
     @SuppressLint("ShowToast")
     private fun showAToast(st: String?) {
         try {
-            mToast.view.isShown // true if visible
+            mToast.view?.isShown // true if visible
             mToast.setText(st)
         } catch (e: java.lang.Exception) {         // invisible if exception
             mToast = Toast.makeText(context, st, Toast.LENGTH_LONG)
@@ -77,7 +77,7 @@ class OcrAnalyzer(
         mToast.show() //finally display it
     }
 
-    private fun detectNumbers(items: List<FirebaseVisionText.TextBlock>, bufferSize: Size) {
+    private fun detectNumbers(items: List<Text.TextBlock>, bufferSize: Size) {
         for (i in items.indices) {
             val item = items[i]
             val lines = item.lines
@@ -87,16 +87,16 @@ class OcrAnalyzer(
                     for (word in words) {
                         if (word != null) {
                             val number = extractNumbers(word.text)
-                            val numberDouble = number!!.toDoubleOrNull()
+                            val numberDouble = number.toDoubleOrNull()
                             if (numberDouble != null) {
-                                val extracted = FirebaseVisionText.Element(
-                                    numberDouble.toString(),
-                                    word.boundingBox,
-                                    word.recognizedLanguages,
-                                    word.confidence
-                                )
-                                // Call all listeners with new value
-                                mListeners.forEach { it(extracted, bufferSize) }
+                                word.boundingBox?.let {
+                                    val extracted = Price(
+                                        amount = numberDouble,
+                                        boundingBox = it,
+                                    )
+                                    // Call all listeners with new value
+                                    mListeners.forEach { it(extracted, bufferSize) }
+                                }
                             }
                         }
                     }
@@ -106,7 +106,7 @@ class OcrAnalyzer(
     }
 
     // Extracts numbers from the passed string, returns null if there aren't
-    private fun extractNumbers(originalString: String): String? {
+    private fun extractNumbers(originalString: String): String {
         val regexNotNumbersCommaDot =
             Regex("([^0-9.,]+[.,])") // select everything except numbers with commas/dots
         val onlyNumbers =

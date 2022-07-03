@@ -15,13 +15,12 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.android.synthetic.main.fragment_currencies_list_dialog.*
-import kotlinx.android.synthetic.main.fragment_currencies_list_dialog_item.view.*
 import xyz.izadi.exploratu.R
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Currency
+import xyz.izadi.exploratu.databinding.FragmentCurrenciesListDialogBinding
+import xyz.izadi.exploratu.databinding.FragmentCurrenciesListDialogItemBinding
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 const val ARG_CURRENCIES = "currencies_object"
@@ -39,28 +38,43 @@ const val ARG_CURRENCIES = "currencies_object"
  */
 class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
+    private var _binding: FragmentCurrenciesListDialogBinding? = null
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding
+        get() = _binding
+
     private var mListener: Listener? = null
-    private var mAdapter: CurrenciesAdapter? = null
+    private lateinit var mAdapter: CurrenciesAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_currencies_list_dialog, container, false)
-    }
+    ): View = FragmentCurrenciesListDialogBinding.inflate(inflater, container, false).apply {
+        _binding = this
+    }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val layoutManager = LinearLayoutManager(context)
-        rv_currency_list.layoutManager = layoutManager
         mAdapter = CurrenciesAdapter(requireArguments().getParcelable(ARG_CURRENCIES)!!)
-        rv_currency_list.adapter = mAdapter
 
-        setUpQueryListener()
-        setUpScrollListener()
+        binding?.apply {
+            rvCurrencyList.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = mAdapter
+            }
+            setUpQueryListener()
+            setUpScrollListener()
+        }
     }
 
-    private fun setUpScrollListener() {
-        rv_currency_list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun FragmentCurrenciesListDialogBinding.setUpScrollListener() =
+        rvCurrencyList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
@@ -72,12 +86,11 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
                 }
             }
         })
-    }
 
-    private fun setUpQueryListener() {
-        sv_currencies.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+    private fun FragmentCurrenciesListDialogBinding.setUpQueryListener() =
+        svCurrencies.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                val parentWithBSBehavior = cl_bs_currency_selector.parent as FrameLayout
+                val parentWithBSBehavior = clBsCurrencySelector.parent as FrameLayout
                 val mBottomSheetBehavior = BottomSheetBehavior.from(parentWithBSBehavior)
 
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -87,7 +100,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                val parentWithBSBehavior = cl_bs_currency_selector.parent as FrameLayout
+                val parentWithBSBehavior = clBsCurrencySelector.parent as FrameLayout
                 val mBottomSheetBehavior = BottomSheetBehavior.from(parentWithBSBehavior)
 
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -96,7 +109,6 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
                 return false
             }
         })
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -117,20 +129,19 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         fun onCurrencyClicked(code: String)
     }
 
-    private inner class ViewHolder internal constructor(
+    private inner class ViewHolder constructor(
         inflater: LayoutInflater,
-        parent: ViewGroup
-    ) : RecyclerView.ViewHolder(
-        inflater.inflate(
-            R.layout.fragment_currencies_list_dialog_item,
+        parent: ViewGroup,
+        binding: FragmentCurrenciesListDialogItemBinding = FragmentCurrenciesListDialogItemBinding.inflate(
+            inflater,
             parent,
             false
         )
-    ) {
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-        internal val flag: ImageView = itemView.iv_currency_flag
-        internal val cod: TextView = itemView.tv_currency_code
-        internal val desc: TextView = itemView.tv_currency_desc
+        val flag: ImageView = binding.ivCurrencyFlag
+        val cod: TextView = binding.tvCurrencyCode
+        val desc: TextView = binding.tvCurrencyDesc
 
         init {
             itemView.setOnClickListener {

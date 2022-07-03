@@ -3,13 +3,12 @@ package xyz.izadi.exploratu.currencies.camera
 import android.content.SharedPreferences
 import android.graphics.*
 import android.util.Size
-import com.google.firebase.ml.vision.text.FirebaseVisionText
 import xyz.izadi.exploratu.currencies.others.Utils
 import java.text.DecimalFormat
 
 class OcrGraphic(
     overlay: GraphicOverlay<*>,
-    val text: FirebaseVisionText.Element,
+    private val boundingBox: Rect,
     private val number: Double,
     private val graphic: Bitmap,
     private val sharedPreferences: SharedPreferences,
@@ -48,15 +47,13 @@ class OcrGraphic(
      * @return True if the provided point is contained within this graphic's bounding box.
      */
     override fun contains(x: Float, y: Float): Boolean {
-        var rect = RectF(text.boundingBox)
+        var rect = RectF(boundingBox)
         rect = translateRect(rect)
         return rect.contains(x, y)
     }
 
     // Draws the text block annotations for position, size, and raw value on the supplied canvas.
     override fun draw(canvas: Canvas) {
-        if (text.boundingBox == null || text.boundingBox !is Rect) return
-
         textPaint.color = if (isDarkTheme) TEXT_COLOR else PRICE_COLOR
 
         val conversionRate = sharedPreferences.getFloat("currency_conversion_rate_AR", 1f)
@@ -76,18 +73,18 @@ class OcrGraphic(
         val commasString = Utils.addCommas(DecimalFormat("#.##").format(roundedNum))
         val convertedSting = "$symbol$commasString"
 
-        val end = translateX(text.boundingBox!!.right.toFloat())
-        val bottom = translateY(text.boundingBox!!.bottom.toFloat())
+        val end = translateX(boundingBox.right.toFloat())
+        val bottom = translateY(boundingBox.bottom.toFloat())
         canvas.drawBitmap(
             graphic,
             end,
-            (bottom - (text.boundingBox!!.height() / 2 + graphic.height / 2 + 15)),
+            (bottom - (boundingBox.height() / 2 + graphic.height / 2 + 15)),
             textPaint
         )
         canvas.drawText(
             convertedSting,
             end + getApproxXToCenterText(convertedSting, textPaint, graphic.width),
-            (bottom - (text.boundingBox!!.height() / 2 - 4)),
+            (bottom - (boundingBox.height() / 2 - 4)),
             textPaint
         )
     }
