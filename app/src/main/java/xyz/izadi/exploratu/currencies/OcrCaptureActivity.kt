@@ -17,7 +17,6 @@ import android.text.format.DateUtils
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.ScaleGestureDetector
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
 import androidx.camera.camera2.Camera2Config
@@ -30,8 +29,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xyz.izadi.exploratu.MainActivity
@@ -143,7 +142,7 @@ class OcrCaptureActivity :
         setContentView(binding.root)
     }
 
-    private fun OcrCaptureBinding.showWarnModalIfRequired() {
+    private fun showWarnModalIfRequired() {
         val hideArWarnModalPrefKey = "hideARWarnModal"
 
         if (!sharedPref.contains(hideArWarnModalPrefKey)) {
@@ -197,7 +196,7 @@ class OcrCaptureActivity :
         ibReverseCurrencies.setOnClickListener { reverseCurrencies() }
         ibLocateFromCurrency.setOnClickListener { locateFromCurrency() }
         ibFlashToggle.setOnClickListener { turnOnOffFlash() }
-        ibGoToList.setOnClickListener { goToListView(it) }
+        ibGoToList.setOnClickListener { goToListView() }
     }
 
     private fun OcrCaptureBinding.setUpCurrencySelectorListeners() {
@@ -329,7 +328,7 @@ class OcrCaptureActivity :
     }
 
     private fun updateRates() {
-        GlobalScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             // If there are no conversion rates or if they are older than today
             if (currencyRates == null || !DateUtils.isToday(currencyRates?.date?.time!!)) {
                 // get the latest from db
@@ -405,17 +404,17 @@ class OcrCaptureActivity :
         binding.loadCurrencyTo(activeCurCodes[1], 1)
     }
 
-    private fun goToListView(view: View) {
+    private fun goToListView() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
     }
 
-    private suspend fun insertRateInDB(rates: Rates) {
+    private fun insertRateInDB(rates: Rates) {
         rates.rates.resetEur()
         ratesDB?.ratesDao()?.insertRates(rates)
     }
 
-    private suspend fun saveRatesFallbackInDB() {
+    private fun saveRatesFallbackInDB() {
         currencyRates = currencies?.getRates() //fallback from JSON
         insertRateInDB(currencyRates!!)
     }
