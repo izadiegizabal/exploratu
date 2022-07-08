@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.os.Bundle
-import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -447,10 +446,11 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
                 }
             }
 
-            if (rates != null) {
-                val formattedDate = getFormattedDate(rates.date)
-                tvExchangeProvider.text =
-                    getString(R.string.exchanges_provided_by_at, formattedDate)
+            rates?.date?.let {
+                tvExchangeProvider.text = getString(
+                    R.string.exchanges_provided_by_at,
+                    getFormattedDate(it)
+                )
             }
         }
     }
@@ -467,11 +467,11 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
     private fun updateRates() {
         CoroutineScope(Dispatchers.IO).launch {
             // If there are no conversion rates or if they are older than today
-            if (currencyRates == null || !DateUtils.isToday(currencyRates?.date?.time!!)) {
+            if (currencyRates?.haveBeenRefreshedToday() != true) {
                 // get the latest from db
                 val latestRatesFromDB = ratesDB?.ratesDao()?.getLatestRates()
                 // if there isn't any on db or if they are older than today
-                if (latestRatesFromDB == null || !DateUtils.isToday(latestRatesFromDB.date.time)) {
+                if (latestRatesFromDB?.haveBeenRefreshedToday() != true) {
                     // check for internet
                     if (context != null && Utils.isInternetAvailable(requireContext())) {
                         // Try to fetch from the API
@@ -480,10 +480,13 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
                             try {
                                 if (response.isSuccessful) {
                                     currencyRates = response.body()
-                                    currencyRates?.rates?.resetEur()
-                                    ratesDB?.ratesDao()?.insertRates(response.body()!!)
-                                    activity?.runOnUiThread {
-                                        binding?.makeConversions()
+                                    response.body()?.let { rates ->
+                                        rates.rates?.let {
+                                            ratesDB?.ratesDao()?.insertRates(rates)
+                                            activity?.runOnUiThread {
+                                                binding?.makeConversions()
+                                            }
+                                        }
                                     }
                                 } else {
                                     Log.d(
@@ -527,7 +530,6 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
     }
 
     private fun insertRateInDB(rates: Rates) {
-        rates.rates.resetEur()
         ratesDB?.ratesDao()?.insertRates(rates)
     }
 

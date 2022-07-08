@@ -1,6 +1,6 @@
 # Exploratu
 
-Thesis Project for the last year of the Degree in Multimedia Engineering. Native app for Android written in Kotlin using ML Kit, Material Design, Google Jetpack among other libraries. It got the maximum score (10/10) and the mention of Honors by a tribunal composed of multiple professors of the Polytechnic School of the University of Alicante.
+Thesis Project for the last year of the Degree in Multimedia Engineering (2019). Native app for Android written in Kotlin using ML Kit, Material Design, Google Jetpack among other libraries. It got the maximum score (10/10) and the mention of Honors by a tribunal composed of multiple professors of the Polytechnic School of the University of Alicante.
 
 Additionally, it also got the 3rd award in the "Premios TFG/TFM de la Cátedra de Estudios Turísticos「Pedro Zaragoza Orts」de la Universidad de Alicante", being chosen as one of the most interesting and promising thesis of the year 2018/2019 in the area of tourism.
 

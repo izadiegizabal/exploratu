@@ -7,22 +7,22 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.os.Bundle
-import android.text.format.DateUtils
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.ScaleGestureDetector
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
-import androidx.camera.camera2.Camera2Config
-import androidx.camera.core.*
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -49,31 +49,21 @@ import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
 import xyz.izadi.exploratu.databinding.OcrCaptureBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.math.abs
-
-// This is an arbitrary number we are using to keep track of the permission
-// request. Where an app has multiple context for requesting permission,
-// this can help differentiate the different contexts.
-private const val REQUEST_CODE_PERMISSIONS = 10
 
 // This is an array of all the permission specified in the manifest.
-private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+private const val REQUIRED_PERMISSION = Manifest.permission.CAMERA
 
 private const val RATIO_4_3_VALUE = 4.0 / 3.0
 private const val RATIO_16_9_VALUE = 16.0 / 9.0
 
 class OcrCaptureActivity :
     AppCompatActivity(),
-    CameraXConfig.Provider,
     CurrenciesListDialogFragment.Listener {
 
     private lateinit var binding: OcrCaptureBinding
 
-    private var preview: Preview? = null
     private var camera: Camera? = null
-    private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
-    private var imageAnalyzer: ImageAnalysis? = null
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -87,6 +77,7 @@ class OcrCaptureActivity :
     private var selectingCurrencyIndex = -1
     private val activeCurCodes = ArrayList<String>()
     private lateinit var sharedPref: SharedPreferences
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
     // Control camera state
     private var isPreviewPaused = false
@@ -99,22 +90,22 @@ class OcrCaptureActivity :
         binding = OcrCaptureBinding.inflate(layoutInflater)
         sharedPref = getPreferences(Context.MODE_PRIVATE)
         // Initialize our background executor
-        cameraExecutor = Executors.newSingleThreadExecutor()
+        cameraExecutor = Executors.newFixedThreadPool(4)
 
         binding.apply {
-            // Check for the camera permission before accessing the camera.  If the
-            // permission is not granted yet, request permission.
-            // Request camera permissions
-            if (allPermissionsGranted()) {
-                previewView.post {
-                    startCamera()
+            requestPermissionLauncher = registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                if (isGranted) {
+                    previewView.post { binding.startCamera() }
+                } else {
+                    // TODO: manage better denied permission
                 }
-            } else {
-                ActivityCompat.requestPermissions(
-                    this@OcrCaptureActivity,
-                    REQUIRED_PERMISSIONS,
-                    REQUEST_CODE_PERMISSIONS
-                )
+            }
+
+            when {
+                allPermissionsGranted() -> binding.previewView.post { binding.startCamera() }
+                else -> requestPermissionLauncher.launch(REQUIRED_PERMISSION)
             }
 
             cameraFab.setOnClickListener {
@@ -330,11 +321,11 @@ class OcrCaptureActivity :
     private fun updateRates() {
         CoroutineScope(Dispatchers.IO).launch {
             // If there are no conversion rates or if they are older than today
-            if (currencyRates == null || !DateUtils.isToday(currencyRates?.date?.time!!)) {
+            if (currencyRates?.haveBeenRefreshedToday() != true) {
                 // get the latest from db
                 val latestRatesFromDB = ratesDB?.ratesDao()?.getLatestRates()
                 // if there isn't any on db or if they are older than today
-                if (latestRatesFromDB == null || !DateUtils.isToday(latestRatesFromDB.date.time)) {
+                if (latestRatesFromDB?.haveBeenRefreshedToday() != true) {
                     // check for internet
                     if (isInternetAvailable(applicationContext)) {
                         // Try to fetch from the API
@@ -343,10 +334,13 @@ class OcrCaptureActivity :
                             try {
                                 if (response.isSuccessful) {
                                     currencyRates = response.body()
-                                    currencyRates?.rates?.resetEur()
-                                    ratesDB?.ratesDao()?.insertRates(response.body()!!)
-                                    runOnUiThread {
-                                        makeConversions()
+                                    response.body()?.let { rates ->
+                                        rates.rates?.let {
+                                            ratesDB?.ratesDao()?.insertRates(rates)
+                                            runOnUiThread {
+                                                makeConversions()
+                                            }
+                                        }
                                     }
                                 } else {
                                     Log.d(
@@ -410,7 +404,6 @@ class OcrCaptureActivity :
     }
 
     private fun insertRateInDB(rates: Rates) {
-        rates.rates.resetEur()
         ratesDB?.ratesDao()?.insertRates(rates)
     }
 
@@ -420,92 +413,72 @@ class OcrCaptureActivity :
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
-//    CAMERA STUFF ///////////////////////////////////////////////////////////////////////
+//    CAMERA STUFF    ////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
-    override fun getCameraXConfig(): CameraXConfig {
-        return Camera2Config.defaultConfig()
-    }
-
     private fun OcrCaptureBinding.startCamera() {
-        // Get screen metrics used to setup camera for full screen resolution
-        val metrics = DisplayMetrics().also { previewView.display.getRealMetrics(it) }
-        val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
-
-        val rotation = previewView.display.rotation
-
         // Bind the CameraProvider to the LifeCycleOwner
-        val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
+        val cameraSelector = CameraSelector.Builder().build()
         cameraProviderFuture = ProcessCameraProvider.getInstance(this@OcrCaptureActivity)
         cameraProviderFuture.addListener({
 
             // CameraProvider
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            val cameraProvider = cameraProviderFuture.get().also {
+                // Must unbind the use-cases before rebinding them
+                it.unbindAll()
+            }
 
             // Preview
-            preview = Preview.Builder()
-                // We request aspect ratio but no resolution
-                .setTargetAspectRatio(screenAspectRatio)
-                // Set initial target rotation
-                .setTargetRotation(rotation)
-                .build()
+            val preview = Preview.Builder().build()
 
             // Attach the previewView's surface provider to preview use case
-            preview?.setSurfaceProvider(previewView.surfaceProvider)
-
-            // ImageAnalysis
-            imageAnalyzer = ImageAnalysis.Builder()
-                // We request aspect ratio but no resolution
-                .setTargetAspectRatio(screenAspectRatio)
-                // Set initial target rotation, we will have to call this again if rotation changes
-                // during the lifecycle of this use case
-                .setTargetRotation(rotation)
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
+            preview.setSurfaceProvider(previewView.surfaceProvider)
 
             // Build the image analysis use case and instantiate our analyzer
             val isDarkMode = Utils.isDarkTheme(this@OcrCaptureActivity)
-            val inputStream = if (isDarkMode) {
-                assets.open("priceTag_material_dark.png")
-            } else {
-                assets.open("priceTag_material.png")
+            val icon = BitmapFactory.decodeStream(
+                if (isDarkMode) {
+                    assets.open("priceTag_material_dark.png")
+                } else {
+                    assets.open("priceTag_material.png")
+                }
+            )
+            graphicOverlay.apply {
+                setCameraFacing(CameraSelector.LENS_FACING_BACK)
+                clear()
             }
-            val icon: Bitmap = BitmapFactory.decodeStream(inputStream)
-            graphicOverlay.setCameraFacing(CameraSelector.LENS_FACING_BACK)
-            graphicOverlay.clear()
-            val analyzerUseCase = imageAnalyzer?.apply {
-                setAnalyzer(
-                    cameraExecutor,
-                    OcrAnalyzer(applicationContext, graphicOverlay) { price, bufferSize ->
-                        run {
-                            val graphic =
-                                OcrGraphic(
-                                    graphicOverlay,
-                                    price.boundingBox,
-                                    price.amount,
-                                    icon,
-                                    sharedPref,
-                                    isDarkMode,
-                                    bufferSize
-                                )
-                            // Toast.makeText(applicationContext, word.text, Toast.LENGTH_SHORT).show()
-                            graphicOverlay.add(graphic)
-                        }
-                    })
-            }
-
-            // Must unbind the use-cases before rebinding them
-            cameraProvider.unbindAll()
+            // ImageAnalysis
+            val imageAnalyzer = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build().apply {
+                    setAnalyzer(
+                        cameraExecutor,
+                        OcrAnalyzer(applicationContext, graphicOverlay) { price, bufferSize ->
+                            run {
+                                val graphic =
+                                    OcrGraphic(
+                                        graphicOverlay,
+                                        price.boundingBox,
+                                        price.amount,
+                                        icon,
+                                        sharedPref,
+                                        isDarkMode,
+                                        bufferSize
+                                    )
+                                // Toast.makeText(applicationContext, word.text, Toast.LENGTH_SHORT).show()
+                                graphicOverlay.add(graphic)
+                            }
+                        })
+                }
 
             try {
                 // A variable number of use-cases can be passed here -
                 // camera provides access to CameraControl & CameraInfo
-                camera =
-                    cameraProvider.bindToLifecycle(
-                        this@OcrCaptureActivity,
-                        cameraSelector,
-                        analyzerUseCase,
-                        preview
-                    )
+                camera = cameraProvider.bindToLifecycle(
+                    this@OcrCaptureActivity,
+                    cameraSelector,
+                    imageAnalyzer,
+                    preview
+                )
 
                 setUpPinchToZoom()
 
@@ -517,14 +490,6 @@ class OcrCaptureActivity :
             }
 
         }, ContextCompat.getMainExecutor(this@OcrCaptureActivity))
-    }
-
-    private fun aspectRatio(width: Int, height: Int): Int {
-        val previewRatio = width.coerceAtLeast(height).toDouble() / width.coerceAtMost(height)
-        if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
-            return AspectRatio.RATIO_4_3
-        }
-        return AspectRatio.RATIO_16_9
     }
 
     override fun onDestroy() {
@@ -539,9 +504,7 @@ class OcrCaptureActivity :
         // Make sure that all permissions are still present, since the
         // user could have removed them while the app was in paused state.
         if (!allPermissionsGranted()) {
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
+            requestPermissionLauncher.launch(REQUIRED_PERMISSION)
         }
         if (isPreviewPaused) {
             binding.startPreviewPause(false)
@@ -588,27 +551,11 @@ class OcrCaptureActivity :
         }
     }
 
-    /**
-     * Process result from permission request dialog box, has the request
-     * been granted? If yes, start Camera
-     */
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                binding.apply {
-                    previewView.post { startCamera() }
-                }
-            } else {
-                // TODO: handle not having permission better
-            }
-        }
-    }
-
     // Check if all permission specified in the manifest have been granted
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun allPermissionsGranted() =
+        ContextCompat.checkSelfPermission(
+            baseContext,
+            REQUIRED_PERMISSION
+        ) == PackageManager.PERMISSION_GRANTED
 
 }

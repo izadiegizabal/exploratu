@@ -132,7 +132,7 @@ object Utils {
             e.printStackTrace()
         }
 
-        return if (!currentCountry.isBlank()) {
+        return if (currentCountry.isNotBlank()) {
             getCurrencyCodeFromCountryISO(currentCountry)
         } else {
             null

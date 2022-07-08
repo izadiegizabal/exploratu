@@ -49,30 +49,30 @@
                 android:contentDescription="@string/tt_go_to_list"
                 android:padding="4dp"
                 android:src="@drawable/ic_list_alt"
-                android:tint="@color/color_on_primary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/color_on_primary" />
 
             <ImageButton
                 android:id="@+id/ib_locate_from_currency"
                 style="@style/OptionsAR"
                 android:contentDescription="@string/tt_locate_from_currency"
                 android:src="@drawable/ic_twotone_my_location"
-                android:tint="@color/color_on_primary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/color_on_primary" />
 
             <ImageButton
                 android:id="@+id/ib_flash_toggle"
                 style="@style/OptionsAR"
                 android:contentDescription="@string/tt_flash_toggle"
                 android:src="@drawable/ic_flash_off"
-                android:tint="@color/color_on_primary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/ib_locate_from_currency"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/color_on_primary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -121,7 +121,7 @@
                 android:background="?actionBarItemBackground"
                 android:contentDescription="@string/tt_reverse_currencies"
                 android:src="@drawable/ic_twotone_chevron_right"
-                android:tint="@color/color_on_primary" />
+                app:tint="@color/color_on_primary" />
 
             <LinearLayout
                 android:id="@+id/ll_currency_to"

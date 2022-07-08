@@ -10,7 +10,7 @@ import xyz.izadi.exploratu.currencies.data.models.Rates
 
 @Database(
     entities = [Rates::class, Exchanges::class],
-    version = 3
+    version = 4
 )
 @TypeConverters(DateTypeConverter::class)
 abstract class RatesDatabase : RoomDatabase() {

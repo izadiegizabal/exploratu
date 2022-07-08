@@ -2,62 +2,48 @@ package xyz.izadi.exploratu.currencies.data.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
 @Entity
 data class Exchanges(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int? = null,
-    val AUD: Float,
-    val BGN: Float,
-    val BRL: Float,
-    val CAD: Float,
-    val CHF: Float,
-    val CNY: Float,
-    val CZK: Float,
-    val DKK: Float,
-    var EUR: Float,
-    val GBP: Float,
-    val HKD: Float,
-    val HRK: Float,
-    val HUF: Float,
-    val IDR: Float,
-    val ILS: Float,
-    val INR: Float,
-    val ISK: Float,
-    val JPY: Float,
-    val KRW: Float,
-    val MXN: Float,
-    val MYR: Float,
-    val NOK: Float,
-    val NZD: Float,
-    val PHP: Float,
-    val PLN: Float,
-    val RON: Float,
-    val RUB: Float,
-    val SEK: Float,
-    val SGD: Float,
-    val THB: Float,
-    val TRY: Float,
-    val USD: Float,
-    val ZAR: Float
+    @PrimaryKey(autoGenerate = true) val id: Int? = null,
+    @SerializedName("aud") val AUD: Float,
+    @SerializedName("bgn") val BGN: Float,
+    @SerializedName("brl") val BRL: Float,
+    @SerializedName("cad") val CAD: Float,
+    @SerializedName("chf") val CHF: Float,
+    @SerializedName("cny") val CNY: Float,
+    @SerializedName("czk") val CZK: Float,
+    @SerializedName("dkk") val DKK: Float,
+    @SerializedName("eur") val EUR: Float,
+    @SerializedName("gbp") val GBP: Float,
+    @SerializedName("hkd") val HKD: Float,
+    @SerializedName("hrk") val HRK: Float,
+    @SerializedName("huf") val HUF: Float,
+    @SerializedName("idr") val IDR: Float,
+    @SerializedName("ils") val ILS: Float,
+    @SerializedName("inr") val INR: Float,
+    @SerializedName("isk") val ISK: Float,
+    @SerializedName("jpy") val JPY: Float,
+    @SerializedName("krw") val KRW: Float,
+    @SerializedName("mxn") val MXN: Float,
+    @SerializedName("myr") val MYR: Float,
+    @SerializedName("nok") val NOK: Float,
+    @SerializedName("nzd") val NZD: Float,
+    @SerializedName("php") val PHP: Float,
+    @SerializedName("pln") val PLN: Float,
+    @SerializedName("ron") val RON: Float,
+    @SerializedName("rub") val RUB: Float,
+    @SerializedName("sek") val SEK: Float,
+    @SerializedName("sgd") val SGD: Float,
+    @SerializedName("thb") val THB: Float,
+    @SerializedName("try") val TRY: Float,
+    @SerializedName("usd") val USD: Float,
+    @SerializedName("zar") val ZAR: Float
 ) {
-    fun getRate(from: String): Float? {
-        try {
-            val field = Exchanges::class.java.getDeclaredField(from)
-            return field.getFloat(this)
-        } catch (e: Exception) {
-            e.printStackTrace() // to catch NoSuchFieldException
-        }
-        return null
-    }
-
-    init {
-        EUR = 1.0f
-    }
-
-    fun resetEur() {
-        EUR = 1.0f
-    }
+    fun getRate(from: String): Float? = runCatching {
+        Exchanges::class.java.getDeclaredField(from).getFloat(this)
+    }.getOrNull()
 
     constructor(rates: ArrayList<Float>) : this(
         null,
