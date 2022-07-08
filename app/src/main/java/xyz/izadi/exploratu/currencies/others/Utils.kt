@@ -7,15 +7,10 @@ import android.content.Context
 import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import android.telephony.TelephonyManager
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateInterpolator
-import com.google.gson.Gson
-import xyz.izadi.exploratu.currencies.data.models.Currencies
-import java.io.IOException
 import java.math.BigDecimal
-import java.util.*
 import kotlin.math.max
 
 
@@ -100,67 +95,6 @@ object Utils {
         }
 
         return quantityRes
-    }
-
-    fun getCurrencies(context: Context): Currencies? {
-        try {
-            val gson = Gson()
-
-            val jsonString =
-                context.assets.open("currencyInfo.json").bufferedReader().use {
-                    it.readText()
-                }
-
-            return gson.fromJson(jsonString, Currencies::class.java)
-
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
-        return null
-    }
-
-    fun getDetectedCurrency(context: Context): String? {
-
-        var currentCountry = ""
-
-        try {
-            val telephonyManager =
-                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            currentCountry = telephonyManager.networkCountryIso
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return if (currentCountry.isNotBlank()) {
-            getCurrencyCodeFromCountryISO(currentCountry)
-        } else {
-            null
-        }
-    }
-
-    private fun getCurrencyCodeFromCountryISO(countryISO: String): String? {
-        try {
-            val locale = Locale("", countryISO)
-            return getCurrencyCodeFromLocale(locale)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
-    }
-
-    fun getCurrencyCodeFromDeviceLocale(): String? {
-        val currentLocale = Locale.getDefault()
-        return getCurrencyCodeFromLocale(currentLocale)
-    }
-
-    private fun getCurrencyCodeFromLocale(locale: Locale): String? {
-        try {
-            return Currency.getInstance(locale).currencyCode
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
     }
 
     fun isInternetAvailable(context: Context): Boolean {

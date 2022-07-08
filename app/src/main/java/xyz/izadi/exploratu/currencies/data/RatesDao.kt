@@ -16,5 +16,5 @@ interface RatesDao {
     fun deleteRates(rates: Rates)
 
     @Query("SELECT * FROM Rates ORDER BY date DESC LIMIT 1")
-    fun getLatestRates(): Rates
+    fun getLatestRates(): Flow<Rates>
 }

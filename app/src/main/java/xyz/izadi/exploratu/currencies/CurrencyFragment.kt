@@ -5,38 +5,27 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
+import dagger.hilt.android.AndroidEntryPoint
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import xyz.izadi.exploratu.R
-import xyz.izadi.exploratu.currencies.data.RatesDatabase
-import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
 import xyz.izadi.exploratu.currencies.others.Utils
 import xyz.izadi.exploratu.databinding.FragmentCurrencyBinding
 import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CurrencyFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
     private var _binding: FragmentCurrencyBinding? = null
 
@@ -45,27 +34,15 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
     private val binding
         get() = _binding
 
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private val vm by viewModels<CurrenciesViewModel>()
 
-    private val mLog = this.javaClass.simpleName
-    private var ratesDB: RatesDatabase? = null
-    private var currencies: Currencies? = null
     private var currencyRates: Rates? = null
+    private var currencies: Currencies? = null
     private var activeCurrencyIndex = -1
     private var selectingCurrencyIndex = -1
     private var activeCurrencyAmount = ""
     private var isDefaultValue = true
     private val activeCurCodes = ArrayList<String>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,12 +54,8 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ratesDB = context?.let { RatesDatabase.getInstance(it) }
-        currencies = context?.let { Utils.getCurrencies(it) }
-
         binding?.apply {
             setPreferredCurrencies()
-            updateRates()
 
             setUpAmountListeners()
             setUpPadListeners()
@@ -90,6 +63,16 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
 
             setUpToolTips()
             tvCurrency1Quantity.performClick()
+
+            vm.rates.onEach {
+                currencyRates = it
+                makeConversions()
+            }.launchIn(lifecycleScope)
+
+            vm.currencies.onEach {
+                currencies = it
+                setPreferredCurrencies()
+            }.launchIn(lifecycleScope)
         }
 
         setUpNetworkChangeListener()
@@ -98,6 +81,11 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        vm.syncRates()
     }
 
     private fun FragmentCurrencyBinding.setUpToolTips() {
@@ -178,20 +166,20 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
     }
 
     private fun FragmentCurrencyBinding.setUpCurrencySelectorListeners() {
-        llCurrency1.setOnClickListener {
-            selectingCurrencyIndex = 0
+        fun onClick(index: Int) {
+            selectingCurrencyIndex = index
             CurrenciesListDialogFragment.newInstance(currencies)
                 .show(childFragmentManager, "dialog")
+        }
+
+        llCurrency1.setOnClickListener {
+            onClick(0)
         }
         llCurrency2.setOnClickListener {
-            selectingCurrencyIndex = 1
-            CurrenciesListDialogFragment.newInstance(currencies)
-                .show(childFragmentManager, "dialog")
+            onClick(1)
         }
         llCurrency3.setOnClickListener {
-            selectingCurrencyIndex = 2
-            CurrenciesListDialogFragment.newInstance(currencies)
-                .show(childFragmentManager, "dialog")
+            onClick(2)
         }
     }
 
@@ -209,7 +197,7 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
             NetworkRequest.Builder().build(),
             object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
-                    updateRates()
+                    vm.syncRates()
                 }
             })
     }
@@ -462,99 +450,5 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
 
     private fun getAmountFloat(): Float {
         return activeCurrencyAmount.replace(",", "").toFloat()
-    }
-
-    private fun updateRates() {
-        CoroutineScope(Dispatchers.IO).launch {
-            // If there are no conversion rates or if they are older than today
-            if (currencyRates?.haveBeenRefreshedToday() != true) {
-                // get the latest from db
-                val latestRatesFromDB = ratesDB?.ratesDao()?.getLatestRates()
-                // if there isn't any on db or if they are older than today
-                if (latestRatesFromDB?.haveBeenRefreshedToday() != true) {
-                    // check for internet
-                    if (context != null && Utils.isInternetAvailable(requireContext())) {
-                        // Try to fetch from the API
-                        val response = ApiFactory.exchangeRatesAPI.getLatestRates()
-                        withContext(Dispatchers.Main) {
-                            try {
-                                if (response.isSuccessful) {
-                                    currencyRates = response.body()
-                                    response.body()?.let { rates ->
-                                        rates.rates?.let {
-                                            ratesDB?.ratesDao()?.insertRates(rates)
-                                            activity?.runOnUiThread {
-                                                binding?.makeConversions()
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    Log.d(
-                                        mLog,
-                                        "Error while getting new data: ${response.code()}"
-                                    )
-                                    // DB fallback in case of error, no connection...
-                                    if (latestRatesFromDB == null) {
-                                        saveRatesFallbackInDB()
-                                    } else {
-                                        currencyRates = latestRatesFromDB
-                                    }
-                                    activity?.runOnUiThread {
-                                        binding?.makeConversions()
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-                    } else {
-                        // DB fallback in case of no connection...
-                        if (latestRatesFromDB == null) {
-                            saveRatesFallbackInDB()
-                        } else {
-                            currencyRates = latestRatesFromDB
-                        }
-                        activity?.runOnUiThread {
-                            binding?.makeConversions()
-                        }
-                    }
-                } else {
-                    // if they are from today we just use them
-                    currencyRates = latestRatesFromDB
-                    activity?.runOnUiThread {
-                        binding?.makeConversions()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun insertRateInDB(rates: Rates) {
-        ratesDB?.ratesDao()?.insertRates(rates)
-    }
-
-    private fun saveRatesFallbackInDB() {
-        currencyRates = currencies?.getRates() //fallback from JSON
-        insertRateInDB(currencyRates!!)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CurrencyFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CurrencyFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }

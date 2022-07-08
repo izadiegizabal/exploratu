@@ -1,6 +1,5 @@
 package xyz.izadi.exploratu.currencies.data.api
 
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import xyz.izadi.exploratu.currencies.data.models.Rates
@@ -12,5 +11,5 @@ interface ExchangeRatesAPI {
          *  Date formatted as YYYY-MM-DD or "latest"
          **/
         @Path("date") date: String = "latest"
-    ): Response<Rates>
+    ): Rates
 }

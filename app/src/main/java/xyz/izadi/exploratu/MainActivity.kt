@@ -5,11 +5,12 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import xyz.izadi.exploratu.currencies.CurrencyFragment
 import xyz.izadi.exploratu.currencies.OcrCaptureActivity
 import xyz.izadi.exploratu.databinding.ActivityMainBinding
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,13 +18,15 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater).apply {
             setSupportActionBar(bottomAppBar)
 
-            val ft = supportFragmentManager.beginTransaction()
-            ft.replace(R.id.f_main_mode, CurrencyFragment())
-            ft.commit()
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.f_main_mode, CurrencyFragment())
+                commit()
+            }
 
             fab.setOnClickListener {
-                val intent = Intent(this@MainActivity, OcrCaptureActivity::class.java)
-                startActivity(intent)
+                Intent(this@MainActivity, OcrCaptureActivity::class.java).also {
+                    startActivity(it)
+                }
             }
         }.also {
             setContentView(it.root)

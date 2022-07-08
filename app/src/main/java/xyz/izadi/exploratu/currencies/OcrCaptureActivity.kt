@@ -16,36 +16,29 @@ import android.util.Log
 import android.view.ScaleGestureDetector
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
-import androidx.camera.core.Camera
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.liveData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.picasso.Picasso
+import dagger.hilt.android.AndroidEntryPoint
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import xyz.izadi.exploratu.MainActivity
 import xyz.izadi.exploratu.R
 import xyz.izadi.exploratu.currencies.camera.OcrAnalyzer
 import xyz.izadi.exploratu.currencies.camera.OcrGraphic
-import xyz.izadi.exploratu.currencies.data.RatesDatabase
-import xyz.izadi.exploratu.currencies.data.api.ApiFactory
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
 import xyz.izadi.exploratu.currencies.others.Utils
-import xyz.izadi.exploratu.currencies.others.Utils.getCurrencies
-import xyz.izadi.exploratu.currencies.others.Utils.getCurrencyCodeFromDeviceLocale
-import xyz.izadi.exploratu.currencies.others.Utils.getDetectedCurrency
-import xyz.izadi.exploratu.currencies.others.Utils.isInternetAvailable
 import xyz.izadi.exploratu.databinding.OcrCaptureBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -56,11 +49,14 @@ private const val REQUIRED_PERMISSION = Manifest.permission.CAMERA
 private const val RATIO_4_3_VALUE = 4.0 / 3.0
 private const val RATIO_16_9_VALUE = 16.0 / 9.0
 
+@AndroidEntryPoint
 class OcrCaptureActivity :
     AppCompatActivity(),
     CurrenciesListDialogFragment.Listener {
 
     private lateinit var binding: OcrCaptureBinding
+
+    private val vm by viewModels<CurrenciesViewModel>()
 
     private var camera: Camera? = null
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
@@ -70,9 +66,8 @@ class OcrCaptureActivity :
 
     // Helper variables to check the state of the activity
     private val mTAG = this.javaClass.simpleName
-    private var ratesDB: RatesDatabase? = null
-    private var currencies: Currencies? = null
     private var currencyRates: Rates? = null
+    private var currencies: Currencies? = null
     private var activeCurrencyIndex = 0
     private var selectingCurrencyIndex = -1
     private val activeCurCodes = ArrayList<String>()
@@ -116,22 +111,28 @@ class OcrCaptureActivity :
                 }
             }
 
-            // Initialise conversion data
-            ratesDB = RatesDatabase.getInstance(applicationContext)
-
-            currencies = getCurrencies(applicationContext)
             setPreferredCurrencies()
-            updateRates()
             setUpOptionsListeners()
             setUpCurrencySelectorListeners()
             setUpNetworkChangeListener()
             setUpToolTips()
 
             showWarnModalIfRequired()
+
+            vm.rates.onEach {
+                currencyRates = it
+                makeConversions()
+            }.launchIn(lifecycleScope)
+
+            vm.currencies.onEach {
+                currencies = it
+                setPreferredCurrencies()
+            }.launchIn(lifecycleScope)
         }
 
         setContentView(binding.root)
     }
+
 
     private fun showWarnModalIfRequired() {
         val hideArWarnModalPrefKey = "hideARWarnModal"
@@ -191,15 +192,17 @@ class OcrCaptureActivity :
     }
 
     private fun OcrCaptureBinding.setUpCurrencySelectorListeners() {
-        llCurrencyFrom.setOnClickListener {
-            selectingCurrencyIndex = 0
+        fun onClick(index: Int) {
+            selectingCurrencyIndex = index
             CurrenciesListDialogFragment.newInstance(currencies)
                 .show(supportFragmentManager, "dialog")
         }
+
+        llCurrencyFrom.setOnClickListener {
+            onClick(0)
+        }
         llCurrencyTo.setOnClickListener {
-            selectingCurrencyIndex = 1
-            CurrenciesListDialogFragment.newInstance(currencies)
-                .show(supportFragmentManager, "dialog")
+            onClick(1)
         }
     }
 
@@ -211,7 +214,7 @@ class OcrCaptureActivity :
         val defaultToCurrencyCode = "USD"
 
         if (!sharedPref.contains(fromKey)) {
-            val fromCode = getDetectedCurrency(applicationContext)
+            val fromCode = vm.detectedCurrency
             activeCurCodes.add(fromCode ?: defaultFromCurrencyCode)
         } else {
             activeCurCodes.add(
@@ -220,7 +223,7 @@ class OcrCaptureActivity :
         }
 
         if (!sharedPref.contains(toKey)) {
-            activeCurCodes.add(getCurrencyCodeFromDeviceLocale() ?: defaultFromCurrencyCode)
+            activeCurCodes.add(vm.localeCurrency ?: defaultFromCurrencyCode)
         } else {
             activeCurCodes.add(sharedPref.getString(toKey, defaultToCurrencyCode) ?: return)
         }
@@ -239,7 +242,7 @@ class OcrCaptureActivity :
 
         // update tv
         val curr = currencies?.getCurrency(code)
-        val currSign = curr?.sign?.split("/")!![0]
+        val currSign = curr?.sign?.split("/")?.getOrNull(0)
         val flagPath = "file:///android_asset/flags/${code}.png"
         val transformation = RoundedCornersTransformation(32, 0)
         when (listPos) {
@@ -293,7 +296,7 @@ class OcrCaptureActivity :
             NetworkRequest.Builder().build(),
             object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
-                    updateRates()
+                    lazy { vm.syncRates() }
                 }
             })
     }
@@ -309,82 +312,17 @@ class OcrCaptureActivity :
         if (currencyRates != null) {
             val rates = currencyRates
             val from = activeCurCodes[activeCurrencyIndex]
-            val rateIndex = rates?.convertFloat(1f, from, activeCurCodes[1])
+            val rateIndex = rates?.convertFloat(1f, from, activeCurCodes[1]) ?: 1f
             getPreferences(Context.MODE_PRIVATE) ?: return
             with(sharedPref.edit()) {
-                putFloat("currency_conversion_rate_AR", rateIndex!!)
+                putFloat("currency_conversion_rate_AR", rateIndex)
                 apply()
             }
         }
     }
 
-    private fun updateRates() {
-        CoroutineScope(Dispatchers.IO).launch {
-            // If there are no conversion rates or if they are older than today
-            if (currencyRates?.haveBeenRefreshedToday() != true) {
-                // get the latest from db
-                val latestRatesFromDB = ratesDB?.ratesDao()?.getLatestRates()
-                // if there isn't any on db or if they are older than today
-                if (latestRatesFromDB?.haveBeenRefreshedToday() != true) {
-                    // check for internet
-                    if (isInternetAvailable(applicationContext)) {
-                        // Try to fetch from the API
-                        val response = ApiFactory.exchangeRatesAPI.getLatestRates()
-                        withContext(Dispatchers.Main) {
-                            try {
-                                if (response.isSuccessful) {
-                                    currencyRates = response.body()
-                                    response.body()?.let { rates ->
-                                        rates.rates?.let {
-                                            ratesDB?.ratesDao()?.insertRates(rates)
-                                            runOnUiThread {
-                                                makeConversions()
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    Log.d(
-                                        mTAG,
-                                        "Error while getting new data: ${response.code()}"
-                                    )
-                                    // DB fallback in case of error, no connection...
-                                    if (latestRatesFromDB == null) {
-                                        saveRatesFallbackInDB()
-                                    } else {
-                                        currencyRates = latestRatesFromDB
-                                    }
-                                    runOnUiThread {
-                                        makeConversions()
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-                    } else {
-                        // DB fallback in case of no connection...
-                        if (latestRatesFromDB == null) {
-                            saveRatesFallbackInDB()
-                        } else {
-                            currencyRates = latestRatesFromDB
-                        }
-                        runOnUiThread {
-                            makeConversions()
-                        }
-                    }
-                } else {
-                    // if they are from today we just use them
-                    currencyRates = latestRatesFromDB
-                    runOnUiThread {
-                        makeConversions()
-                    }
-                }
-            }
-        }
-    }
-
     private fun locateFromCurrency() {
-        val fromCode = getDetectedCurrency(applicationContext)
+        val fromCode = vm.detectedCurrency
         activeCurCodes[0] = fromCode ?: activeCurCodes[0]
         binding.loadCurrencyTo(activeCurCodes[0], 0)
     }
@@ -401,15 +339,6 @@ class OcrCaptureActivity :
     private fun goToListView() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-    }
-
-    private fun insertRateInDB(rates: Rates) {
-        ratesDB?.ratesDao()?.insertRates(rates)
-    }
-
-    private fun saveRatesFallbackInDB() {
-        currencyRates = currencies?.getRates() //fallback from JSON
-        insertRateInDB(currencyRates!!)
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -483,7 +412,7 @@ class OcrCaptureActivity :
                 setUpPinchToZoom()
 
                 // set up live data for camera info
-                isFlashOn = camera?.cameraInfo?.torchState!!
+                isFlashOn = camera?.cameraInfo?.torchState ?: liveData { TorchState.OFF }
                 isPreviewPaused = false
             } catch (exc: Exception) {
                 Log.e(mTAG, "Use case binding failed", exc)
@@ -501,6 +430,7 @@ class OcrCaptureActivity :
 
     override fun onResume() {
         super.onResume()
+        vm.syncRates()
         // Make sure that all permissions are still present, since the
         // user could have removed them while the app was in paused state.
         if (!allPermissionsGranted()) {
