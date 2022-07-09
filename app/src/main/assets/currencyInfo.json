@@ -1,432 +1,1551 @@
 {
-   "version":0.1,
-   "versionDate":"2019-07-06T00:44:12.511Z",
-   "totalCurrencies":33,
-   "currencies":[
-      {
-         "name":"Australian Dollar",
-         "code":"AUD",
-         "sign":"$",
-         "defaultValue":1.61,
-         "countries":[
-            "Australia",
-            "Christmas Island",
-            "Cocos (Keeling) Islands",
-            "Heard Island and McDonald Islands",
-            "Norfolk Island",
-            "Kiribati",
-            "Nauru",
-            "Tuvalu"
-         ]
-      },
-      {
-         "name":"Bulgarian Lev",
-         "code":"BGN",
-         "sign":"лв",
-         "defaultValue":1.96,
-         "countries":[
-            "Bulgaria",
-            "България"
-         ]
-      },
-      {
-         "name":"Brazilian Real",
-         "code":"BRL",
-         "sign":"R$",
-         "defaultValue":4.29,
-         "countries":[
-            "Brazil",
-            "Brasil"
-         ]
-      },
-      {
-         "name":"Canadian Dollar",
-         "code":"CAD",
-         "sign":"$",
-         "defaultValue":1.47,
-         "countries":[
-            "Canada"
-         ]
-      },
-      {
-         "name":"Swiss Franc",
-         "code":"CHF",
-         "sign":"CHF",
-         "defaultValue":1.11,
-         "countries":[
-            "Switzerland",
-            "Swiss Confederation",
-            "Schweizerische Eidgenossenschaft",
-            "Confédération suisse",
-            "Confederazione Svizzera",
-            "Confederaziun svizra",
-            "Confoederatio Helvetica",
-            "Liechtenstein"
-         ]
-      },
-      {
-         "name":"Yuan Renminbi",
-         "code":"CNY",
-         "sign":"¥/元",
-         "defaultValue":7.74,
-         "countries":[
-            "China",
-            "中国",
-            "People's Republic of China",
-            "PRC",
-            "中华人民共和国"
-         ]
-      },
-      {
-         "name":"Czech Koruna",
-         "code":"CZK",
-         "sign":"Kč",
-         "defaultValue":25.47,
-         "countries":[
-            "Czech Republic",
-            "Česká republika",
-            "Czechia",
-            "Česko"
-         ]
-      },
-      {
-         "name":"Danish Krone",
-         "code":"DKK",
-         "sign":"kr",
-         "defaultValue":7.46,
-         "countries":[
-            "Denmark",
-            "Danmark",
-            "Greenland",
-            "Faroe Islands"
-         ]
-      },
-      {
-         "name":"Euro",
-         "code":"EUR",
-         "sign":"€",
-         "defaultValue":1,
-         "countries":[
-            "Austria",
-            "Österreich",
-            "Belgium",
-            "België",
-            "Belgique",
-            "Belgien",
-            "Cyprus",
-            "Κύπρος",
-            "Kıbrıs",
-            "Estonia",
-            "Eesti",
-            "Finland",
-            "Suomi",
-            "France",
-            "Germany",
-            "Deutschland",
-            "Greece",
-            "Hellas",
-            "Ireland",
-            "Italy",
-            "Italia",
-            "Latvia",
-            "Latvija",
-            "Leţmō",
-            "Lithuania",
-            "Lietuva",
-            "Luxembourg",
-            "Lëtzebuerg",
-            "Malta",
-            "Netherlands",
-            "Nederland",
-            "Portugal",
-            "Slovakia",
-            "Slovensko",
-            "Slovenia",
-            "Slovenija",
-            "Spain",
-            "España",
-            "Andorra",
-            "Monaco",
-            "San Marino",
-            "Vatican City",
-            "Vaticano",
-            "Montenegro",
-            "Kosovo"
-         ]
-      },
-      {
-         "name":"Pound Sterling",
-         "code":"GBP",
-         "sign":"£",
-         "defaultValue":0.9,
-         "countries":[
-            "United Kingdom",
-            "Jersey",
-            "Guernsey",
-            "Isle of Man",
-            "South Georgia and the South Sandwich Islands",
-            "British Antarctic Territory",
-            "Tristan da Cunha"
-         ]
-      },
-      {
-         "name":"Hong Kong Dollar",
-         "code":"HKD",
-         "sign":"HK$",
-         "defaultValue":8.76,
-         "countries":[
-            "Hong Kong",
-            "香港"
-         ]
-      },
-      {
-         "name":"Kuna",
-         "code":"HRK",
-         "sign":"kn",
-         "defaultValue":7.4,
-         "countries":[
-            "Croatia",
-            "Hrvatska"
-         ]
-      },
-      {
-         "name":"Forint",
-         "code":"HUF",
-         "sign":"Ft",
-         "defaultValue":323.41,
-         "countries":[
-            "Hungary",
-            "Magyarország"
-         ]
-      },
-      {
-         "name":"Rupiah",
-         "code":"IDR",
-         "sign":"Rp",
-         "defaultValue":15899.68,
-         "countries":[
-            "Indonesia"
-         ]
-      },
-      {
-         "name":"New Israeli Sheqel",
-         "code":"ILS",
-         "sign":"₪",
-         "defaultValue":4.01,
-         "countries":[
-            "Israel",
-            "Palestina"
-         ]
-      },
-      {
-         "name":"Indian Rupee",
-         "code":"INR",
-         "sign":"₹",
-         "defaultValue":77.11,
-         "countries":[
-            "India",
-            "Bhārat",
-            "Bhutan",
-            "འབྲུག་ཡུལ་"
-         ]
-      },
-      {
-         "name":"Iceland Króna",
-         "code":"ISK",
-         "sign":"kr",
-         "defaultValue":141.7,
-         "countries":[
-            "Iceland",
-            "Ísland"
-         ]
-      },
-      {
-         "name":"Yen",
-         "code":"JPY",
-         "sign":"¥/円",
-         "defaultValue":121.77,
-         "countries":[
-            "Japan",
-            "日本"
-         ]
-      },
-      {
-         "name":"Won",
-         "code":"KRW",
-         "sign":"₩",
-         "defaultValue":1318.43,
-         "countries":[
-            "South Korea",
-            "한국"
-         ]
-      },
-      {
-         "name":"Mexican Peso",
-         "code":"MXN",
-         "sign":"$",
-         "defaultValue":21.39,
-         "countries":[
-            "Mexico",
-            "México"
-         ]
-      },
-      {
-         "name":"Malaysian Ringgit",
-         "code":"MYR",
-         "sign":"RM",
-         "defaultValue":4.66,
-         "countries":[
-            "Malaysia"
-         ]
-      },
-      {
-         "name":"Norwegian Krone",
-         "code":"NOK",
-         "sign":"kr",
-         "defaultValue":9.63,
-         "countries":[
-            "Norway",
-            "Norge",
-            "Noreg",
-            "Norga",
-            "Nöörje",
-            "Vuodna",
-            "Bouvet Island",
-            "Svalbard and Jan Mayen"
-         ]
-      },
-      {
-         "name":"New Zealand Dollar",
-         "code":"NZD",
-         "sign":"$",
-         "defaultValue":1.69,
-         "countries":[
-            "New Zealand",
-            "Aotearoa",
-            "Cook Islands",
-            "Niue",
-            "Ross Dependency",
-            "Tokelau",
-            "Pitcairn Islands"
-         ]
-      },
-      {
-         "name":"Philippine Peso",
-         "code":"PHP",
-         "sign":"₱",
-         "defaultValue":57.66,
-         "countries":[
-            "Philippines",
-            "Pilipinas",
-            "Filipinas"
-         ]
-      },
-      {
-         "name":"Zloty",
-         "code":"PLN",
-         "sign":"zł",
-         "defaultValue":4.24,
-         "countries":[
-            "Poland",
-            "Rzeczpospolita Polska"
-         ]
-      },
-      {
-         "name":"Romanian Leu",
-         "code":"RON",
-         "sign":"L",
-         "defaultValue":4.72,
-         "countries":[
-            "Romania",
-            "România"
-         ]
-      },
-      {
-         "name":"Russian Ruble",
-         "code":"RUB",
-         "sign":"₽",
-         "defaultValue":71.5,
-         "countries":[
-            "Russia",
-            "Росси́я",
-            "Russian Federation",
-            "Росси́йская Федера́ция"
-         ]
-      },
-      {
-         "name":"Swedish Krona",
-         "code":"SEK",
-         "sign":"kr",
-         "defaultValue":10.56,
-         "countries":[
-            "Sweden",
-            "Sverige"
-         ]
-      },
-      {
-         "name":"Singapore Dollar",
-         "code":"SGD",
-         "sign":"S$",
-         "defaultValue":1.53,
-         "countries":[
-            "Singapore",
-            "Republic of Singapore",
-            "Republik Singapura",
-            "新加坡共和国",
-            "சிங்கப்பூர் குடியரசு"
-         ]
-      },
-      {
-         "name":"Baht",
-         "code":"THB",
-         "sign":"฿",
-         "defaultValue":34.53,
-         "countries":[
-            "Thailand",
-            "ประเทศไทย",
-            "Siam",
-            "สยาม"
-         ]
-      },
-      {
-         "name":"Turkish Lira",
-         "code":"TRY",
-         "sign":"₺",
-         "defaultValue":6.31,
-         "countries":[
-            "Turkey",
-            "Türkiye"
-         ]
-      },
-      {
-         "name":"US Dollar",
-         "code":"USD",
-         "sign":"$",
-         "defaultValue":1.13,
-         "countries":[
-            "United States",
-            "United States of America",
-            "East Timor",
-            "Ecuador",
-            "El Salvador",
-            "Micronesia",
-            "Marshall Islands",
-            "Palau",
-            "Panama",
-            "Zimbabwe"
-         ]
-      },
-      {
-         "name":"Rand",
-         "code":"ZAR",
-         "sign":"R",
-         "defaultValue":15.89,
-         "countries":[
-            "South Africa",
-            "Lesotho",
-            "Namibia",
-            "Eswatini"
-         ]
-      }
-   ]
+  "version": 0.2,
+  "versionDate": "2022-07-08T00:44:12.511Z",
+  "totalCurrencies": 147,
+  "currencies": [
+    {
+      "name": "Australian Dollar",
+      "code": "AUD",
+      "sign": "$",
+      "defaultValue": 1.503517,
+      "countries": [
+        "Australia",
+        "Christmas Island",
+        "Cocos (Keeling) Islands",
+        "Heard Island and McDonald Islands",
+        "Norfolk Island",
+        "Kiribati",
+        "Nauru",
+        "Tuvalu"
+      ]
+    },
+    {
+      "name": "Lev",
+      "code": "BGN",
+      "sign": "лв",
+      "defaultValue": 1.954807,
+      "countries": [
+        "Bulgaria",
+        "България"
+      ]
+    },
+    {
+      "name": "Brazilian Real",
+      "code": "BRL",
+      "sign": "R$",
+      "defaultValue": 5.526769,
+      "countries": [
+        "Brazil",
+        "Brasil"
+      ]
+    },
+    {
+      "name": "Canadian Dollar",
+      "code": "CAD",
+      "sign": "$",
+      "defaultValue": 1.327756,
+      "countries": [
+        "Canada"
+      ]
+    },
+    {
+      "name": "Swiss Franc",
+      "code": "CHF",
+      "sign": "CHF",
+      "defaultValue": 0.987944,
+      "countries": [
+        "Switzerland",
+        "Swiss Confederation",
+        "Schweizerische Eidgenossenschaft",
+        "Confédération suisse",
+        "Confederazione Svizzera",
+        "Confederaziun svizra",
+        "Confoederatio Helvetica",
+        "Liechtenstein"
+      ]
+    },
+    {
+      "name": "Yuan Renminbi",
+      "code": "CNY",
+      "sign": "¥/元",
+      "defaultValue": 6.82782,
+      "countries": [
+        "China",
+        "中国",
+        "People's Republic of China",
+        "PRC",
+        "中华人民共和国"
+      ]
+    },
+    {
+      "name": "Czech Koruna",
+      "code": "CZK",
+      "sign": "Kč",
+      "defaultValue": 24.776099,
+      "countries": [
+        "Czech Republic",
+        "Česká republika",
+        "Czechia",
+        "Česko"
+      ]
+    },
+    {
+      "name": "Danish Krone",
+      "code": "DKK",
+      "sign": "kr",
+      "defaultValue": 7.441806,
+      "countries": [
+        "Denmark",
+        "Danmark",
+        "Greenland",
+        "Faroe Islands"
+      ]
+    },
+    {
+      "name": "Euro",
+      "code": "EUR",
+      "sign": "€",
+      "defaultValue": 1,
+      "countries": [
+        "Austria",
+        "Österreich",
+        "Belgium",
+        "België",
+        "Belgique",
+        "Belgien",
+        "Cyprus",
+        "Κύπρος",
+        "Kıbrıs",
+        "Estonia",
+        "Eesti",
+        "Finland",
+        "Suomi",
+        "France",
+        "Germany",
+        "Deutschland",
+        "Greece",
+        "Hellas",
+        "Ireland",
+        "Italy",
+        "Italia",
+        "Latvia",
+        "Latvija",
+        "Leţmō",
+        "Lithuania",
+        "Lietuva",
+        "Luxembourg",
+        "Lëtzebuerg",
+        "Malta",
+        "Netherlands",
+        "Nederland",
+        "Portugal",
+        "Slovakia",
+        "Slovensko",
+        "Slovenia",
+        "Slovenija",
+        "Spain",
+        "España",
+        "Andorra",
+        "Monaco",
+        "San Marino",
+        "Vatican City",
+        "Vaticano",
+        "Montenegro",
+        "Kosovo",
+        "Réunion",
+        "Reunion"
+      ]
+    },
+    {
+      "name": "Pound Sterling",
+      "code": "GBP",
+      "sign": "£",
+      "defaultValue": 0.854487,
+      "countries": [
+        "United Kingdom",
+        "Jersey",
+        "Guernsey",
+        "Isle of Man",
+        "South Georgia and the South Sandwich Islands",
+        "British Antarctic Territory",
+        "Tristan da Cunha"
+      ]
+    },
+    {
+      "name": "Hong Kong Dollar",
+      "code": "HKD",
+      "sign": "HK$",
+      "defaultValue": 7.987587,
+      "countries": [
+        "Hong Kong",
+        "香港"
+      ]
+    },
+    {
+      "name": "Kuna",
+      "code": "HRK",
+      "sign": "kn",
+      "defaultValue": 7.521365,
+      "countries": [
+        "Croatia",
+        "Hrvatska"
+      ]
+    },
+    {
+      "name": "Forint",
+      "code": "HUF",
+      "sign": "Ft",
+      "defaultValue": 409.550582,
+      "countries": [
+        "Hungary",
+        "Magyarország"
+      ]
+    },
+    {
+      "name": "Rupiah",
+      "code": "IDR",
+      "sign": "Rp",
+      "defaultValue": 15263.345395,
+      "countries": [
+        "Indonesia"
+      ]
+    },
+    {
+      "name": "Sheqel",
+      "code": "ILS",
+      "sign": "₪",
+      "defaultValue": 3.555918,
+      "countries": [
+        "Israel",
+        "إسرائيل",
+        "ישראל",
+        "Palestine",
+        "فلسطين"
+      ]
+    },
+    {
+      "name": "Indian Rupee",
+      "code": "INR",
+      "sign": "₹",
+      "defaultValue": 80.455949,
+      "countries": [
+        "India",
+        "Bhārat",
+        "Bhutan",
+        "འབྲུག་ཡུལ་"
+      ]
+    },
+    {
+      "name": "Iceland Króna",
+      "code": "ISK",
+      "sign": "kr",
+      "defaultValue": 138.102795,
+      "countries": [
+        "Iceland",
+        "Ísland"
+      ]
+    },
+    {
+      "name": "Yen",
+      "code": "JPY",
+      "sign": "¥/円",
+      "defaultValue": 138.336617,
+      "countries": [
+        "Japan",
+        "日本"
+      ]
+    },
+    {
+      "name": "South Korean Won",
+      "code": "KRW",
+      "sign": "₩",
+      "defaultValue": 1330.462689,
+      "countries": [
+        "South Korea",
+        "한국"
+      ]
+    },
+    {
+      "name": "Mexican Peso",
+      "code": "MXN",
+      "sign": "$",
+      "defaultValue": 21.04074,
+      "countries": [
+        "Mexico",
+        "México"
+      ]
+    },
+    {
+      "name": "Ringgit",
+      "code": "MYR",
+      "sign": "RM",
+      "defaultValue": 4.503008,
+      "countries": [
+        "Malaysia"
+      ]
+    },
+    {
+      "name": "Norwegian Krone",
+      "code": "NOK",
+      "sign": "kr",
+      "defaultValue": 10.340061,
+      "countries": [
+        "Norway",
+        "Norge",
+        "Noreg",
+        "Norga",
+        "Nöörje",
+        "Vuodna",
+        "Bouvet Island",
+        "Svalbard and Jan Mayen"
+      ]
+    },
+    {
+      "name": "New Zealand Dollar",
+      "code": "NZD",
+      "sign": "$",
+      "defaultValue": 1.656982,
+      "countries": [
+        "New Zealand",
+        "Aotearoa",
+        "Cook Islands",
+        "Niue",
+        "Ross Dependency",
+        "Tokelau",
+        "Pitcairn Islands"
+      ]
+    },
+    {
+      "name": "Philippine Peso",
+      "code": "PHP",
+      "sign": "₱",
+      "defaultValue": 56.980002,
+      "countries": [
+        "Philippines",
+        "Pilipinas",
+        "Filipinas"
+      ]
+    },
+    {
+      "name": "Zloty",
+      "code": "PLN",
+      "sign": "zł",
+      "defaultValue": 4.767088,
+      "countries": [
+        "Poland",
+        "Rzeczpospolita Polska"
+      ]
+    },
+    {
+      "name": "Romanian Leu",
+      "code": "RON",
+      "sign": "L",
+      "defaultValue": 4.944046,
+      "countries": [
+        "Romania",
+        "România"
+      ]
+    },
+    {
+      "name": "Russian Ruble",
+      "code": "RUB",
+      "sign": "₽",
+      "defaultValue": 64.6847,
+      "countries": [
+        "Russia",
+        "Росси́я",
+        "Russian Federation",
+        "Росси́йская Федера́ция"
+      ]
+    },
+    {
+      "name": "Swedish Krona",
+      "code": "SEK",
+      "sign": "kr",
+      "defaultValue": 10.734487,
+      "countries": [
+        "Sweden",
+        "Sverige"
+      ]
+    },
+    {
+      "name": "Singapore Dollar",
+      "code": "SGD",
+      "sign": "S$",
+      "defaultValue": 1.430493,
+      "countries": [
+        "Singapore",
+        "Republic of Singapore",
+        "Republik Singapura",
+        "新加坡共和国",
+        "சிங்கப்பூர் குடியரசு"
+      ]
+    },
+    {
+      "name": "Baht",
+      "code": "THB",
+      "sign": "฿",
+      "defaultValue": 36.889218,
+      "countries": [
+        "Thailand",
+        "ประเทศไทย",
+        "Siam",
+        "สยาม"
+      ]
+    },
+    {
+      "name": "Turkish Lira",
+      "code": "TRY",
+      "sign": "₺",
+      "defaultValue": 17.531693,
+      "countries": [
+        "Turkey",
+        "Türkiye"
+      ]
+    },
+    {
+      "name": "US Dollar",
+      "code": "USD",
+      "sign": "$",
+      "defaultValue": 1.017858,
+      "countries": [
+        "United States",
+        "USA",
+        "Cambodia",
+        "United States of America",
+        "East Timor",
+        "Ecuador",
+        "El Salvador",
+        "Micronesia",
+        "Marshall Islands",
+        "Palau",
+        "Panama",
+        "Zimbabwe"
+      ]
+    },
+    {
+      "name": "Rand",
+      "code": "ZAR",
+      "sign": "R",
+      "defaultValue": 17.097028,
+      "countries": [
+        "South Africa",
+        "Lesotho",
+        "Namibia",
+        "Eswatini"
+      ]
+    },
+    {
+      "name": "UAE Dirham",
+      "code": "AED",
+      "sign": "د.إ",
+      "defaultValue": 3.74,
+      "countries": [
+        "United Arab Emirates",
+        "UAE",
+        "الإمارات العربية المتحدة",
+        "دولة الإمارات العربية المتحدة"
+      ]
+    },
+    {
+      "name": "Afghani",
+      "code": "AFN",
+      "sign": "؋",
+      "defaultValue": 89.32,
+      "countries": [
+        "Islamic Republic of Afghanistan",
+        "Afghanistan",
+        "جمهورية أففانستان الإسلامية",
+        "أفغانستان"
+      ]
+    },
+    {
+      "name": "Lek",
+      "code": "ALL",
+      "sign": "L",
+      "defaultValue": 118.1,
+      "countries": [
+        "Albania",
+        "Republic of Albania",
+        "Republika e Shqipërisë",
+        "Shqipëria"
+      ]
+    },
+    {
+      "name": "Dram",
+      "code": "AMD",
+      "sign": "֏",
+      "defaultValue": 415.49,
+      "countries": [
+        "Armenia",
+        "Republic of Armenia",
+        "Հայաստանի Հանրապետություն",
+        "Հայաստան"
+      ]
+    },
+    {
+      "name": "Guilder",
+      "code": "ANG",
+      "sign": "ƒ",
+      "defaultValue": 1.834811,
+      "countries": [
+        "Curaçao",
+        "Sint Maarten"
+      ]
+    },
+    {
+      "name": "Kwanza",
+      "code": "AOA",
+      "sign": "Kz",
+      "defaultValue": 435.713494,
+      "countries": [
+        "Angola"
+      ]
+    },
+    {
+      "name": "Argentine Peso",
+      "code": "ARS",
+      "sign": "$",
+      "defaultValue": 128.629325,
+      "countries": [
+        "Argentina",
+        "Argentine"
+      ]
+    },
+    {
+      "name": "Florin",
+      "code": "AWG",
+      "sign": "ƒ",
+      "defaultValue": 1.827056,
+      "countries": [
+        "Aruba"
+      ]
+    },
+    {
+      "name": "Azerbaijani Manat",
+      "code": "AZN",
+      "sign": "₼",
+      "defaultValue": 1.722646,
+      "countries": [
+        "Azerbaijan",
+        "Azərbaycan Respublikası"
+      ]
+    },
+    {
+      "name": "Mark",
+      "code": "BAM",
+      "sign": "KM",
+      "defaultValue": 1.952968,
+      "countries": [
+        "Bosnia and Herzegovina",
+        "Bosna i Hercegovina"
+      ]
+    },
+    {
+      "name": "Barbadian Dollar",
+      "code": "BBD",
+      "sign": "$",
+      "defaultValue": 2.055588,
+      "countries": [
+        "Barbados"
+      ]
+    },
+    {
+      "name": "Taka",
+      "code": "BDT",
+      "sign": "৳",
+      "defaultValue": 95.137476,
+      "countries": [
+        "Bangladesh",
+        "বাংলাদেশ"
+      ]
+    },
+    {
+      "name": "Bahraini Dinar",
+      "code": "BHD",
+      "sign": ".د.ب",
+      "defaultValue": 0.383796,
+      "countries": [
+        "Bahrain",
+        "مملكة البحرين"
+      ]
+    },
+    {
+      "name": "Burundian Franc",
+      "code": "BIF",
+      "sign": "Fr",
+      "defaultValue": 2095.519008,
+      "countries": [
+        "Burundi"
+      ]
+    },
+    {
+      "name": "Bermudian Dollar",
+      "code": "BMD",
+      "sign": "$",
+      "defaultValue": 1.017858,
+      "countries": [
+        "Bermuda"
+      ]
+    },
+    {
+      "name": "Boliviano",
+      "code": "BOL",
+      "sign": "Bs.",
+      "defaultValue": 6.999143,
+      "countries": [
+        "Bolivia",
+        "Wuliwya",
+        "Volívia",
+        "Buliwya"
+      ]
+    },
+    {
+      "name": "Bahamian Dollar",
+      "code": "BSD",
+      "sign": "$",
+      "defaultValue": 1.018108,
+      "countries": [
+        "Bahamas"
+      ]
+    },
+    {
+      "name": "Bhutanese Ngultrum",
+      "code": "BTN",
+      "sign": "Nu.",
+      "defaultValue": 80.761144,
+      "countries": [
+        "Bhutan",
+        "འབྲུག་ཡུལ་"
+      ]
+    },
+    {
+      "name": "Pula",
+      "code": "BWP",
+      "sign": "P",
+      "defaultValue": 12.821909,
+      "countries": [
+        "Botswana"
+      ]
+    },
+    {
+      "name": "Belarusian Ruble",
+      "code": "BYN",
+      "sign": "Br",
+      "defaultValue": 3.438992,
+      "countries": [
+        "Belarus",
+        "Белару́сь"
+      ]
+    },
+    {
+      "name": "Belize Dollar",
+      "code": "BZD",
+      "sign": "$",
+      "defaultValue": 2.052093,
+      "countries": [
+        "Belize"
+      ]
+    },
+    {
+      "name": "Congolese Franc",
+      "code": "CDF",
+      "sign": "FC",
+      "defaultValue": 2038.258409,
+      "countries": [
+        "Democratic Republic of the Congo",
+        "Repubilika ya Kongo Demokratiki"
+      ]
+    },
+    {
+      "name": "Chilean Peso",
+      "code": "CLP",
+      "sign": "$",
+      "defaultValue": 987.322582,
+      "countries": [
+        "Chile"
+      ]
+    },
+    {
+      "name": "Colombian Peso",
+      "code": "COP",
+      "sign": "$",
+      "defaultValue": 4406.603865,
+      "countries": [
+        "Colombia"
+      ]
+    },
+    {
+      "name": "Colón",
+      "code": "CRC",
+      "sign": "₡",
+      "defaultValue": 699.524843,
+      "countries": [
+        "Costa Rica",
+        "Colon"
+      ]
+    },
+    {
+      "name": "Cuban Peso",
+      "code": "CUP",
+      "sign": "$",
+      "defaultValue": 26.973246,
+      "countries": [
+        "Cuba"
+      ]
+    },
+    {
+      "name": "Escudo",
+      "code": "CVE",
+      "sign": "Esc",
+      "defaultValue": 110.103643,
+      "countries": [
+        "Cape Verde",
+        "Cabo Verde"
+      ]
+    },
+    {
+      "name": "Dominican Peso",
+      "code": "DOP",
+      "sign": "$",
+      "defaultValue": 55.749299,
+      "countries": [
+        "Dominican Republic",
+        "República Dominicana"
+      ]
+    },
+    {
+      "name": "Algerian Dinar",
+      "code": "DZD",
+      "sign": "د.ج",
+      "defaultValue": 149.922457,
+      "countries": [
+        "Algeria",
+        "الجزائر",
+        "Western Sahara",
+        "Sahrawi Arab Democratic Republic"
+      ]
+    },
+    {
+      "name": "Egyptian Pound",
+      "code": "EGP",
+      "sign": "E£",
+      "defaultValue": 19.217775,
+      "countries": [
+        "Egypt",
+        "مصر",
+        "Palestine",
+        "فلسطين"
+      ]
+    },
+    {
+      "name": "Nakfa",
+      "code": "ERN",
+      "sign": "Nfk",
+      "defaultValue": 15.267876,
+      "countries": [
+        "Eritrea",
+        "دولة إرتريا",
+        "ኤርትራ"
+      ]
+    },
+    {
+      "name": "Birr",
+      "code": "ETB",
+      "sign": "Br",
+      "defaultValue": 53.109967,
+      "countries": [
+        "Ethiopia",
+        "ኢትዮጵያ"
+      ]
+    },
+    {
+      "name": "Fijian Dollar",
+      "code": "FJD",
+      "sign": "$",
+      "defaultValue": 2.278682,
+      "countries": [
+        "Fiji",
+        "Viti"
+      ]
+    },
+    {
+      "name": "Falkland Islands Pound",
+      "code": "FKP",
+      "sign": "£",
+      "defaultValue": 0.835762,
+      "countries": [
+        "Falkland Islands"
+      ]
+    },
+    {
+      "name": "Lari",
+      "code": "GEL",
+      "sign": "₾",
+      "defaultValue": 2.992364,
+      "countries": [
+        "Georgia",
+        "საქართველო"
+      ]
+    },
+    {
+      "name": "Cedi",
+      "code": "GHS",
+      "sign": "₵",
+      "defaultValue": 8.185205,
+      "countries": [
+        "Ghana"
+      ]
+    },
+    {
+      "name": "Dalasi",
+      "code": "GMD",
+      "sign": "D",
+      "defaultValue": 55.055652,
+      "countries": [
+        "Gambia"
+      ]
+    },
+    {
+      "name": "Guinean Franc",
+      "code": "GNF",
+      "sign": "Fr",
+      "defaultValue": 8842.341511,
+      "countries": [
+        "Guinea",
+        "Guinée"
+      ]
+    },
+    {
+      "name": "Quetzal",
+      "code": "GTQ",
+      "sign": "Q",
+      "defaultValue": 7.892533,
+      "countries": [
+        "Guatemala"
+      ]
+    },
+    {
+      "name": "Guyanese Dollar",
+      "code": "GYD",
+      "sign": "$",
+      "defaultValue": 213.057763,
+      "countries": [
+        "Guyana"
+      ]
+    },
+    {
+      "name": "Lempira",
+      "code": "HNL",
+      "sign": "L",
+      "defaultValue": 25.028321,
+      "countries": [
+        "Honduras"
+      ]
+    },
+    {
+      "name": "Gourde",
+      "code": "HTG",
+      "sign": "G",
+      "defaultValue": 117.855283,
+      "countries": [
+        "Haiti",
+        "Haïti",
+        "Ayiti"
+      ]
+    },
+    {
+      "name": "Iraqi Dinar",
+      "code": "IQD",
+      "sign": "ع.د",
+      "defaultValue": 1485.852477,
+      "countries": [
+        "Iraq"
+      ]
+    },
+    {
+      "name": "Iranian Rial",
+      "code": "IRR",
+      "sign": "﷼",
+      "defaultValue": 43106.299697,
+      "countries": [
+        "Iran"
+      ]
+    },
+    {
+      "name": "Jamaican Dollar",
+      "code": "JMD",
+      "sign": "$",
+      "defaultValue": 153.085652,
+      "countries": [
+        "Jamaica"
+      ]
+    },
+    {
+      "name": "Jordanian Dinar",
+      "code": "JOD",
+      "sign": "د.ا",
+      "defaultValue": 0.721672,
+      "countries": [
+        "Jordan",
+        "Palestine"
+      ]
+    },
+    {
+      "name": "Kenyan Shilling",
+      "code": "KES",
+      "sign": "Sh",
+      "defaultValue": 120.158232,
+      "countries": [
+        "Kenya"
+      ]
+    },
+    {
+      "name": "Som",
+      "code": "KGS",
+      "sign": "c",
+      "defaultValue": 80.918884,
+      "countries": [
+        "Kyrgyzstan"
+      ]
+    },
+    {
+      "name": "Cambodian Riel",
+      "code": "KHR",
+      "sign": "៛",
+      "defaultValue": 4148.620179,
+      "countries": [
+        "Cambodia"
+      ]
+    },
+    {
+      "name": "Comorian Franc",
+      "code": "COM",
+      "sign": "Fr",
+      "defaultValue": 472.922429,
+      "countries": [
+        "Comoros"
+      ]
+    },
+    {
+      "name": "North Korean Won",
+      "code": "KPW",
+      "sign": "₩",
+      "defaultValue": 916.072333,
+      "countries": [
+        "North Korea",
+        "조선"
+      ]
+    },
+    {
+      "name": "Kuwaiti Dinar",
+      "code": "KWD",
+      "sign": "د.ك",
+      "defaultValue": 0.312892,
+      "countries": [
+        "Kuwait"
+      ]
+    },
+    {
+      "name": "Cayman Islands Dollar",
+      "code": "KYD",
+      "sign": "$",
+      "defaultValue": 0.848357,
+      "countries": [
+        "Cayman Islands"
+      ]
+    },
+    {
+      "name": "Tenge",
+      "code": "KZT",
+      "sign": "₸",
+      "defaultValue": 474.274948,
+      "countries": [
+        "Kazakhstan"
+      ]
+    },
+    {
+      "name": "Kip",
+      "code": "LAK",
+      "sign": "₭",
+      "defaultValue": 15291.789817,
+      "countries": [
+        "Laos"
+      ]
+    },
+    {
+      "name": "Lebanese Pound",
+      "code": "LBP",
+      "sign": "ل.ل",
+      "defaultValue": 1539.344085,
+      "countries": [
+        "Lebanon"
+      ]
+    },
+    {
+      "name": "Sri Lankan Rupee",
+      "code": "CODE",
+      "sign": "Rs රු",
+      "defaultValue": 363.435983,
+      "countries": [
+        "Sri Lanka"
+      ]
+    },
+    {
+      "name": "Liberian Dollar",
+      "code": "LRD",
+      "sign": "$",
+      "defaultValue": 155.221931,
+      "countries": [
+        "Liberia"
+      ]
+    },
+    {
+      "name": "Loti",
+      "code": "LSL",
+      "sign": "L",
+      "defaultValue": 16.123091,
+      "countries": [
+        "Lesotho"
+      ]
+    },
+    {
+      "name": "Libyan Dinar",
+      "code": "LYD",
+      "sign": "ل.د",
+      "defaultValue": 4.923984,
+      "countries": [
+        "Libya"
+      ]
+    },
+    {
+      "name": "Moroccan Dirham",
+      "code": "MAD",
+      "sign": "د.م.",
+      "defaultValue": 10.349033,
+      "countries": [
+        "Morocco",
+        "Western Sahara"
+      ]
+    },
+    {
+      "name": "Moldovan Leu",
+      "code": "MDL",
+      "sign": "L",
+      "defaultValue": 19.445403,
+      "countries": [
+        "Moldova"
+      ]
+    },
+    {
+      "name": "Ariary",
+      "code": "MGA",
+      "sign": "Ar",
+      "defaultValue": 4163.857849,
+      "countries": [
+        "Madagascar"
+      ]
+    },
+    {
+      "name": "Denar",
+      "code": "MKD",
+      "sign": "den",
+      "defaultValue": 61.585251,
+      "countries": [
+        "North Macedonia"
+      ]
+    },
+    {
+      "name": "Kyat",
+      "code": "MMK",
+      "sign": "Ks",
+      "defaultValue": 1884.93452,
+      "countries": [
+        "Myanmar"
+      ]
+    },
+    {
+      "name": "Tögrög",
+      "code": "MNT",
+      "sign": "₮",
+      "defaultValue": 3179.878568,
+      "countries": [
+        "Mongolia",
+        "Togrog"
+      ]
+    },
+    {
+      "name": "Pataca",
+      "code": "MOP",
+      "sign": "P",
+      "defaultValue": 8.228541,
+      "countries": [
+        "Macau",
+        "澳门"
+      ]
+    },
+    {
+      "name": "Mauritian Rupee",
+      "code": "MUR",
+      "sign": "₨",
+      "defaultValue": 46.418523,
+      "countries": [
+        "Mauritius",
+        "Maurice"
+      ]
+    },
+    {
+      "name": "Rufiyaa",
+      "code": "MVR",
+      "sign": ".ރ",
+      "defaultValue": 15.624365,
+      "countries": [
+        "Maldives",
+        "ދިވެހިރާއްޖޭގެ"
+      ]
+    },
+    {
+      "name": "Malawian Kwacha",
+      "code": "MWK",
+      "sign": "MK",
+      "defaultValue": 1041.473716,
+      "countries": [
+        "Malawi"
+      ]
+    },
+    {
+      "name": "Metical",
+      "code": "MZN",
+      "sign": "MT",
+      "defaultValue": 64.969646,
+      "countries": [
+        "Mozambique"
+      ]
+    },
+    {
+      "name": "Namibian Dollar",
+      "code": "NAD",
+      "sign": "$",
+      "defaultValue": 16.123188,
+      "countries": [
+        "Namibia"
+      ]
+    },
+    {
+      "name": "Naira",
+      "code": "NGN",
+      "sign": "₦",
+      "defaultValue": 422.747364,
+      "countries": [
+        "Nigeria"
+      ]
+    },
+    {
+      "name": "Córdoba",
+      "code": "NIO",
+      "sign": "C$",
+      "defaultValue": 36.502505,
+      "countries": [
+        "Nicaragua",
+        "Cordoba"
+      ]
+    },
+    {
+      "name": "Nepalese Rupee",
+      "code": "NPR",
+      "sign": "₨",
+      "defaultValue": 129.217631,
+      "countries": [
+        "Nepal"
+      ]
+    },
+    {
+      "name": "Omani Rial",
+      "code": "OMR",
+      "sign": "ر.ع.",
+      "defaultValue": 0.391913,
+      "countries": [
+        "Oman"
+      ]
+    },
+    {
+      "name": "Balboa",
+      "code": "PAB",
+      "sign": "B/.",
+      "defaultValue": 1.018008,
+      "countries": [
+        "Panamá",
+        "Panama"
+      ]
+    },
+    {
+      "name": "Sol",
+      "code": "PEN",
+      "sign": "S/ ",
+      "defaultValue": 3.93034,
+      "countries": [
+        "Peru"
+      ]
+    },
+    {
+      "name": "Kina",
+      "code": "PGK",
+      "sign": "K",
+      "defaultValue": 3.633375,
+      "countries": [
+        "Papua New Guinea"
+      ]
+    },
+    {
+      "name": "Pakistani Rupee",
+      "code": "PKR",
+      "sign": "₨",
+      "defaultValue": 211.501544,
+      "countries": [
+        "Pakistan"
+      ]
+    },
+    {
+      "name": "Guaraní",
+      "code": "PYG",
+      "sign": "₲",
+      "defaultValue": 6980.769652,
+      "countries": [
+        "Paraguay",
+        "Guarani"
+      ]
+    },
+    {
+      "name": "Qatari Riyal",
+      "code": "QAR",
+      "sign": "ر.ق",
+      "defaultValue": 3.705983,
+      "countries": [
+        "Qatar"
+      ]
+    },
+    {
+      "name": "Serbian Dinar",
+      "code": "RSD",
+      "sign": "дин.",
+      "defaultValue": 117.364145,
+      "countries": [
+        "Serbia"
+      ]
+    },
+    {
+      "name": "Rwandan Franc",
+      "code": "RWF",
+      "sign": "Fr",
+      "defaultValue": 1041.453745,
+      "countries": [
+        "Rwanda"
+      ]
+    },
+    {
+      "name": "Saudi Riyal",
+      "code": "SAR",
+      "sign": "ر.س",
+      "defaultValue": 3.820828,
+      "countries": [
+        "Saudi Arabia"
+      ]
+    },
+    {
+      "name": "Solomon Islands Dollar",
+      "code": "SBD",
+      "sign": "$",
+      "defaultValue": 8.305692,
+      "countries": [
+        "Solomon Islands"
+      ]
+    },
+    {
+      "name": "Seychellois Rupee",
+      "code": "SCR",
+      "sign": "₨",
+      "defaultValue": 13.674485,
+      "countries": [
+        "Seychelles"
+      ]
+    },
+    {
+      "name": "Sudanese Pound",
+      "code": "SDG",
+      "sign": "£",
+      "defaultValue": 464.649226,
+      "countries": [
+        "Sudan"
+      ]
+    },
+    {
+      "name": "Saint Helena Pound",
+      "code": "SHP",
+      "sign": "£",
+      "defaultValue": 1.401995,
+      "countries": [
+        "South Georgia"
+      ]
+    },
+    {
+      "name": "Sierra Leonean Leone",
+      "code": "SLL",
+      "sign": "Le",
+      "defaultValue": 13405.193945,
+      "countries": [
+        "Sierra Leone"
+      ]
+    },
+    {
+      "name": "Somali Shillings",
+      "code": "SOS",
+      "sign": "Sh",
+      "defaultValue": 594.941308,
+      "countries": [
+        "Somalia"
+      ]
+    },
+    {
+      "name": "Surinamese Dollar",
+      "code": "SRD",
+      "sign": "$",
+      "defaultValue": 22.717068,
+      "countries": [
+        "Suriname"
+      ]
+    },
+    {
+      "name": "Syrian Pound",
+      "code": "SYP",
+      "sign": "£",
+      "defaultValue": 2557.399952,
+      "countries": [
+        "Syria"
+      ]
+    },
+    {
+      "name": "Lilangeni",
+      "code": "SZL",
+      "sign": "L",
+      "defaultValue": 17.044821,
+      "countries": [
+        "Eswatini"
+      ]
+    },
+    {
+      "name": "Somoni",
+      "code": "TJS",
+      "sign": "SM",
+      "defaultValue": 10.613246,
+      "countries": [
+        "Tajikistan"
+      ]
+    },
+    {
+      "name": "Turkmenistan Manat",
+      "code": "TMT",
+      "sign": "m",
+      "defaultValue": 3.572683,
+      "countries": [
+        "Turkmenistan"
+      ]
+    },
+    {
+      "name": "Tunisian dinar",
+      "code": "TND",
+      "sign": "د.ت",
+      "defaultValue": 3.118208,
+      "countries": [
+        "Tunisia"
+      ]
+    },
+    {
+      "name": "Paʻanga",
+      "code": "TOP",
+      "sign": "T$",
+      "defaultValue": 2.399905,
+      "countries": [
+        "Tonga",
+        "Paanga"
+      ]
+    },
+    {
+      "name": "Trinidad and Tobago Dollar",
+      "code": "TTD",
+      "sign": "$",
+      "defaultValue": 6.906878,
+      "countries": [
+        "Trinidad and Tobago"
+      ]
+    },
+    {
+      "name": "New Taiwan Dollar",
+      "code": "TWD",
+      "sign": "$",
+      "defaultValue": 30.335227,
+      "countries": [
+        "Taiwan",
+        "台灣"
+      ]
+    },
+    {
+      "name": "Tanzanian Shilling",
+      "code": "TZS",
+      "sign": "Sh",
+      "defaultValue": 2374.110781,
+      "countries": [
+        "Tanzania"
+      ]
+    },
+    {
+      "name": "Hryvnia",
+      "code": "UAH",
+      "sign": "₴",
+      "defaultValue": 30.077222,
+      "countries": [
+        "Ukraine"
+      ]
+    },
+    {
+      "name": "Ugandan Shilling",
+      "code": "UGX",
+      "sign": "Sh",
+      "defaultValue": 3827.890211,
+      "countries": [
+        "Uganda"
+      ]
+    },
+    {
+      "name": "Uruguayan Peso",
+      "code": "UYU",
+      "sign": "$",
+      "defaultValue": 40.686374,
+      "countries": [
+        "Uruguay"
+      ]
+    },
+    {
+      "name": "Soʻm",
+      "code": "UZS",
+      "sign": "so'm",
+      "defaultValue": 11084.485639,
+      "countries": [
+        "Country"
+      ]
+    },
+    {
+      "name": "Đồng",
+      "code": "VND",
+      "sign": "₫",
+      "defaultValue": 23795.491905,
+      "countries": [
+        "Vietnam",
+        "Việt Nam",
+        "Dong"
+      ]
+    },
+    {
+      "name": "Vanuatu",
+      "code": "VUV",
+      "sign": "Vt",
+      "defaultValue": 118.286164,
+      "countries": [
+        "Vanuatu"
+      ]
+    },
+    {
+      "name": "Tālā",
+      "code": "WST",
+      "sign": "T",
+      "defaultValue": 2.691952,
+      "countries": [
+        "Samoa",
+        "Tala"
+      ]
+    },
+    {
+      "name": "Central African CFA Franc",
+      "code": "XAF",
+      "sign": "Fr",
+      "defaultValue": 654.997099,
+      "countries": [
+        "Cameroon",
+        "Central African Republic",
+        "Republic of the Congo",
+        "Chad",
+        "Gabon",
+        "Equatorial Guinea"
+      ]
+    },
+    {
+      "name": "Eastern Caribbean Dollar",
+      "code": "XCD",
+      "sign": "$",
+      "defaultValue": 2.750813,
+      "countries": [
+        "Saint Vincent and the Grenadines",
+        "Montserrat",
+        "Dominica",
+        "Saint Lucia",
+        "Antigua and Barbuda",
+        "Anguilla",
+        "Grenada",
+        "Saint Kitts and Nevis"
+      ]
+    },
+    {
+      "name": "West African CFA Franc",
+      "code": "XOF",
+      "sign": "Fr",
+      "defaultValue": 654.997099,
+      "countries": [
+        "Senegal",
+        "Ivory Coast",
+        "Burkina Faso",
+        "Togo",
+        "Guinea-Bissau",
+        "Mali",
+        "Niger",
+        "Benin"
+      ]
+    },
+    {
+      "name": "CFP Franc",
+      "code": "XPF",
+      "sign": "₣",
+      "defaultValue": 115.170739,
+      "countries": [
+        "French Polynesia",
+        "Wallis and Futuna",
+        "New Caledonia"
+      ]
+    },
+    {
+      "name": "Yemeni Rial",
+      "code": "YER",
+      "sign": "﷼",
+      "defaultValue": 254.719125,
+      "countries": [
+        "Yemen"
+      ]
+    },
+    {
+      "name": "Zambian Kwacha",
+      "code": "ZMW",
+      "sign": "ZK",
+      "defaultValue": 16.594381,
+      "countries": [
+        "Zambia"
+      ]
+    },
+    {
+      "name": "Zimbabwean Dollar",
+      "code": "ZWL",
+      "sign": "$",
+      "defaultValue": 327.749965,
+      "countries": [
+        "Republic of Zimbabwe"
+      ]
+    }
+  ]
 }
