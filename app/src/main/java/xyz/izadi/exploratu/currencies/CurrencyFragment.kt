@@ -439,6 +439,8 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
                     R.string.exchanges_provided_by_at,
                     getFormattedDate(it)
                 )
+            } ?: run {
+                tvExchangeProvider.text = ""
             }
         }
     }
