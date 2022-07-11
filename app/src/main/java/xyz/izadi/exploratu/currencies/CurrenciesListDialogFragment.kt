@@ -7,14 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.Filter
+import android.widget.Filterable
+import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Picasso
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import xyz.izadi.exploratu.R
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Currency
@@ -139,9 +140,9 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         )
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        val flag: ImageView = binding.ivCurrencyFlag
-        val cod: TextView = binding.tvCurrencyCode
-        val desc: TextView = binding.tvCurrencyDesc
+        val flag = binding.ivCurrencyFlag
+        val cod = binding.tvCurrencyCode
+        val desc = binding.tvCurrencyDesc
 
         init {
             itemView.setOnClickListener {
@@ -170,12 +171,10 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
                     context?.getString(R.string.currency_desc, currency.name, currency.sign)
 
                 val flagPath = "file:///android_asset/flags/${currency.code}.png"
-                val transformation = RoundedCornersTransformation(32, 0)
                 Picasso
                     .get()
                     .load(flagPath)
                     .placeholder(R.drawable.ic_dollar_placeholder)
-                    .transform(transformation)
                     .into(holder.flag)
             }
         }

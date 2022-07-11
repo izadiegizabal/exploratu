@@ -29,7 +29,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import xyz.izadi.exploratu.MainActivity
@@ -244,14 +243,12 @@ class OcrCaptureActivity :
         val curr = currencies?.getCurrency(code)
         val currSign = curr?.sign?.split("/")?.getOrNull(0)
         val flagPath = "file:///android_asset/flags/${code}.png"
-        val transformation = RoundedCornersTransformation(32, 0)
         when (listPos) {
             0 -> {
                 Picasso
                     .get()
                     .load(flagPath)
                     .placeholder(R.drawable.ic_dollar_placeholder)
-                    .transform(transformation)
                     .into(ivCurrencyFromFlag)
                 tvCurrencyFromCode.text = code
 
@@ -266,7 +263,6 @@ class OcrCaptureActivity :
                     .get()
                     .load(flagPath)
                     .placeholder(R.drawable.ic_dollar_placeholder)
-                    .transform(transformation)
                     .into(ivCurrencyToFlag)
                 tvCurrencyToCode.text = code
 

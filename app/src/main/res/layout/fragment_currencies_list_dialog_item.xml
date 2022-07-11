@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/cl_rv_item"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_rv_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <ImageView
-            android:id="@+id/iv_currency_flag"
-            style="@style/CurrencyFlag"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="@string/flag_of_the_first_currency"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-            android:id="@+id/tv_currency_code"
-            style="@style/CurrencyCode"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@id/iv_currency_flag"
-            app:layout_constraintStart_toEndOf="@id/iv_currency_flag"
-            app:layout_constraintTop_toTopOf="@id/iv_currency_flag"
-            tools:text="USD" />
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/iv_currency_flag"
+        style="@style/CurrencyFlag"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/flag_of_the_first_currency"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-            android:id="@+id/tv_currency_desc"
-            style="@style/CurrencyDesc"
-            android:layout_marginStart="16dp"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_currency_code"
-            app:layout_constraintStart_toEndOf="@+id/tv_currency_code"
-            app:layout_constraintTop_toTopOf="@+id/tv_currency_code"
-            tools:text="US Dollar - $" />
+        android:id="@+id/tv_currency_code"
+        style="@style/CurrencyCode"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/iv_currency_flag"
+        app:layout_constraintStart_toEndOf="@id/iv_currency_flag"
+        app:layout_constraintTop_toTopOf="@id/iv_currency_flag"
+        tools:text="USD" />
+
+    <TextView
+        android:id="@+id/tv_currency_desc"
+        style="@style/CurrencyDesc"
+        android:layout_marginStart="16dp"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_currency_code"
+        app:layout_constraintStart_toEndOf="@+id/tv_currency_code"
+        app:layout_constraintTop_toTopOf="@+id/tv_currency_code"
+        tools:text="US Dollar - $" />
 </androidx.constraintlayout.widget.ConstraintLayout>

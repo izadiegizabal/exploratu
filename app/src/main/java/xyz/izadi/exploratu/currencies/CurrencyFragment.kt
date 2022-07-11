@@ -15,7 +15,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import xyz.izadi.exploratu.R
@@ -117,14 +116,12 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
         // update tv
         val curr = currencies?.getCurrency(code)
         val flagPath = "file:///android_asset/flags/${curr?.code}.png"
-        val transformation = RoundedCornersTransformation(32, 0)
         when (listPos) {
             0 -> {
                 Picasso
                     .get()
                     .load(flagPath)
                     .placeholder(R.drawable.ic_dollar_placeholder)
-                    .transform(transformation)
                     .into(ivCurrency1Flag)
                 tvCurrency1Code.text = curr?.code
                 tvCurrency1Desc.text =
@@ -135,7 +132,6 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
                     .get()
                     .load(flagPath)
                     .placeholder(R.drawable.ic_dollar_placeholder)
-                    .transform(transformation)
                     .into(ivCurrency2Flag)
                 tvCurrency2Code.text = curr?.code
                 tvCurrency2Desc.text =
@@ -146,7 +142,6 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
                     .get()
                     .load(flagPath)
                     .placeholder(R.drawable.ic_dollar_placeholder)
-                    .transform(transformation)
                     .into(ivCurrency3Flag)
                 tvCurrency3Code.text = curr?.code
                 tvCurrency3Desc.text =
