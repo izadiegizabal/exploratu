@@ -3,7 +3,6 @@ package xyz.izadi.exploratu.currencies.data.models
 import android.os.Parcel
 import android.os.Parcelable
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 data class Currencies(
@@ -49,14 +48,6 @@ data class Currencies(
         }
 
         return null
-    }
-
-    fun getRates(): Rates {
-        val rates: ArrayList<Float> = ArrayList()
-        for (currency: Currency in currencies) {
-            rates.add(currency.defaultValue)
-        }
-        return Rates(versionDate, Exchanges(rates))
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

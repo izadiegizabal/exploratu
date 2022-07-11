@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.izadi.exploratu.ApplicationScope
 import xyz.izadi.exploratu.currencies.data.models.Currencies
+import xyz.izadi.exploratu.currencies.data.models.toRates
 import javax.inject.Inject
 
 class PrepopulateRatesCallback @Inject constructor(
@@ -29,7 +30,7 @@ class PrepopulateRatesCallback @Inject constructor(
                     .bufferedReader().use {
                         it.readText()
                     }
-                Gson().fromJson(jsonString, Currencies::class.java).getRates()
+                Gson().fromJson(jsonString, Currencies::class.java).toRates()
             }.getOrNull()?.let {
                 ratesDao.get().insertRates(it)
             }
