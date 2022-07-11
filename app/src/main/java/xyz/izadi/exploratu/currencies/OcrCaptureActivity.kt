@@ -333,8 +333,13 @@ class OcrCaptureActivity :
     }
 
     private fun goToListView() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
+        if (isTaskRoot) {
+            Intent(this, MainActivity::class.java).also {
+                startActivity(it)
+            }
+        } else {
+            finish()
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////

@@ -24,8 +24,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             fab.setOnClickListener {
-                Intent(this@MainActivity, OcrCaptureActivity::class.java).also {
-                    startActivity(it)
+                if (isTaskRoot) {
+                    Intent(this@MainActivity, OcrCaptureActivity::class.java).also {
+                        startActivity(it)
+                    }
+                } else {
+                    finish()
                 }
             }
         }.also {
