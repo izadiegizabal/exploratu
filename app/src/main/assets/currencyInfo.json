@@ -920,7 +920,7 @@
     },
     {
       "name": "Comorian Franc",
-      "code": "COM",
+      "code": "KMF",
       "sign": "Fr",
       "defaultValue": 472.922429,
       "countries": [
@@ -984,7 +984,7 @@
     },
     {
       "name": "Sri Lankan Rupee",
-      "code": "CODE",
+      "code": "LKR",
       "sign": "Rs රු",
       "defaultValue": 363.435983,
       "countries": [
