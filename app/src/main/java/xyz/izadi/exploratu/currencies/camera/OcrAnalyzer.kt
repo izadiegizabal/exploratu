@@ -45,7 +45,7 @@ class OcrAnalyzer(
             )
             detector.process(image)
                 .addOnSuccessListener { text ->
-                    overlay.clear()
+                    overlay.clearOld()
                     // Task completed successfully
                     // Logic
                     detectNumbers(

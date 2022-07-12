@@ -1,5 +1,7 @@
 package xyz.izadi.exploratu.currencies.camera
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.SharedPreferences
 import android.graphics.*
 import android.util.Size
@@ -8,14 +10,15 @@ import java.text.DecimalFormat
 
 class OcrGraphic(
     overlay: GraphicOverlay<*>,
-    private val boundingBox: Rect,
-    private val number: Double,
+    override var boundingBox: Rect,
+    override val value: Double,
     private val graphic: Bitmap,
     private val sharedPreferences: SharedPreferences,
     private val isDarkTheme: Boolean = false,
     bufferSize: Size
 ) : GraphicOverlay.Graphic(overlay) {
     var id: Int = 0
+    private var animator: ValueAnimator? = null
 
     init {
 
@@ -58,7 +61,7 @@ class OcrGraphic(
 
         val conversionRate = sharedPreferences.getFloat("currency_conversion_rate_AR", 1f)
         val symbol = sharedPreferences.getString("currency_to_symbol", "")
-        val convertedNum = (number * conversionRate).toFloat()
+        val convertedNum = (value * conversionRate).toFloat()
         val roundedNum = when {
             convertedNum < 10000 -> {
                 Utils.round(convertedNum, 1)
@@ -89,11 +92,24 @@ class OcrGraphic(
         )
     }
 
-    companion object {
-        private const val TEXT_COLOR = Color.WHITE
-        private const val PRICE_COLOR = Color.BLACK
-        private lateinit var rectPaint: Paint
-        private lateinit var textPaint: Paint
+    override fun moveToNewPosition(newBoundingBox: Rect) {
+        animator?.cancel()
+        activeTime = System.currentTimeMillis()
+
+        animator = ObjectAnimator.ofMultiFloat(
+            this,
+            "boundingBox",
+            arrayOf(boundingBox.edges, newBoundingBox.edges)
+        ).apply {
+            duration = ANIMATION_DURATION_MS
+            addUpdateListener {
+                (it.animatedValue as? FloatArray)?.asRect()?.let { newRect ->
+                    boundingBox = newRect
+                    postInvalidate()
+                }
+            }
+            start()
+        }
     }
 
     private fun getApproxXToCenterText(
@@ -104,4 +120,21 @@ class OcrGraphic(
         val textWidth = p.measureText(text)
         return 72 + ((widthToFitStringInto - textWidth - 56) / 2f) - (p.textSize / 2f)
     }
+
+    companion object {
+        private const val TEXT_COLOR = Color.WHITE
+        private const val PRICE_COLOR = Color.BLACK
+        private const val ANIMATION_DURATION_MS: Long = 100
+        private lateinit var rectPaint: Paint
+        private lateinit var textPaint: Paint
+    }
 }
+
+private val Rect.edges
+    get() = listOf(left, top, right, bottom).map { it.toFloat() }.toFloatArray()
+
+private fun FloatArray.asRect(): Rect? = runCatching {
+    this.toList().map { it.toInt() }.let {
+        Rect(it[0], it[1], it[2], it[3])
+    }
+}.getOrNull()
