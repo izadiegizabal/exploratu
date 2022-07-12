@@ -19,9 +19,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/graphicOverlay">
+            app:layout_constraintTop_toTopOf="@+id/graphicOverlay" />
 
-        </androidx.camera.view.PreviewView>
+        <ImageView
+            android:id="@+id/paused_preview_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/graphicOverlay" />
 
         <xyz.izadi.exploratu.currencies.camera.GraphicOverlay
             android:id="@+id/graphicOverlay"

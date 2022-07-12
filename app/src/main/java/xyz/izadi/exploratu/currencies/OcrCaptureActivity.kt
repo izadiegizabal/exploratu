@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Network
@@ -14,6 +15,7 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Log
 import android.view.ScaleGestureDetector
+import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -25,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.liveData
+import coil.load
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
@@ -100,11 +103,7 @@ class OcrCaptureActivity :
             }
 
             cameraFab.setOnClickListener {
-                if (!isPreviewPaused) {
-                    startPreviewPause(true)
-                } else {
-                    startPreviewPause(false)
-                }
+                startPreviewPause(!isPreviewPaused)
             }
 
             setPreferredCurrencies()
@@ -155,7 +154,7 @@ class OcrCaptureActivity :
                 }
             }
         }
-        // TODO: replace the strings from resources
+
         MaterialAlertDialogBuilder(this@OcrCaptureActivity)
             .setTitle(getString(R.string.ar_warning_title))
             .setMessage(getString(R.string.ar_warning_message))
@@ -324,8 +323,8 @@ class OcrCaptureActivity :
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
-//    CAMERA STUFF    ////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
+    //    CAMERA STUFF    ////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
     private fun OcrCaptureBinding.startCamera() {
         // Bind the CameraProvider to the LifeCycleOwner
         val cameraSelector = CameraSelector.Builder().build()
@@ -423,9 +422,6 @@ class OcrCaptureActivity :
         if (!allPermissionsGranted()) {
             requestPermissionLauncher.launch(REQUIRED_PERMISSION)
         }
-        if (isPreviewPaused) {
-            binding.startPreviewPause(false)
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -450,12 +446,27 @@ class OcrCaptureActivity :
     private fun OcrCaptureBinding.startPreviewPause(pauseIt: Boolean) {
         if (pauseIt) {
             isPreviewPaused = true
+            previewView.bitmap?.let {
+                showPausedPreview(it)
+            }
             cameraProviderFuture.get().unbindAll()
             cameraFab.setImageResource(R.drawable.ic_play_arrow)
         } else {
+            hidePausedPreview()
             startCamera()
             cameraFab.setImageResource(R.drawable.ic_twotone_pause)
         }
+    }
+
+    private fun OcrCaptureBinding.showPausedPreview(bitmap: Bitmap) {
+        previewView.visibility = View.GONE
+        pausedPreviewView.load(bitmap)
+        pausedPreviewView.visibility = View.VISIBLE
+    }
+
+    private fun OcrCaptureBinding.hidePausedPreview() {
+        previewView.visibility = View.VISIBLE
+        pausedPreviewView.visibility = View.GONE
     }
 
     private fun OcrCaptureBinding.turnOnOffFlash() {

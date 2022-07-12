@@ -41,6 +41,7 @@ class CurrenciesViewModel @Inject constructor(
         }
     }
 
+
     val detectedCurrency
         get() = ratesRepository.getDetectedCurrency()
     val localeCurrency
@@ -49,7 +50,7 @@ class CurrenciesViewModel @Inject constructor(
     val currencies = ratesRepository.getCurrencies()
 
     val rates = ratesRepository.getRates()
-
+    
     fun syncRates() = viewModelScope.launch {
         ratesRepository.syncRates()
     }
