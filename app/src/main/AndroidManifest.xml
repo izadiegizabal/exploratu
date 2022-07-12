@@ -20,14 +20,6 @@
         android:supportsRtl="true"
         android:theme="@style/MyTheme.DayNight"
         tools:targetApi="s">
-        <!-- To download on-device API of ML Kit OCR -->
-        <meta-data
-            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-            android:value="ocr,barcode" />
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
         <activity
             android:name=".currencies.OcrCaptureActivity"
             android:exported="true">
@@ -37,5 +29,18 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="xyz.izadi.exploratu.initializer.AdmobInitializer"
+                android:value="androidx.startup" />
+        </provider>
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="" />
     </application>
 </manifest>
