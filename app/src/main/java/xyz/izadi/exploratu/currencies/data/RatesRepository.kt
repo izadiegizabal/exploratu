@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.withContext
-import xyz.izadi.exploratu.ApplicationScope
-import xyz.izadi.exploratu.IoDispatcher
 import xyz.izadi.exploratu.currencies.data.api.ExchangeRatesAPI
 import xyz.izadi.exploratu.currencies.data.models.Currencies
+import xyz.izadi.exploratu.di.ApplicationScope
+import xyz.izadi.exploratu.di.IoDispatcher
 import java.util.*
 import javax.inject.Inject
 

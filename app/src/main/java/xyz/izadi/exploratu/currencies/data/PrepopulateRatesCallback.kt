@@ -9,9 +9,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import xyz.izadi.exploratu.ApplicationScope
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.toRates
+import xyz.izadi.exploratu.di.ApplicationScope
 import javax.inject.Inject
 
 class PrepopulateRatesCallback @Inject constructor(
