@@ -83,6 +83,7 @@ class OcrCaptureActivity :
 
         binding = OcrCaptureBinding.inflate(layoutInflater)
         sharedPref = getPreferences(Context.MODE_PRIVATE)
+
         // Initialize our background executor
         cameraExecutor = Executors.newFixedThreadPool(4)
 
@@ -333,12 +334,14 @@ class OcrCaptureActivity :
     }
 
     private fun goToListView() {
-        if (isTaskRoot) {
-            Intent(this, MainActivity::class.java).also {
-                startActivity(it)
+        vm.showAd(this) {
+            if (isTaskRoot) {
+                Intent(this, MainActivity::class.java).also {
+                    startActivity(it)
+                }
+            } else {
+                finish()
             }
-        } else {
-            finish()
         }
     }
 
@@ -431,7 +434,12 @@ class OcrCaptureActivity :
 
     override fun onResume() {
         super.onResume()
-        vm.syncRates()
+
+        vm.apply {
+            syncRates()
+            loadAd()
+        }
+
         // Make sure that all permissions are still present, since the
         // user could have removed them while the app was in paused state.
         if (!allPermissionsGranted()) {

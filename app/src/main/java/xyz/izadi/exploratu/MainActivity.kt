@@ -4,14 +4,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
+import xyz.izadi.exploratu.currencies.CurrenciesViewModel
 import xyz.izadi.exploratu.currencies.CurrencyFragment
 import xyz.izadi.exploratu.currencies.OcrCaptureActivity
 import xyz.izadi.exploratu.databinding.ActivityMainBinding
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    private val vm by viewModels<CurrenciesViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,12 +28,14 @@ class MainActivity : AppCompatActivity() {
             }
 
             fab.setOnClickListener {
-                if (isTaskRoot) {
-                    Intent(this@MainActivity, OcrCaptureActivity::class.java).also {
-                        startActivity(it)
+                vm.showAd(this@MainActivity) {
+                    if (isTaskRoot) {
+                        Intent(this@MainActivity, OcrCaptureActivity::class.java).also {
+                            startActivity(it)
+                        }
+                    } else {
+                        finish()
                     }
-                } else {
-                    finish()
                 }
             }
         }.also {
@@ -52,4 +58,8 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onResume() {
+        super.onResume()
+        vm.loadAd()
+    }
 }
