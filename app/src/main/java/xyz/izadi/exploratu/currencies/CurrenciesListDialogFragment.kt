@@ -20,7 +20,6 @@ import xyz.izadi.exploratu.currencies.data.models.Currency
 import xyz.izadi.exploratu.currencies.others.Utils.updateCurrencyViews
 import xyz.izadi.exploratu.databinding.FragmentCurrenciesListDialogBinding
 import xyz.izadi.exploratu.databinding.FragmentCurrenciesListDialogItemBinding
-import java.util.*
 
 
 const val ARG_CURRENCIES = "currencies_object"
@@ -197,8 +196,8 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
                                 filteredList.add(currency)
                             }
                         }
-                        Currencies(2.0f, Date(), filteredList)
-                    }
+                        mCurrencies.copy(currencies = filteredList)
+                    }.ordered()
 
                     val filterResults = FilterResults()
                     filterResults.values = mCurrenciesFiltered
@@ -232,9 +231,13 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         fun newInstance(currencies: Currencies?): CurrenciesListDialogFragment =
             CurrenciesListDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(ARG_CURRENCIES, currencies)
+                    putParcelable(ARG_CURRENCIES, currencies?.ordered())
                 }
             }
 
     }
 }
+
+private fun Currencies.ordered(): Currencies = copy(
+    currencies = currencies.sortedBy { it.code }
+)
