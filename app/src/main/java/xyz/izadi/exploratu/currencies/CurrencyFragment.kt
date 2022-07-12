@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -21,6 +20,7 @@ import xyz.izadi.exploratu.R
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
 import xyz.izadi.exploratu.currencies.others.Utils
+import xyz.izadi.exploratu.currencies.others.Utils.updateCurrencyViews
 import xyz.izadi.exploratu.databinding.FragmentCurrencyBinding
 import java.util.*
 
@@ -114,39 +114,26 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
         activeCurCodes[listPos] = code
 
         // update tv
-        val curr = currencies?.getCurrency(code)
-        val flagPath = "file:///android_asset/flags/${curr?.code}.png"
+        val curr = currencies?.getCurrency(code) ?: return
         when (listPos) {
-            0 -> {
-                Picasso
-                    .get()
-                    .load(flagPath)
-                    .placeholder(R.drawable.ic_dollar_placeholder)
-                    .into(ivCurrency1Flag)
-                tvCurrency1Code.text = curr?.code
-                tvCurrency1Desc.text =
-                    context?.getString(R.string.currency_desc, curr?.name, curr?.sign)
-            }
-            1 -> {
-                Picasso
-                    .get()
-                    .load(flagPath)
-                    .placeholder(R.drawable.ic_dollar_placeholder)
-                    .into(ivCurrency2Flag)
-                tvCurrency2Code.text = curr?.code
-                tvCurrency2Desc.text =
-                    context?.getString(R.string.currency_desc, curr?.name, curr?.sign)
-            }
-            2 -> {
-                Picasso
-                    .get()
-                    .load(flagPath)
-                    .placeholder(R.drawable.ic_dollar_placeholder)
-                    .into(ivCurrency3Flag)
-                tvCurrency3Code.text = curr?.code
-                tvCurrency3Desc.text =
-                    context?.getString(R.string.currency_desc, curr?.name, curr?.sign)
-            }
+            0 -> context?.updateCurrencyViews(
+                currency = curr,
+                flagIv = ivCurrency1Flag,
+                codeTv = tvCurrency1Code,
+                descTv = tvCurrency1Desc
+            )
+            1 -> context?.updateCurrencyViews(
+                currency = curr,
+                flagIv = ivCurrency2Flag,
+                codeTv = tvCurrency2Code,
+                descTv = tvCurrency2Desc
+            )
+            2 -> context?.updateCurrencyViews(
+                currency = curr,
+                flagIv = ivCurrency3Flag,
+                codeTv = tvCurrency3Code,
+                descTv = tvCurrency3Desc
+            )
         }
 
         calculateConversions()

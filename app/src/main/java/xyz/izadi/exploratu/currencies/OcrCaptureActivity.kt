@@ -27,7 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.liveData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
-import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -38,6 +37,7 @@ import xyz.izadi.exploratu.currencies.camera.OcrGraphic
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
 import xyz.izadi.exploratu.currencies.others.Utils
+import xyz.izadi.exploratu.currencies.others.loadFlag
 import xyz.izadi.exploratu.databinding.OcrCaptureBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -228,16 +228,11 @@ class OcrCaptureActivity :
         val currencySymbolKey = "currency_to_symbol"
 
         // update tv
-        val curr = currencies?.getCurrency(code)
-        val currSign = curr?.sign?.split("/")?.getOrNull(0)
-        val flagPath = "file:///android_asset/flags/${code}.png"
+        val curr = currencies?.getCurrency(code) ?: return
+        val currSign = curr.sign.split("/").getOrNull(0)
         when (listPos) {
             0 -> {
-                Picasso
-                    .get()
-                    .load(flagPath)
-                    .placeholder(R.drawable.ic_dollar_placeholder)
-                    .into(ivCurrencyFromFlag)
+                ivCurrencyFromFlag.loadFlag(curr)
                 tvCurrencyFromCode.text = code
 
                 getPreferences(Context.MODE_PRIVATE) ?: return
@@ -247,11 +242,7 @@ class OcrCaptureActivity :
                 }
             }
             1 -> {
-                Picasso
-                    .get()
-                    .load(flagPath)
-                    .placeholder(R.drawable.ic_dollar_placeholder)
-                    .into(ivCurrencyToFlag)
+                ivCurrencyToFlag.loadFlag(curr)
                 tvCurrencyToCode.text = code
 
                 getPreferences(Context.MODE_PRIVATE) ?: return

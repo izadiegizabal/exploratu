@@ -15,10 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.squareup.picasso.Picasso
-import xyz.izadi.exploratu.R
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Currency
+import xyz.izadi.exploratu.currencies.others.Utils.updateCurrencyViews
 import xyz.izadi.exploratu.databinding.FragmentCurrenciesListDialogBinding
 import xyz.izadi.exploratu.databinding.FragmentCurrenciesListDialogItemBinding
 import java.util.*
@@ -166,16 +165,13 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             if (position < mCurrenciesFiltered.currencies.size) {
                 val currency = mCurrenciesFiltered.currencies[position]
-                holder.cod.text = currency.code
-                holder.desc.text =
-                    context?.getString(R.string.currency_desc, currency.name, currency.sign)
 
-                val flagPath = "file:///android_asset/flags/${currency.code}.png"
-                Picasso
-                    .get()
-                    .load(flagPath)
-                    .placeholder(R.drawable.ic_dollar_placeholder)
-                    .into(holder.flag)
+                context?.updateCurrencyViews(
+                    currency = currency,
+                    flagIv = holder.flag,
+                    codeTv = holder.cod,
+                    descTv = holder.desc
+                )
             }
         }
 
