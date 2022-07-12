@@ -47,9 +47,13 @@ android {
         }
     }
 
-    // Allow references to generated code
     kapt {
+        // Allow references to generated code
         correctErrorTypes = true
+
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
+        }
     }
 }
 
