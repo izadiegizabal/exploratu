@@ -96,7 +96,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-                mAdapter?.filter?.filter(query)
+                mAdapter.filter.filter(query)
                 return false
             }
 
@@ -106,7 +106,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-                mAdapter?.filter?.filter(newText)
+                mAdapter.filter.filter(newText)
                 return false
             }
         })
@@ -186,16 +186,16 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         override fun getFilter(): Filter {
             return object : Filter() {
                 override fun performFiltering(charSequence: CharSequence): FilterResults {
-                    val charString = charSequence.toString().toLowerCase(Locale.ROOT)
+                    val charString = charSequence.toString().lowercase()
 
                     mCurrenciesFiltered = if (charString.isEmpty()) {
                         mCurrencies
                     } else {
                         val filteredList = ArrayList<Currency>()
                         for (currency in mCurrencies.currencies) {
-                            if (currency.name.toLowerCase(Locale.ROOT).contains(charString)
-                                || currency.code.toLowerCase(Locale.ROOT).contains(charString)
-                                || currency.sign.toLowerCase(Locale.ROOT).contains(charString)
+                            if (currency.name.lowercase().contains(charString)
+                                || currency.code.lowercase().contains(charString)
+                                || currency.sign.lowercase().contains(charString)
                                 || countryNameMatch(currency.countries, charString)
                             ) {
                                 filteredList.add(currency)
@@ -225,7 +225,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
 
     private fun countryNameMatch(countries: Array<String>, query: String): Boolean {
         for (country in countries) {
-            if (country.toLowerCase(Locale.ROOT).contains(query)) {
+            if (country.lowercase().contains(query)) {
                 return true
             }
         }
