@@ -180,7 +180,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         }
 
         override fun getItemCount(): Int {
-            return mCurrenciesFiltered.totalCurrencies
+            return mCurrenciesFiltered.currencies.size
         }
 
         override fun getFilter(): Filter {
@@ -191,7 +191,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
                     mCurrenciesFiltered = if (charString.isEmpty()) {
                         mCurrencies
                     } else {
-                        val filteredList = ArrayList<Currency>()
+                        val filteredList = mutableListOf<Currency>()
                         for (currency in mCurrencies.currencies) {
                             if (currency.name.lowercase().contains(charString)
                                 || currency.code.lowercase().contains(charString)
@@ -201,7 +201,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
                                 filteredList.add(currency)
                             }
                         }
-                        Currencies(2.0f, Date(), filteredList.size, filteredList.toTypedArray())
+                        Currencies(2.0f, Date(), filteredList)
                     }
 
                     val filterResults = FilterResults()
@@ -223,7 +223,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun countryNameMatch(countries: Array<String>, query: String): Boolean {
+    private fun countryNameMatch(countries: List<String>, query: String): Boolean {
         for (country in countries) {
             if (country.lowercase().contains(query)) {
                 return true

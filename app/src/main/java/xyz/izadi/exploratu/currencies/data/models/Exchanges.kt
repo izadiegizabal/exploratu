@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 
 @Entity
 data class Exchanges(
-    @PrimaryKey(autoGenerate = true) val id: Int? = null,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @SerializedName("aud") val AUD: Float = 1f,
     @SerializedName("bgn") val BGN: Float = 1f,
     @SerializedName("brl") val BRL: Float = 1f,
@@ -156,7 +156,156 @@ data class Exchanges(
     @SerializedName("zmw") val ZMW: Float = 1f,
     @SerializedName("zwl") val ZWL: Float = 1f
 ) {
-    fun getRate(from: String): Float? = runCatching {
-        Exchanges::class.java.getDeclaredField(from).getFloat(this)
-    }.getOrNull()
+    // TODO: use a map instead of different variables
+    fun getRate(from: String): Float? = when (from.uppercase()) {
+        "AUD" -> AUD
+        "BGN" -> BGN
+        "BRL" -> BRL
+        "CAD" -> CAD
+        "CHF" -> CHF
+        "CNY" -> CNY
+        "CZK" -> CZK
+        "DKK" -> DKK
+        "EUR" -> EUR
+        "GBP" -> GBP
+        "HKD" -> HKD
+        "HRK" -> HRK
+        "HUF" -> HUF
+        "IDR" -> IDR
+        "ILS" -> ILS
+        "INR" -> INR
+        "ISK" -> ISK
+        "JPY" -> JPY
+        "KRW" -> KRW
+        "MXN" -> MXN
+        "MYR" -> MYR
+        "NOK" -> NOK
+        "NZD" -> NZD
+        "PHP" -> PHP
+        "PLN" -> PLN
+        "RON" -> RON
+        "RUB" -> RUB
+        "SEK" -> SEK
+        "SGD" -> SGD
+        "THB" -> THB
+        "TRY" -> TRY
+        "USD" -> USD
+        "ZAR" -> ZAR
+        "AED" -> AED
+        "AFN" -> AFN
+        "ALL" -> ALL
+        "AMD" -> AMD
+        "ANG" -> ANG
+        "AOA" -> AOA
+        "ARS" -> ARS
+        "AWG" -> AWG
+        "AZN" -> AZN
+        "BAM" -> BAM
+        "BBD" -> BBD
+        "BDT" -> BDT
+        "BHD" -> BHD
+        "BIF" -> BIF
+        "BMD" -> BMD
+        "BOB" -> BOB
+        "BSD" -> BSD
+        "BTN" -> BTN
+        "BWP" -> BWP
+        "BYN" -> BYN
+        "BZD" -> BZD
+        "CDF" -> CDF
+        "CLP" -> CLP
+        "COP" -> COP
+        "CRC" -> CRC
+        "CUP" -> CUP
+        "CVE" -> CVE
+        "DOP" -> DOP
+        "DZD" -> DZD
+        "EGP" -> EGP
+        "ERN" -> ERN
+        "ETB" -> ETB
+        "FJD" -> FJD
+        "FKP" -> FKP
+        "GEL" -> GEL
+        "GHS" -> GHS
+        "GMD" -> GMD
+        "GNF" -> GNF
+        "GTQ" -> GTQ
+        "GYD" -> GYD
+        "HNL" -> HNL
+        "HTG" -> HTG
+        "IQD" -> IQD
+        "IRR" -> IRR
+        "JMD" -> JMD
+        "JOD" -> JOD
+        "KES" -> KES
+        "KGS" -> KGS
+        "KHR" -> KHR
+        "KMF" -> KMF
+        "KPW" -> KPW
+        "KWD" -> KWD
+        "KYD" -> KYD
+        "KZT" -> KZT
+        "LAK" -> LAK
+        "LBP" -> LBP
+        "LKR" -> LKR
+        "LRD" -> LRD
+        "LSL" -> LSL
+        "LYD" -> LYD
+        "MAD" -> MAD
+        "MDL" -> MDL
+        "MGA" -> MGA
+        "MKD" -> MKD
+        "MMK" -> MMK
+        "MNT" -> MNT
+        "MOP" -> MOP
+        "MUR" -> MUR
+        "MVR" -> MVR
+        "MWK" -> MWK
+        "MZN" -> MZN
+        "NAD" -> NAD
+        "NGN" -> NGN
+        "NIO" -> NIO
+        "NPR" -> NPR
+        "OMR" -> OMR
+        "PAB" -> PAB
+        "PEN" -> PEN
+        "PGK" -> PGK
+        "PKR" -> PKR
+        "PYG" -> PYG
+        "QAR" -> QAR
+        "RSD" -> RSD
+        "RWF" -> RWF
+        "SAR" -> SAR
+        "SBD" -> SBD
+        "SCR" -> SCR
+        "SDG" -> SDG
+        "SHP" -> SHP
+        "SLL" -> SLL
+        "SOS" -> SOS
+        "SRD" -> SRD
+        "SYP" -> SYP
+        "SZL" -> SZL
+        "TJS" -> TJS
+        "TMT" -> TMT
+        "TND" -> TND
+        "TOP" -> TOP
+        "TTD" -> TTD
+        "TWD" -> TWD
+        "TZS" -> TZS
+        "UAH" -> UAH
+        "UGX" -> UGX
+        "UYU" -> UYU
+        "UZS" -> UZS
+        "VND" -> VND
+        "VUV" -> VUV
+        "WST" -> WST
+        "XAF" -> XAF
+        "XCD" -> XCD
+        "XOF" -> XOF
+        "XPF" -> XPF
+        "YER" -> YER
+        "ZMW" -> ZMW
+        "ZWL" -> ZWL
+        else -> null
+    }
 }

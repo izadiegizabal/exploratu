@@ -10,7 +10,7 @@ import java.util.*
 
 @Entity
 data class Rates(
-    @PrimaryKey
+    @[PrimaryKey SerializedName("date")]
     val date: Date?,
     @[Embedded SerializedName("eur")]
     val rates: Exchanges?

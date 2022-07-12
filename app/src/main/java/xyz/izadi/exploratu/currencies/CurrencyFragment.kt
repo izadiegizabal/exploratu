@@ -41,7 +41,7 @@ class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
     private var selectingCurrencyIndex = -1
     private var activeCurrencyAmount = ""
     private var isDefaultValue = true
-    private val activeCurCodes = ArrayList<String>()
+    private val activeCurCodes = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

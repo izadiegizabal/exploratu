@@ -25,8 +25,8 @@ class OcrAnalyzer(
     private val overlay: GraphicOverlay<GraphicOverlay.Graphic>,
     listener: OCRListener? = null
 ) : ImageAnalysis.Analyzer {
-    private var mToast = Toast(context)
-    private val mListeners = ArrayList<OCRListener>().apply { listener?.let { add(it) } }
+    private var mToast: Toast? = null
+    private val mListeners = mutableListOf<OCRListener>().apply { listener?.let { add(it) } }
     private val detector = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     @SuppressLint("UnsafeExperimentalUsageError")
@@ -68,13 +68,10 @@ class OcrAnalyzer(
 
     @SuppressLint("ShowToast")
     private fun showAToast(st: String?) {
-        try {
-            mToast.view?.isShown // true if visible
-            mToast.setText(st)
-        } catch (e: java.lang.Exception) {         // invisible if exception
-            mToast = Toast.makeText(context, st, Toast.LENGTH_LONG)
+        mToast?.cancel()
+        mToast = Toast.makeText(context, st, Toast.LENGTH_LONG)?.also {
+            it.show()
         }
-        mToast.show() //finally display it
     }
 
     private fun detectNumbers(items: List<Text.TextBlock>, bufferSize: Size) {

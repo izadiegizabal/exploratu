@@ -64,8 +64,9 @@ class RatesRepository @Inject constructor(
         getCurrencyCodeFromLocale(Locale("", countryISO))
     }.getOrNull()
 
-    fun getCurrencyCodeFromDeviceLocale(): String? =
-        getCurrencyCodeFromLocale(Locale.getDefault())
+    fun getCurrencyCodeFromDeviceLocale(): String? = getCurrencyCodeFromLocale(
+        context.resources.configuration.locales.get(0)
+    )
 
     private fun getCurrencyCodeFromLocale(locale: Locale): String? {
         try {

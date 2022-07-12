@@ -42,11 +42,7 @@ import xyz.izadi.exploratu.databinding.OcrCaptureBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-// This is an array of all the permission specified in the manifest.
 private const val REQUIRED_PERMISSION = Manifest.permission.CAMERA
-
-private const val RATIO_4_3_VALUE = 4.0 / 3.0
-private const val RATIO_16_9_VALUE = 16.0 / 9.0
 
 @AndroidEntryPoint
 class OcrCaptureActivity :
@@ -69,7 +65,7 @@ class OcrCaptureActivity :
     private var currencies: Currencies? = null
     private var activeCurrencyIndex = 0
     private var selectingCurrencyIndex = -1
-    private val activeCurCodes = ArrayList<String>()
+    private val activeCurCodes = mutableListOf<String>()
     private lateinit var sharedPref: SharedPreferences
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
@@ -210,27 +206,18 @@ class OcrCaptureActivity :
         // read preferences to load
         val fromKey = "currency_code_from"
         val toKey = "currency_code_to"
-        val defaultFromCurrencyCode = "EUR"
-        val defaultToCurrencyCode = "USD"
+        val defaultFromCurrencyCode = vm.detectedCurrency ?: "EUR"
+        val defaultToCurrencyCode = vm.localeCurrency ?: "USD"
 
-        if (!sharedPref.contains(fromKey)) {
-            val fromCode = vm.detectedCurrency
-            activeCurCodes.add(fromCode ?: defaultFromCurrencyCode)
-        } else {
-            activeCurCodes.add(
-                sharedPref.getString(fromKey, defaultFromCurrencyCode) ?: return
-            )
+        (sharedPref.getString(fromKey, defaultFromCurrencyCode) ?: defaultFromCurrencyCode).let {
+            activeCurCodes.add(it)
+            loadCurrencyTo(it, 0)
         }
 
-        if (!sharedPref.contains(toKey)) {
-            activeCurCodes.add(vm.localeCurrency ?: defaultFromCurrencyCode)
-        } else {
-            activeCurCodes.add(sharedPref.getString(toKey, defaultToCurrencyCode) ?: return)
+        (sharedPref.getString(toKey, defaultToCurrencyCode) ?: defaultToCurrencyCode).let {
+            activeCurCodes.add(it)
+            loadCurrencyTo(it, 1)
         }
-
-        // load them
-        loadCurrencyTo(activeCurCodes[0], 0)
-        loadCurrencyTo(activeCurCodes[1], 1)
     }
 
     private fun OcrCaptureBinding.loadCurrencyTo(code: String, listPos: Int) {
