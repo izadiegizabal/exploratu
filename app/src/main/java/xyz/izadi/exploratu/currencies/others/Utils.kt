@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.Resources.getSystem
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.view.View
@@ -139,3 +140,8 @@ object Utils {
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 }
+
+val Int.dp: Int get() = (this / getSystem().displayMetrics.density).toInt()
+
+val Int.px: Int get() = (this * getSystem().displayMetrics.density).toInt()
+

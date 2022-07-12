@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.graphics.*
 import android.util.Size
 import xyz.izadi.exploratu.currencies.others.Utils
+import xyz.izadi.exploratu.currencies.others.dp
 import java.text.DecimalFormat
 
 class OcrGraphic(
@@ -78,18 +79,29 @@ class OcrGraphic(
 
         val end = translateX(boundingBox.right.toFloat())
         val bottom = translateY(boundingBox.bottom.toFloat())
-        canvas.drawBitmap(
-            graphic,
-            end,
-            (bottom - (boundingBox.height() / 2 + graphic.height / 2 + 15)),
-            textPaint
-        )
-        canvas.drawText(
-            convertedSting,
-            end + getApproxXToCenterText(convertedSting, textPaint, graphic.width),
-            (bottom - (boundingBox.height() / 2 - 4)),
-            textPaint
-        )
+        if (doesThisFitInCanvas(canvas)) {
+            canvas.drawBitmap(
+                graphic,
+                end,
+                (bottom - (boundingBox.height() / 2 + graphic.height / 2 + 15)),
+                textPaint
+            )
+            canvas.drawText(
+                convertedSting,
+                end + getApproxXToCenterText(convertedSting, textPaint, graphic.width),
+                (bottom - (boundingBox.height() / 2 - 4)),
+                textPaint
+            )
+        }
+    }
+
+    private fun doesThisFitInCanvas(canvas: Canvas): Boolean {
+        val maxRight = translateX(boundingBox.right.toFloat()) + (graphic.width / 2)
+        val maxLeft = translateX(boundingBox.left.toFloat())
+        val maxTop = translateY(boundingBox.top.toFloat())
+        val maxBottom = translateY(boundingBox.bottom.toFloat()) + graphic.height.toFloat() + 56.dp
+
+        return !(maxRight > canvas.width || maxLeft < 0 || maxTop < 0 || maxBottom > canvas.height)
     }
 
     override fun moveToNewPosition(newBoundingBox: Rect) {
