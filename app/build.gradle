@@ -16,8 +16,8 @@ android {
         applicationId "xyz.izadi.exploratu"
         minSdk 23
         targetSdk 32
-        versionCode 11
-        versionName "0.3-dev"
+        versionCode 12
+        versionName "1.1.0-dev"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -31,6 +31,9 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
     buildFeatures {
