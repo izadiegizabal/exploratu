@@ -21,11 +21,12 @@ import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
 import xyz.izadi.exploratu.currencies.others.Utils
 import xyz.izadi.exploratu.currencies.others.Utils.updateCurrencyViews
+import xyz.izadi.exploratu.currencies.ui.rv.CurrenciesAdapter
 import xyz.izadi.exploratu.databinding.FragmentCurrencyBinding
 import java.util.*
 
 @AndroidEntryPoint
-class CurrencyFragment : Fragment(), CurrenciesListDialogFragment.Listener {
+class CurrencyFragment : Fragment(), CurrenciesAdapter.Listener {
     private var _binding: FragmentCurrencyBinding? = null
 
     // This property is only valid between onCreateView and

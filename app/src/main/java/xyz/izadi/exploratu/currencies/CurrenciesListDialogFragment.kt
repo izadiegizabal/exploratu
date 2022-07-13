@@ -1,14 +1,11 @@
 package xyz.izadi.exploratu.currencies
 
 import android.app.Activity
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Filter
-import android.widget.Filterable
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,10 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import xyz.izadi.exploratu.currencies.data.models.Currencies
-import xyz.izadi.exploratu.currencies.data.models.Currency
-import xyz.izadi.exploratu.currencies.others.Utils.updateCurrencyViews
+import xyz.izadi.exploratu.currencies.ui.rv.CurrenciesAdapter
+import xyz.izadi.exploratu.currencies.ui.rv.ordered
 import xyz.izadi.exploratu.databinding.FragmentCurrenciesListDialogBinding
-import xyz.izadi.exploratu.databinding.FragmentCurrenciesListDialogItemBinding
 
 
 const val ARG_CURRENCIES = "currencies_object"
@@ -35,7 +31,7 @@ const val ARG_CURRENCIES = "currencies_object"
  *
  * You activity (or fragment) needs to implement [CurrenciesListDialogFragment.Listener].
  */
-class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
+class CurrenciesListDialogFragment : BottomSheetDialogFragment(), CurrenciesAdapter.Listener {
 
     private var _binding: FragmentCurrenciesListDialogBinding? = null
 
@@ -44,7 +40,6 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
     private val binding
         get() = _binding
 
-    private var mListener: Listener? = null
     private lateinit var mAdapter: CurrenciesAdapter
 
     override fun onCreateView(
@@ -55,12 +50,19 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
     }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        mAdapter = CurrenciesAdapter(requireArguments().getParcelable(ARG_CURRENCIES)!!)
+
+        mAdapter = CurrenciesAdapter(
+            context = context ?: return,
+            currencies = requireArguments().getParcelable(ARG_CURRENCIES) ?: return,
+            listener = this
+        )
 
         binding?.apply {
             rvCurrencyList.apply {
                 layoutManager = LinearLayoutManager(context)
                 adapter = mAdapter
+                setHasFixedSize(true)
+                setItemViewCacheSize(20)
             }
             setUpQueryListener()
             setUpScrollListener()
@@ -101,131 +103,12 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 val parentWithBSBehavior = clBsCurrencySelector.parent as FrameLayout
                 val mBottomSheetBehavior = BottomSheetBehavior.from(parentWithBSBehavior)
-
                 mBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
                 mAdapter.filter.filter(newText)
                 return false
             }
         })
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        val parent = parentFragment
-        mListener = if (parent != null) {
-            parent as Listener
-        } else {
-            context as Listener
-        }
-    }
-
-    override fun onDetach() {
-        mListener = null
-        super.onDetach()
-    }
-
-    interface Listener {
-        fun onCurrencyClicked(code: String)
-    }
-
-    private inner class ViewHolder constructor(
-        inflater: LayoutInflater,
-        parent: ViewGroup,
-        binding: FragmentCurrenciesListDialogItemBinding = FragmentCurrenciesListDialogItemBinding.inflate(
-            inflater,
-            parent,
-            false
-        )
-    ) : RecyclerView.ViewHolder(binding.root) {
-
-        val flag = binding.ivCurrencyFlag
-        val cod = binding.tvCurrencyCode
-        val desc = binding.tvCurrencyDesc
-
-        init {
-            itemView.setOnClickListener {
-                mListener?.let {
-                    it.onCurrencyClicked(cod.text.toString())
-                    dismiss()
-                }
-            }
-        }
-    }
-
-    private inner class CurrenciesAdapter internal constructor(
-        private val mCurrencies: Currencies,
-        private var mCurrenciesFiltered: Currencies = mCurrencies
-    ) : RecyclerView.Adapter<ViewHolder>(), Filterable {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            return ViewHolder(LayoutInflater.from(parent.context), parent)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            if (position < mCurrenciesFiltered.currencies.size) {
-                val currency = mCurrenciesFiltered.currencies[position]
-
-                context?.updateCurrencyViews(
-                    currency = currency,
-                    flagIv = holder.flag,
-                    codeTv = holder.cod,
-                    descTv = holder.desc
-                )
-            }
-        }
-
-        override fun getItemCount(): Int {
-            return mCurrenciesFiltered.currencies.size
-        }
-
-        override fun getFilter(): Filter {
-            return object : Filter() {
-                override fun performFiltering(charSequence: CharSequence): FilterResults {
-                    val charString = charSequence.toString().lowercase()
-
-                    mCurrenciesFiltered = if (charString.isEmpty()) {
-                        mCurrencies
-                    } else {
-                        val filteredList = mutableListOf<Currency>()
-                        for (currency in mCurrencies.currencies) {
-                            if (currency.name.lowercase().contains(charString)
-                                || currency.code.lowercase().contains(charString)
-                                || currency.sign.lowercase().contains(charString)
-                                || countryNameMatch(currency.countries, charString)
-                            ) {
-                                filteredList.add(currency)
-                            }
-                        }
-                        mCurrencies.copy(currencies = filteredList)
-                    }.ordered()
-
-                    val filterResults = FilterResults()
-                    filterResults.values = mCurrenciesFiltered
-
-                    return filterResults
-                }
-
-                override fun publishResults(
-                    charSequence: CharSequence,
-                    filterResults: FilterResults
-                ) {
-                    mCurrenciesFiltered = filterResults.values as Currencies
-
-                    // refresh the list with filtered data
-                    notifyDataSetChanged()
-                }
-            }
-        }
-    }
-
-    private fun countryNameMatch(countries: List<String>, query: String): Boolean {
-        for (country in countries) {
-            if (country.lowercase().contains(query)) {
-                return true
-            }
-        }
-        return false
-    }
 
     companion object {
         fun newInstance(currencies: Currencies?): CurrenciesListDialogFragment =
@@ -234,10 +117,10 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment() {
                     putParcelable(ARG_CURRENCIES, currencies?.ordered())
                 }
             }
+    }
 
+    override fun onCurrencyClicked(code: String) {
+        ((parentFragment ?: context) as? CurrenciesAdapter.Listener)?.onCurrencyClicked(code)
+        dismiss()
     }
 }
-
-private fun Currencies.ordered(): Currencies = copy(
-    currencies = currencies.sortedBy { it.code }
-)

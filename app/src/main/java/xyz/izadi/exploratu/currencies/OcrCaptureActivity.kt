@@ -41,6 +41,7 @@ import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Rates
 import xyz.izadi.exploratu.currencies.others.Utils
 import xyz.izadi.exploratu.currencies.others.loadFlag
+import xyz.izadi.exploratu.currencies.ui.rv.CurrenciesAdapter
 import xyz.izadi.exploratu.databinding.OcrCaptureBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -50,7 +51,7 @@ private const val REQUIRED_PERMISSION = Manifest.permission.CAMERA
 @AndroidEntryPoint
 class OcrCaptureActivity :
     AppCompatActivity(),
-    CurrenciesListDialogFragment.Listener {
+    CurrenciesAdapter.Listener {
 
     private lateinit var binding: OcrCaptureBinding
 
