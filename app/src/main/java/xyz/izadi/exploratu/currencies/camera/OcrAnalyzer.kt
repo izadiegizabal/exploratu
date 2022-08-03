@@ -2,33 +2,32 @@ package xyz.izadi.exploratu.currencies.camera
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.util.Size
 import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
-import com.google.firebase.ml.vision.text.FirebaseVisionText
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.Text
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
 /** Helper type alias used for analysis use case callbacks */
-typealias OCRListener = (price: FirebaseVisionText.Element, bufferSize: Size) -> Unit
+typealias OCRListener = (price: Price, bufferSize: Size) -> Unit
+
+data class Price(
+    val amount: Double,
+    val boundingBox: Rect
+)
 
 class OcrAnalyzer(
     private val context: Context,
-    private val overlay: GraphicOverlay<OcrGraphic>,
+    private val overlay: GraphicOverlay<GraphicOverlay.Graphic>,
     listener: OCRListener? = null
 ) : ImageAnalysis.Analyzer {
-    private var mToast = Toast(context)
-    private val mListeners = ArrayList<OCRListener>().apply { listener?.let { add(it) } }
-
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
-        0 -> FirebaseVisionImageMetadata.ROTATION_0
-        90 -> FirebaseVisionImageMetadata.ROTATION_90
-        180 -> FirebaseVisionImageMetadata.ROTATION_180
-        270 -> FirebaseVisionImageMetadata.ROTATION_270
-        else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
-    }
+    private var mToast: Toast? = null
+    private val mListeners = mutableListOf<OCRListener>().apply { listener?.let { add(it) } }
+    private val detector = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     @SuppressLint("UnsafeExperimentalUsageError")
     override fun analyze(imageProxy: ImageProxy) {
@@ -39,17 +38,18 @@ class OcrAnalyzer(
         }
 
         val mediaImage = imageProxy.image
-        val imageRotation = degreesToFirebaseRotation(imageProxy.imageInfo.rotationDegrees)
         if (mediaImage != null) {
-            val firebaseImage = FirebaseVisionImage.fromMediaImage(mediaImage, imageRotation)
-            val detector = FirebaseVision.getInstance().onDeviceTextRecognizer
-            val result = detector.processImage(firebaseImage)
-                .addOnSuccessListener { firebaseVisionText ->
-                    overlay.clear()
+            val image = InputImage.fromMediaImage(
+                mediaImage,
+                imageProxy.imageInfo.rotationDegrees
+            )
+            detector.process(image)
+                .addOnSuccessListener { text ->
+                    overlay.clearOld()
                     // Task completed successfully
                     // Logic
                     detectNumbers(
-                        firebaseVisionText.textBlocks,
+                        text.textBlocks,
                         Size(mediaImage.width, mediaImage.height)
                     )
                     // Close img for next use
@@ -68,16 +68,13 @@ class OcrAnalyzer(
 
     @SuppressLint("ShowToast")
     private fun showAToast(st: String?) {
-        try {
-            mToast.view.isShown // true if visible
-            mToast.setText(st)
-        } catch (e: java.lang.Exception) {         // invisible if exception
-            mToast = Toast.makeText(context, st, Toast.LENGTH_LONG)
+        mToast?.cancel()
+        mToast = Toast.makeText(context, st, Toast.LENGTH_LONG)?.also {
+            it.show()
         }
-        mToast.show() //finally display it
     }
 
-    private fun detectNumbers(items: List<FirebaseVisionText.TextBlock>, bufferSize: Size) {
+    private fun detectNumbers(items: List<Text.TextBlock>, bufferSize: Size) {
         for (i in items.indices) {
             val item = items[i]
             val lines = item.lines
@@ -86,17 +83,15 @@ class OcrAnalyzer(
                     val words = line.elements
                     for (word in words) {
                         if (word != null) {
-                            val number = extractNumbers(word.text)
-                            val numberDouble = number!!.toDoubleOrNull()
-                            if (numberDouble != null) {
-                                val extracted = FirebaseVisionText.Element(
-                                    numberDouble.toString(),
-                                    word.boundingBox,
-                                    word.recognizedLanguages,
-                                    word.confidence
-                                )
-                                // Call all listeners with new value
-                                mListeners.forEach { it(extracted, bufferSize) }
+                            word.text.number?.takeIf { it > 0.0 }?.let { amount ->
+                                word.boundingBox?.let { rect ->
+                                    val extracted = Price(
+                                        amount = amount,
+                                        boundingBox = rect,
+                                    )
+                                    // Call all listeners with new value
+                                    mListeners.forEach { it(extracted, bufferSize) }
+                                }
                             }
                         }
                     }
@@ -106,21 +101,25 @@ class OcrAnalyzer(
     }
 
     // Extracts numbers from the passed string, returns null if there aren't
-    private fun extractNumbers(originalString: String): String? {
-        val regexNotNumbersCommaDot =
-            Regex("([^0-9.,]+[.,])") // select everything except numbers with commas/dots
-        val onlyNumbers =
-            originalString.replace(regexNotNumbersCommaDot, "") //remove irrelevant chars
-        val dottedPriceRegex = Regex("\\d+([.,])\\d{1,4}") // select numbers with decimals
-        var value = dottedPriceRegex.find(onlyNumbers)?.value
-        if (value != null) {
-            value = value.replace(',', '.')
-            val valueParts = value.split(".")
-            if (valueParts.size > 1 && valueParts[1].length > 2) { // if more than two decimals --> is not decimal, is 1.000s
-                value = valueParts[0] + valueParts[1]
-            }
-            return value
+    private val String.number: Double?
+        get() {
+            // select everything except numbers with commas/dots
+            val regexNotNumbersCommaDot = Regex("([^0-9.,]+[.,])")
+            //remove irrelevant chars
+            val onlyNumbers = replace(regexNotNumbersCommaDot, "")
+            // select numbers with decimals
+            val dottedPriceRegex = Regex("\\d+([.,])\\d{1,4}")
+            var value = dottedPriceRegex.find(onlyNumbers)?.value
+            return if (value != null) {
+                value = value.replace(',', '.')
+                val valueParts = value.split(".")
+                // if more than two decimals --> is not decimal, is 1.000s
+                if (valueParts.size > 1 && valueParts[1].length > 2) {
+                    value = valueParts[0] + valueParts[1]
+                }
+                value
+            } else {
+                onlyNumbers
+            }.toDoubleOrNull()
         }
-        return onlyNumbers
-    }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="xyz.izadi.exploratu">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="xyz.izadi.exploratu">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -8,30 +9,38 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/MyTheme.DayNight"
-            android:configChanges="uiMode"
-            android:fullBackupContent="@xml/backup_descriptor">
-        <!-- To download on-device API of ML Kit OCR -->
-        <meta-data
-                android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-                android:value="ocr,barcode" />
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+        android:name=".ExploratuApplication"
+        android:allowBackup="true"
+        android:configChanges="uiMode"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/MyTheme.DayNight"
+        tools:targetApi="s">
         <activity
-                android:name=".currencies.OcrCaptureActivity"
-                android:label="@string/app_name"
-                android:launchMode="singleInstance">
+            android:name=".currencies.OcrCaptureActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-                android:name=".MainActivity" />
-    </application>
+        <activity android:name=".MainActivity" />
 
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="xyz.izadi.exploratu.initializer.AdmobInitializer"
+                android:value="androidx.startup" />
+        </provider>
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="" />
+    </application>
 </manifest>

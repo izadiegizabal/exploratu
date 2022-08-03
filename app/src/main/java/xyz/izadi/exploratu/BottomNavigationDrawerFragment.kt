@@ -1,11 +1,13 @@
 package xyz.izadi.exploratu
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.fragment_bottom_navigation_drawer.*
+import xyz.izadi.exploratu.databinding.FragmentBottomNavigationDrawerBinding
 
 class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
 
@@ -13,21 +15,18 @@ class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_bottom_navigation_drawer, container, false)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        navigation_view.setNavigationItemSelectedListener { menuItem ->
-            // Bottom Navigation Drawer menu item clicks
+    ): View = FragmentBottomNavigationDrawerBinding.inflate(inflater, container, false).apply {
+        navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                // R.id.nav1 -> context!!.toast(getString(R.string.nav1_clicked))
+                R.id.follow_us -> startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://twitter.com/izadiegizabal")
+                    )
+                )
+                else -> dismiss()
             }
-            // Add code here to update the UI based on the item selected
-            // For example, swap UI fragments here
             true
         }
-    }
+    }.root
 }

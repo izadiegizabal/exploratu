@@ -17,13 +17,13 @@ package xyz.izadi.exploratu.currencies.camera
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Size
 import android.view.View
 import androidx.camera.core.CameraSelector
 import xyz.izadi.exploratu.currencies.camera.GraphicOverlay.Graphic
-import java.util.*
 
 /**
  * A view which renders a series of custom graphics to be overlaid on top of an associated preview
@@ -61,6 +61,9 @@ class GraphicOverlay<T : Graphic>(context: Context, attrs: AttributeSet) :
      * graphics element.  Add instances to the overlay using [GraphicOverlay.add].
      */
     abstract class Graphic(private val mOverlay: GraphicOverlay<*>) {
+        abstract val value: Double
+        abstract val boundingBox: Rect
+        var activeTime = System.currentTimeMillis()
 
         /**
          * Draw the graphic on the supplied canvas.  Drawing should use the following methods to
@@ -132,6 +135,8 @@ class GraphicOverlay<T : Graphic>(context: Context, attrs: AttributeSet) :
             mOverlay.heightScaleFactor = mOverlay.height.toFloat() / bufferSize.width.toFloat()
         }
 
+        abstract fun moveToNewPosition(newBoundingBox: Rect)
+
         fun postInvalidate() {
             mOverlay.postInvalidate()
         }
@@ -147,10 +152,16 @@ class GraphicOverlay<T : Graphic>(context: Context, attrs: AttributeSet) :
 
     // Adds a graphic to the overlay.
     fun add(graphic: T) {
-        synchronized(lock) {
-            graphics.add(graphic)
-        }
-        postInvalidate()
+        graphics
+            .filter { it.value == graphic.value }
+            .getOrNull(0)
+            ?.moveToNewPosition(graphic.boundingBox)
+            ?: run {
+                synchronized(lock) {
+                    graphics.add(graphic)
+                }
+                postInvalidate()
+            }
     }
 
     // Removes a graphic from the overlay.
@@ -200,5 +211,14 @@ class GraphicOverlay<T : Graphic>(context: Context, attrs: AttributeSet) :
                 graphic.draw(canvas)
             }
         }
+    }
+
+    fun clearOld() {
+        graphics.filter { it.activeTime + 200 < System.currentTimeMillis() }.forEach {
+            synchronized(lock) {
+                graphics.remove(it)
+            }
+        }
+        postInvalidate()
     }
 }

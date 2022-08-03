@@ -76,3 +76,5 @@ lint/tmp/
 app/.classpath
 
 app/.DS_Store
+
+.DS_Store

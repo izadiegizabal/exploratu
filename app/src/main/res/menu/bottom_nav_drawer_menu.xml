@@ -16,9 +16,8 @@
                 android:enabled="false"
                 android:title="@string/mode_title_more" />
         <item
-                android:id="@+id/nav4"
-                android:checkable="false"
-                android:enabled="false"
+                android:id="@+id/follow_us"
+                android:enabled="true"
                 android:title="@string/follow_me_twitter" />
     </group>
 </menu>
