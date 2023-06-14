@@ -3,12 +3,18 @@ package xyz.izadi.exploratu.currencies.others
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources.getSystem
+import android.os.Build
+import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import coil.load
 import xyz.izadi.exploratu.R
+import xyz.izadi.exploratu.currencies.ARG_CURRENCIES
+import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.Currency
+import xyz.izadi.exploratu.currencies.ui.rv.CurrenciesAdapter
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 object Utils {
@@ -16,7 +22,7 @@ object Utils {
     fun round(numberToRound: Float, decimalPlaces: Int): Float {
         try {
             var bd = BigDecimal(numberToRound.toString())
-            bd = bd.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP)
+            bd = bd.setScale(decimalPlaces, RoundingMode.HALF_UP)
             return bd.toFloat()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -121,3 +127,10 @@ fun ImageView.loadFlag(currency: Currency) {
     }
 }
 
+inline fun <reified T> Bundle.getParcelableCompat(key: String): T? =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelable(key, T::class.java)
+    } else {
+        @Suppress("deprecation")
+        getParcelable(key) as? T
+    }

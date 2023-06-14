@@ -4,10 +4,12 @@ import android.text.format.DateUtils
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.RoomWarnings
 import com.google.gson.annotations.SerializedName
 import xyz.izadi.exploratu.currencies.others.Utils
 import java.util.*
 
+@Suppress(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
 @Entity
 data class Rates(
     @[PrimaryKey SerializedName("date")]
