@@ -3,9 +3,9 @@
 buildscript {
     ext {
         // https://github.com/JetBrains/kotlin/releases
-        kotlin_version = '1.9.10'
+        kotlin_version = '1.9.21'
         // https://github.com/google/dagger/releases
-        hilt_version = "2.48"
+        hilt_version = "2.49"
     }
     repositories {
         google()
@@ -14,11 +14,11 @@ buildscript {
 
     dependencies {
         // https://developer.android.com/reference/tools/gradle-api
-        classpath "com.android.tools.build:gradle:8.1.1"
+        classpath "com.android.tools.build:gradle:8.2.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // https://developers.google.com/android/guides/google-services-plugin
-        classpath "com.google.gms:google-services:4.3.15"
+        classpath "com.google.gms:google-services:4.4.0"
         // https://mvnrepository.com/artifact/com.google.firebase/firebase-crashlytics-gradle?repo=google
         classpath "com.google.firebase:firebase-crashlytics-gradle:2.9.9"
         // https://mvnrepository.com/artifact/com.google.firebase/perf-plugin
@@ -34,7 +34,7 @@ buildscript {
 
 plugins {
     // https://github.com/google/ksp/releases
-    id "com.google.devtools.ksp" version "$kotlin_version-1.0.13" apply false
+    id "com.google.devtools.ksp" version "$kotlin_version-1.0.15" apply false
 }
 
 allprojects {
@@ -44,6 +44,6 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
