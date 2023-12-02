@@ -16,8 +16,20 @@
 
 <resources>
 
-    <!--Top level DayNight theme to be used in AndroidManifest.xml-->
-    <style name="MyTheme.DayNight" parent="Base.MyTheme" />
+    <!-- Splash screen theme -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background, animated icon, and animation
+        duration. -->
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
+
+        <!-- Use windowSplashScreenAnimatedIcon to add a drawable or an animated
+             drawable. One of these is required. -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+
+        <!-- Set the theme of the Activity that directly follows your splash
+        screen. This is required. -->
+        <item name="postSplashScreenTheme">@style/Base.MyTheme</item>
+    </style>
 
     <!--Base custom theme which will be shared between both light and dark theme variants-->
     <style name="Base.MyTheme" parent="Base.MaterialThemeBuilder">
@@ -86,9 +98,11 @@
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
     </style>
+
     <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/color_secondary</item>
     </style>
+
     <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/color_secondary</item>
     </style>

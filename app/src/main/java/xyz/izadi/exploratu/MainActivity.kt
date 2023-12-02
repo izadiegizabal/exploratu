@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
 import xyz.izadi.exploratu.currencies.CurrenciesViewModel
 import xyz.izadi.exploratu.currencies.CurrencyFragment
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private val vm by viewModels<CurrenciesViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         requestGDPRMessage()
 
