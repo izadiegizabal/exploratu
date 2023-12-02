@@ -19,6 +19,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestGDPRMessage()
+
         ActivityMainBinding.inflate(layoutInflater).apply {
             setSupportActionBar(bottomAppBar)
 

@@ -89,6 +89,8 @@ dependencies {
     implementation 'com.google.mlkit:text-recognition:16.0.0'
     // https://mvnrepository.com/artifact/com.google.android.gms/play-services-ads?repo=google
     implementation 'com.google.android.gms:play-services-ads:22.5.0'
+    // https://mvnrepository.com/artifact/com.google.android.ump/user-messaging-platform
+    implementation "com.google.android.ump:user-messaging-platform:2.1.0"
     // https://firebase.google.com/support/release-notes/android
     implementation platform('com.google.firebase:firebase-bom:32.6.0')
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
