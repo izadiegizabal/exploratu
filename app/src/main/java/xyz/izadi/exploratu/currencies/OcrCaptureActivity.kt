@@ -113,8 +113,6 @@ class OcrCaptureActivity :
             setUpNetworkChangeListener()
             setUpToolTips()
 
-            showWarnModalIfRequired()
-
             vm.rates.onEach {
                 currencyRates = it
                 makeConversions()
@@ -127,41 +125,6 @@ class OcrCaptureActivity :
         }
 
         setContentView(binding.root)
-    }
-
-
-    private fun showWarnModalIfRequired() {
-        val hideArWarnModalPrefKey = "hideARWarnModal"
-
-        if (!sharedPref.contains(hideArWarnModalPrefKey)) {
-            with(sharedPref.edit()) {
-                putBoolean(hideArWarnModalPrefKey, false)
-                apply()
-            }
-        } else {
-            if (sharedPref.getBoolean(hideArWarnModalPrefKey, false)) {
-                // if pref is hide modal --> return
-                return
-            }
-        }
-
-        val actionButtonListener = DialogInterface.OnClickListener { _, which ->
-            when (which) {
-                (DialogInterface.BUTTON_POSITIVE) -> {
-                    with(sharedPref.edit()) {
-                        putBoolean(hideArWarnModalPrefKey, true)
-                        apply()
-                    }
-                }
-            }
-        }
-
-        MaterialAlertDialogBuilder(this@OcrCaptureActivity)
-            .setTitle(getString(R.string.ar_warning_title))
-            .setMessage(getString(R.string.ar_warning_message))
-            .setPositiveButton(getString(R.string.ar_warning_hide_next_time), actionButtonListener)
-            .setNegativeButton(getString(R.string.ar_warning_dismiss), actionButtonListener)
-            .show()
     }
 
     private fun OcrCaptureBinding.setUpToolTips() {
