@@ -15,7 +15,8 @@ import xyz.izadi.exploratu.currencies.data.api.ExchangeRatesAPI
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.di.ApplicationScope
 import xyz.izadi.exploratu.di.IoDispatcher
-import java.util.*
+import java.util.Currency
+import java.util.Locale
 import javax.inject.Inject
 
 class RatesRepository @Inject constructor(

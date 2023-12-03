@@ -61,6 +61,9 @@
     <style name="ModeHeader" parent="@style/TextAppearance.MyTheme.Headline3">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:typeface">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="android:fontFamily">monospace</item>
         <item name="android:paddingTop">16dp</item>
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">16dp</item>

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import xyz.izadi.exploratu.currencies.data.models.Currencies
+import xyz.izadi.exploratu.currencies.others.getParcelableCompat
 import xyz.izadi.exploratu.currencies.ui.rv.CurrenciesAdapter
 import xyz.izadi.exploratu.currencies.ui.rv.ordered
 import xyz.izadi.exploratu.databinding.FragmentCurrenciesListDialogBinding
@@ -53,7 +54,7 @@ class CurrenciesListDialogFragment : BottomSheetDialogFragment(), CurrenciesAdap
 
         mAdapter = CurrenciesAdapter(
             context = context ?: return,
-            currencies = requireArguments().getParcelable(ARG_CURRENCIES) ?: return,
+            currencies = requireArguments().getParcelableCompat(ARG_CURRENCIES) ?: return,
             listener = this
         )
 

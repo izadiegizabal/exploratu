@@ -3,7 +3,6 @@ package xyz.izadi.exploratu.currencies
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -21,14 +20,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
-import androidx.camera.core.*
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
+import androidx.camera.core.TorchState
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.liveData
 import coil.load
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
@@ -113,8 +115,6 @@ class OcrCaptureActivity :
             setUpNetworkChangeListener()
             setUpToolTips()
 
-            showWarnModalIfRequired()
-
             vm.rates.onEach {
                 currencyRates = it
                 makeConversions()
@@ -127,41 +127,6 @@ class OcrCaptureActivity :
         }
 
         setContentView(binding.root)
-    }
-
-
-    private fun showWarnModalIfRequired() {
-        val hideArWarnModalPrefKey = "hideARWarnModal"
-
-        if (!sharedPref.contains(hideArWarnModalPrefKey)) {
-            with(sharedPref.edit()) {
-                putBoolean(hideArWarnModalPrefKey, false)
-                apply()
-            }
-        } else {
-            if (sharedPref.getBoolean(hideArWarnModalPrefKey, false)) {
-                // if pref is hide modal --> return
-                return
-            }
-        }
-
-        val actionButtonListener = DialogInterface.OnClickListener { _, which ->
-            when (which) {
-                (DialogInterface.BUTTON_POSITIVE) -> {
-                    with(sharedPref.edit()) {
-                        putBoolean(hideArWarnModalPrefKey, true)
-                        apply()
-                    }
-                }
-            }
-        }
-
-        MaterialAlertDialogBuilder(this@OcrCaptureActivity)
-            .setTitle(getString(R.string.ar_warning_title))
-            .setMessage(getString(R.string.ar_warning_message))
-            .setPositiveButton(getString(R.string.ar_warning_hide_next_time), actionButtonListener)
-            .setNegativeButton(getString(R.string.ar_warning_dismiss), actionButtonListener)
-            .show()
     }
 
     private fun OcrCaptureBinding.setUpToolTips() {
@@ -241,6 +206,7 @@ class OcrCaptureActivity :
                     apply()
                 }
             }
+
             1 -> {
                 ivCurrencyToFlag.loadFlag(curr)
                 tvCurrencyToCode.text = code
