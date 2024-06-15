@@ -3,9 +3,9 @@
 buildscript {
     ext {
         // https://github.com/JetBrains/kotlin/releases
-        kotlin_version = '1.9.21'
+        kotlin_version = '2.0.0'
         // https://github.com/google/dagger/releases
-        hilt_version = "2.49"
+        hilt_version = "2.51.1"
     }
     repositories {
         google()
@@ -14,13 +14,13 @@ buildscript {
 
     dependencies {
         // https://developer.android.com/reference/tools/gradle-api
-        classpath "com.android.tools.build:gradle:8.2.0"
+        classpath "com.android.tools.build:gradle:8.5.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // https://developers.google.com/android/guides/google-services-plugin
-        classpath "com.google.gms:google-services:4.4.0"
+        classpath "com.google.gms:google-services:4.4.2"
         // https://mvnrepository.com/artifact/com.google.firebase/firebase-crashlytics-gradle?repo=google
-        classpath "com.google.firebase:firebase-crashlytics-gradle:2.9.9"
+        classpath "com.google.firebase:firebase-crashlytics-gradle:3.0.1"
         // https://mvnrepository.com/artifact/com.google.firebase/perf-plugin
         classpath "com.google.firebase:perf-plugin:1.4.2"
 
@@ -34,7 +34,7 @@ buildscript {
 
 plugins {
     // https://github.com/google/ksp/releases
-    id "com.google.devtools.ksp" version "$kotlin_version-1.0.15" apply false
+    id "com.google.devtools.ksp" version "$kotlin_version-1.0.22" apply false
 }
 
 allprojects {

@@ -10,6 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -23,7 +26,7 @@ import xyz.izadi.exploratu.currencies.others.Utils
 import xyz.izadi.exploratu.currencies.others.Utils.updateCurrencyViews
 import xyz.izadi.exploratu.currencies.ui.rv.CurrenciesAdapter
 import xyz.izadi.exploratu.databinding.FragmentCurrencyBinding
-import java.util.*
+import java.util.Date
 
 @AndroidEntryPoint
 class CurrencyFragment : Fragment(), CurrenciesAdapter.Listener {
@@ -55,6 +58,7 @@ class CurrencyFragment : Fragment(), CurrenciesAdapter.Listener {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.apply {
+            setInsetMargins()
             setPreferredCurrencies()
 
             setUpAmountListeners()
@@ -76,6 +80,25 @@ class CurrencyFragment : Fragment(), CurrenciesAdapter.Listener {
         }
 
         setUpNetworkChangeListener()
+    }
+
+    private fun FragmentCurrencyBinding.setInsetMargins() {
+        ViewCompat.setOnApplyWindowInsetsListener(this.root) { _, windowInsets ->
+            val statusBarInsets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+            val systemBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            currencyHeader.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = statusBarInsets.top
+            }
+
+            actionBarPad.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = systemBarsInsets.bottom
+            }
+
+            // Return CONSUMED if you don't want want the window insets to keep passing
+            // down to descendant views.
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     override fun onDestroyView() {
@@ -123,12 +146,14 @@ class CurrencyFragment : Fragment(), CurrenciesAdapter.Listener {
                 codeTv = tvCurrency1Code,
                 descTv = tvCurrency1Desc
             )
+
             1 -> context?.updateCurrencyViews(
                 currency = curr,
                 flagIv = ivCurrency2Flag,
                 codeTv = tvCurrency2Code,
                 descTv = tvCurrency2Desc
             )
+
             2 -> context?.updateCurrencyViews(
                 currency = curr,
                 flagIv = ivCurrency3Flag,
@@ -328,9 +353,11 @@ class CurrencyFragment : Fragment(), CurrenciesAdapter.Listener {
             0 -> {
                 tvCurrency1Quantity.text = activeCurrencyAmount
             }
+
             1 -> {
                 tvCurrency2Quantity.text = activeCurrencyAmount
             }
+
             2 -> {
                 tvCurrency3Quantity.text = activeCurrencyAmount
             }
@@ -372,9 +399,11 @@ class CurrencyFragment : Fragment(), CurrenciesAdapter.Listener {
                 0 -> {
                     tvCurrency1Quantity.text = activeCurrencyAmount
                 }
+
                 1 -> {
                     tvCurrency2Quantity.text = activeCurrencyAmount
                 }
+
                 2 -> {
                     tvCurrency3Quantity.text = activeCurrencyAmount
                 }
@@ -403,12 +432,14 @@ class CurrencyFragment : Fragment(), CurrenciesAdapter.Listener {
                     tvCurrency3Quantity.text =
                         rates?.convert(quantity, from, activeCurCodes[2])
                 }
+
                 1 -> {
                     tvCurrency1Quantity.text =
                         rates?.convert(quantity, from, activeCurCodes[0])
                     tvCurrency3Quantity.text =
                         rates?.convert(quantity, from, activeCurCodes[2])
                 }
+
                 2 -> {
                     tvCurrency1Quantity.text =
                         rates?.convert(quantity, from, activeCurCodes[0])

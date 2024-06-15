@@ -1,49 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/cl_bs_currency_selector"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/bg_rounded_dialog"
-        app:layout_behavior="@string/bottom_sheet_behavior">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_bs_currency_selector"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_rounded_dialog"
+    app:layout_behavior="@string/bottom_sheet_behavior">
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <TextView
-                android:id="@+id/textView3"
-                style="@style/ModeHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:text="@string/select_currency"
-                android:textSize="24sp" />
+            android:id="@+id/textView3"
+            style="@style/ModeHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:text="@string/select_currency"
+            android:textSize="24sp" />
 
         <androidx.appcompat.widget.SearchView
-                android:id="@+id/sv_currencies"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/bg_flag_placeholder"
-                app:iconifiedByDefault="false"
-                app:queryBackground="@android:color/transparent"
-                app:queryHint="@string/currency_query_hint" />
+            android:id="@+id/sv_currencies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_flag_placeholder"
+            app:iconifiedByDefault="false"
+            app:queryBackground="@android:color/transparent"
+            app:queryHint="@string/currency_query_hint" />
 
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_currency_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:minHeight="5000dp"
-                android:paddingTop="@dimen/list_item_spacing_half"
-                android:paddingBottom="@dimen/list_item_spacing_half"
-                tools:context=".currencies.CurrenciesListDialogFragment"
-                tools:listitem="@layout/fragment_currencies_list_dialog_item" />
+            android:id="@+id/rv_currency_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:minHeight="5000dp"
+            android:paddingTop="@dimen/list_item_spacing"
+            android:paddingBottom="@dimen/list_item_spacing"
+            tools:context=".currencies.CurrenciesListDialogFragment"
+            tools:listitem="@layout/fragment_currencies_list_dialog_item" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
