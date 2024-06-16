@@ -5,16 +5,19 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.RoomWarnings
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import xyz.izadi.exploratu.currencies.others.Utils
-import java.util.*
+import java.util.Date
 
 @Suppress(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
+@Serializable
 @Entity
 data class Rates(
-    @[PrimaryKey SerializedName("date")]
+    @Serializable(with = DateSerializer::class)
+    @[PrimaryKey SerialName("date")]
     val date: Date?,
-    @[Embedded SerializedName("eur")]
+    @[Embedded SerialName("eur")]
     val rates: Exchanges?
 ) {
     fun convert(quantity: Float, from: String, to: String): String = rates?.let {

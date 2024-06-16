@@ -35,6 +35,7 @@ buildscript {
 plugins {
     // https://github.com/google/ksp/releases
     id "com.google.devtools.ksp" version "$kotlin_version-1.0.22" apply false
+    id "org.jetbrains.kotlin.plugin.serialization" version "$kotlin_version" apply false
 }
 
 allprojects {

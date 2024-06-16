@@ -2,7 +2,6 @@ package xyz.izadi.exploratu.currencies.data
 
 import android.content.Context
 import android.telephony.TelephonyManager
-import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +10,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import xyz.izadi.exploratu.currencies.data.api.ExchangeRatesAPI
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.di.ApplicationScope
@@ -26,6 +26,11 @@ class RatesRepository @Inject constructor(
     private val ratesDatabase: RatesDatabase,
     private val ratesAPI: ExchangeRatesAPI
 ) {
+    private val jsonParser = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
+
     fun getCurrencies(): Flow<Currencies?> = channelFlow {
         withContext(ioDispatcher) {
             runCatching {
@@ -34,7 +39,7 @@ class RatesRepository @Inject constructor(
                     .bufferedReader()
                     .use { it.readText() }
                     .run {
-                        Gson().fromJson(this, Currencies::class.java)
+                        jsonParser.decodeFromString<Currencies>(this)
                     }
             }.getOrNull()?.let {
                 send(it)

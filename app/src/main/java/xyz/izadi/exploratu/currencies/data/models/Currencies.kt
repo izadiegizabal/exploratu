@@ -1,17 +1,20 @@
 package xyz.izadi.exploratu.currencies.data.models
 
 import android.os.Parcelable
-import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
-import java.util.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import java.util.Date
 
 @Parcelize
+@Serializable
 data class Currencies(
-    @SerializedName("version")
+    @SerialName("version")
     val version: Float,
-    @SerializedName("versionDate")
+    @Serializable(with = DateSerializer::class)
+    @SerialName("versionDate")
     val versionDate: Date,
-    @SerializedName("currencies")
+    @SerialName("currencies")
     val currencies: List<Currency>
 ) : Parcelable {
     fun getCurrency(currencyCodeToSearch: String): Currency? = currencies.find {

@@ -1,19 +1,21 @@
 package xyz.izadi.exploratu.currencies.data.models
 
 import android.os.Parcelable
-import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Parcelize
+@Serializable
 data class Currency(
-    @SerializedName("name")
+    @SerialName("name")
     val name: String,
-    @SerializedName("code")
+    @SerialName("code")
     val code: String,
-    @SerializedName("sign")
+    @SerialName("sign")
     val sign: String,
-    @SerializedName("defaultValue")
+    @SerialName("defaultValue")
     val defaultValue: Float,
-    @SerializedName("countries")
+    @SerialName("countries")
     val countries: List<String>
 ) : Parcelable

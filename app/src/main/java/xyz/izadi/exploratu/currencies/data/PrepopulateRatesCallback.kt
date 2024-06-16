@@ -3,12 +3,12 @@ package xyz.izadi.exploratu.currencies.data
 import android.content.Context
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.google.gson.Gson
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import xyz.izadi.exploratu.currencies.data.models.Currencies
 import xyz.izadi.exploratu.currencies.data.models.toRates
 import xyz.izadi.exploratu.di.ApplicationScope
@@ -30,7 +30,7 @@ class PrepopulateRatesCallback @Inject constructor(
                     .bufferedReader().use {
                         it.readText()
                     }
-                Gson().fromJson(jsonString, Currencies::class.java).toRates()
+                Json.decodeFromString<Currencies>(jsonString).toRates()
             }.getOrNull()?.let {
                 ratesDao.get().insertRates(it)
             }

@@ -1,5 +1,30 @@
 package xyz.izadi.exploratu.currencies.data.models
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toJavaInstant
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import java.util.Date
+
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(forClass = Date::class)
+class DateSerializer : KSerializer<Date> {
+    override fun serialize(encoder: Encoder, value: Date) {
+        encoder.encodeString(value.toInstant().toString())
+    }
+
+    override fun deserialize(decoder: Decoder): Date {
+        val dateString = decoder.decodeString()
+        val localDate = LocalDate.parse(dateString, LocalDate.Formats.ISO)
+        return Date.from(localDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toJavaInstant())
+    }
+}
+
 fun Currencies.toRates() = Rates(
     date = versionDate,
     rates = this.currencies.toList().toExchange()
