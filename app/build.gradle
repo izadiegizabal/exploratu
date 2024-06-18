@@ -27,6 +27,7 @@ android {
         }
 
         buildConfigField("String", "ADS_INTERSTITIAL", getProperty("exploratu.ads.interstitial"))
+        buildConfigField("String", "ADS_UNITYGAMEID", getProperty("exploratu.ads.unityGameId"))
     }
     buildTypes {
         release {
@@ -77,8 +78,8 @@ dependencies {
 
     // https://developers.google.com/ml-kit/vision/text-recognition/v2/android
     implementation 'com.google.mlkit:text-recognition:16.0.0'
-    // https://mvnrepository.com/artifact/com.google.android.gms/play-services-ads?repo=google
-    implementation 'com.google.android.gms:play-services-ads:23.1.0'
+    // https://mvnrepository.com/artifact/com.unity3d.ads/unity-ads
+    implementation 'com.unity3d.ads:unity-ads:4.12.0'
     // https://mvnrepository.com/artifact/com.google.android.ump/user-messaging-platform
     implementation "com.google.android.ump:user-messaging-platform:2.2.0"
     // https://firebase.google.com/support/release-notes/android
