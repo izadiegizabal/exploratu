@@ -34,14 +34,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             fab.setOnClickListener {
-                vm.showAd(this@MainActivity) {
-                    if (isTaskRoot) {
-                        Intent(this@MainActivity, OcrCaptureActivity::class.java).also {
-                            startActivity(it)
-                        }
-                    } else {
-                        finish()
+                if (isTaskRoot) {
+                    Intent(this@MainActivity, OcrCaptureActivity::class.java).also {
+                        startActivity(it)
                     }
+                } else {
+                    finish()
                 }
             }
         }.also {
@@ -64,8 +62,4 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onResume() {
-        super.onResume()
-        vm.loadAd()
-    }
 }

@@ -278,14 +278,12 @@ class OcrCaptureActivity :
     }
 
     private fun goToListView() {
-        vm.showAd(this) {
-            if (isTaskRoot) {
-                Intent(this, MainActivity::class.java).also {
-                    startActivity(it)
-                }
-            } else {
-                finish()
+        if (isTaskRoot) {
+            Intent(this, MainActivity::class.java).also {
+                startActivity(it)
             }
+        } else {
+            finish()
         }
     }
 
@@ -381,7 +379,6 @@ class OcrCaptureActivity :
 
         vm.apply {
             syncRates()
-            loadAd()
         }
 
         // Make sure that all permissions are still present, since the
